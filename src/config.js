@@ -15,13 +15,13 @@ const themecolor = {
     colorRedBg: "#fff0f0",
     colorLightBlue: "#ecf3ff",
     colorSuccess: "#55c27f",
-    colorPrimary: "#1e3a31", // Changed to dark green to match the theme
+    colorPrimary: "#468e39", //TODO: for Blue Theam #000887 Light Green #5EA43B
     //text
     textMute: "#878a99",
-    sidebarText: "#ffffff", // Changed to white for better contrast on dark sidebar
+    sidebarText: "#333232",
     textInfo: "#4ab0c1",
     textDark: "#000",
-    textLight: "#fff",
+    textLight: "#000",
     contactBg: "#d9e8ff",
     textBlue: "#438eff",
     borderGray: " #ebebeb",
@@ -86,14 +86,14 @@ const themecolor = {
       headerBgColor: "#fff",
       verticalSidebarWidth: 260,
       groupTitleColor: "#919da9",
-      itemBg: "#1e3a31", // Changed to dark green for sidebar
-      itemColor: "#ffffff", // Changed to white for better contrast
-      itemActiveBg: "#2a4c40", // Slightly lighter green for active item
-      itemHoverBg: "#2a4c40", // Slightly lighter green for hover
-      itemHoverColor: "#ffffff",
-      subMenuItemBg: "#1e3a31", // Changed to match sidebar
-      itemSelectedBg: "#2a4c40", // Slightly lighter green for selected item
-      menuBorderColor: "#2a4c40", // Changed to match theme
+      itemBg: "#fff",
+      itemColor: "#919da9",
+      itemActiveBg: "#f0f8ff",
+      itemHoverBg: "#f0f8ff",
+      itemHoverColor: "#438eff",
+      subMenuItemBg: "#ffffff",
+      itemSelectedBg: "#f0f8ff",
+      menuBorderColor: "#eff2f7",
     },
     Typography: {
       titleMarginBottom: "1rem",
@@ -361,11 +361,11 @@ const darkthemecolors = {
     colorGreenBg: "#99cc99",
     colorLightBlue: "#232e43",
     colorSuccess: "#55c27f",
-    colorPrimary: "#1e3a31", // Changed to dark green to match the theme
+    colorPrimary: "#468e39", //TODO: for Blue Theam #000887 Light Green #5EA43B
 
     //text
     textMute: "#a6b5d2",
-    sidebarText: "#ffffff", // Changed to white for better contrast
+    sidebarText: "#a6b5d2",
     textInfo: "#fff",
     textDark: "#4ab0c1",
     textLight: "#fff",
@@ -410,13 +410,13 @@ const darkthemecolors = {
     },
     Menu: {
       groupTitleColor: "#859cba",
-      itemBg: "#1e3a31", // Changed to dark green for sidebar
-      itemColor: "#ffffff", // Changed to white for better contrast
-      itemActiveBg: "#2a4c40", // Slightly lighter green for active item
-      itemHoverBg: "#2a4c40", // Slightly lighter green for hover
-      itemHoverColor: "#ffffff",
-      subMenuItemBg: "#1e3a31", // Changed to match sidebar
-      itemSelectedBg: "#2a4c40", // Slightly lighter green for selected item
+      itemBg: "#152234",
+      itemColor: "#849ec1",
+      itemActiveBg: "#0b70ff1a",
+      itemHoverBg: "#0b70ff1a",
+      itemHoverColor: "#438eff",
+      subMenuItemBg: "#152234",
+      itemSelectedBg: "#0b70ff1a",
       menuBorderColor: "#293b55",
     },
     Breadcrumb: {
@@ -523,7 +523,7 @@ const customStyle = {
     colorSuccess: "#55c27f",
     colorGreenBg: "#99cc99",
     colorSuccessBg: "#ecfff3",
-    colorPrimary: "#1e3a31", // Changed to dark green to match the theme
+    colorPrimary: "#468e39", //TODO: for Blue Theam #000887 Light Green #5EA43B
     colorPrimaryBg: "rgba(67, 142, 255, 0.10)",
     colorInfo: "#4ab0c1",
     colorInfoBg: "#dbeff3",
@@ -533,11 +533,11 @@ const customStyle = {
     colorWarning: "#f1be46",
     colorWarningBg: "#fffbe6",
     colorTextCode: "#f7649f",
-    colorLink: "#1e3a31", // Changed to dark green to match the theme
-    colorLinkActive: "#2a4c40", // Slightly lighter green for active state
+    colorLink: "#438e00", // Privious : #438eff
+    colorLinkActive: "#68a400", // Privious : #68a4ff
     colorDark: "#000000",
     colorDarkBg: "#e9ebec",
-    colorLinkHover: "#2a4c40", // Slightly lighter green for hover state
+    colorLinkHover: "#68a400", // Privious : #68a4ff
     controlItemBgHover: "rgba(0, 0, 0, 0.04)",
     bglight: "#000",
     colorSecondary: "#000887",

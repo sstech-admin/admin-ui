@@ -5,7 +5,7 @@ import BrandLogo from "../assets/images/ainfinitylogo.png";
 import { Link } from "react-router-dom";
 import { styled } from "styled-components";
 import { themecolor } from "../config.js";
-import { FileOutput, LogOut, LogOutIcon, Bell, Search, User } from "lucide-react";
+import { FileOutput, LogOut, LogOutIcon } from "lucide-react";
 
 import feviconDharma from "../assets/images/feviconDharma.png";
 import usecustomStyles from "../Common/customStyles";
@@ -67,33 +67,6 @@ const StyleFlagDropdown = styled.div`
           color: ${customStyles.colorPrimary};
         }
       }
-    }
-  }
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-right: auto;
-  
-  .search-icon {
-    position: absolute;
-    left: 10px;
-    color: #aaa;
-  }
-  
-  input {
-    padding: 8px 8px 8px 36px;
-    border-radius: 20px;
-    border: 1px solid #e4e4e4;
-    width: 250px;
-    background-color: #f5f5f5;
-    
-    &:focus {
-      outline: none;
-      border-color: #1e3a31;
-      background-color: #fff;
     }
   }
 `;
@@ -214,29 +187,30 @@ const HeaderLayout = ({ darkMode, handleToggleMode }) => {
             </Col>
           )}
 
-          <Col span={12} lg={16}>
-            <SearchContainer>
-              <Search className="search-icon" size={16} />
-              <input type="text" placeholder="Search..." />
-            </SearchContainer>
-          </Col>
-
           <Col span={6} lg={8} className="ant-ml-auto">
             <HeaderContainer className="ant-topbar-head list-unstyled">
-              <li>
-                <Badge count={3} size="small">
-                  <Bell size={20} style={{ cursor: 'pointer' }} />
-                </Badge>
-              </li>
-              <li>
-                <Badge dot offset={[-3, 5]}>
-                  <User size={20} style={{ cursor: 'pointer' }} />
-                </Badge>
-              </li>
+              {/* <li>
+                <Link>
+                  <NotificationDropdown />
+                </Link>
+              </li> */}
+              {/* <li>
+                <div
+                  onClick={handleToggleMode}
+                  style={{
+                    marginTop: "26px",
+                    display: "flex",
+                    marginRight: customStyles.marginXS,
+                    cursor: "pointer",
+                  }}
+                >
+                  {darkMode === "dark" ? <Moon size={22} /> : <Sun size={22} />}
+                </div>
+              </li> */}
               <li>
                 <Popover
                   placement="bottomRight"
-                  content={profileContentPopover}
+                  // content={profileContentPopover}
                   trigger={["click"]}
                 >
                   <Badge offset={[-3, 5]}>
