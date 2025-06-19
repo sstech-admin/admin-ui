@@ -102,62 +102,6 @@ const AccountDetails = () => {
     fetchTableData();
   }, []);
 
-  // const DeleteOrUpdateTransactionData = async (Data) => {
-  //   try {
-  //     setLoading(true);
-  //     const transactionObject = {
-  //       transactionId: Data?.transactionId,
-  //       accountId: Data?.accountId,
-  //       transactionModeId: Data?.transactionModeId,
-  //       investorId: Data?.investorId,
-  //       amount: Data?.amount,
-  //       dateTime: Data?.dateTime,
-  //     };
-  //     const response = await updateTransaction({
-  //       ...transactionObject,
-  //       deletedOnly: true,
-  //     });
-  //     const statusData = await response.status;
-  //     if (statusData === "success") {
-  //       fetchData();
-  //       fetchTableData();
-  //     }
-  //     await messageApiType.open({
-  //       type: "success",
-  //       content: statusData,
-  //     });
-  //   } catch (error) {
-  //     messageApiType.open({
-  //       type: "error",
-  //       content: error,
-  //     });
-  //   }
-  //   setLoading(false);
-  // };
-  // const showDeleteConfirm = (Value) => {
-  //   confirm({
-  //     title: `Are you sure delete this transaction Id ${Value.transactionId}?`,
-  //     content: "Press Yes for Permenat Delete",
-  //     okText: "Yes",
-  //     okType: "danger",
-  //     cancelText: "No",
-  //     cancleType: "danger",
-  //     autoFocusButton() {
-  //       console.log("autoFocusButton");
-  //     },
-  //     centered: true,
-  //     onOk() {
-  //       console.log("OK");
-  //       DeleteOrUpdateTransactionData(Value);
-  //     },
-  //     onCancel() {
-  //       console.log("Cancel");
-  //     },
-  //     okButtonProps: true,
-  //     confirmLoading: true,
-  //   });
-  // };
-
   const columns = [
     {
       title: "Investor",
