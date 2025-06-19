@@ -8,16 +8,10 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
-  Database,
-  BarChart3,
   Users,
   UserCircle,
-  Wallet,
   ArrowRightLeft,
-  FileText,
   Building,
-  CreditCard,
-  Clock,
   FileSpreadsheet,
 } from "lucide-react";
 import { themecolor } from "../config.js";

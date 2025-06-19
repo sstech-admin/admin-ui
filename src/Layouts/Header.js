@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Badge, Button, Col, Dropdown, Row, Space, Typography } from "antd";
+import { Avatar, Badge, Button, Col, Dropdown, Row, Space } from "antd";
 import { Header } from "antd/es/layout/layout";
 import BrandLogo from "../assets/images/ainfinitylogo.png";
 import { Link } from "react-router-dom";
@@ -8,11 +8,7 @@ import { themecolor } from "../config.js";
 import { Bell, LogOut, Moon, Search, Settings, Sun, User } from "lucide-react";
 
 import feviconDharma from "../assets/images/feviconDharma.png";
-import usecustomStyles from "../Common/customStyles";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
-
-const customStyles = usecustomStyles();
-const { Text } = Typography;
 
 const StyleHeader = styled(Header)`
   padding-inline: 24px;

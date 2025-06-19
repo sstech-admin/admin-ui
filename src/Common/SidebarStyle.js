@@ -29,7 +29,7 @@ const StyledCollapsedButton = styled(Button)`
       ${({ theme }) =>
       theme.direction !== 'rtl' &&
       css`
-        right: -14px;~
+        right: -14px;
       `}
     `;
 
