@@ -14,6 +14,10 @@ import {
   HistoryIcon,
   User2Icon,
   UserCircle2,
+  BarChart2,
+  DollarSign,
+  TrendingUp,
+  PieChart
 } from "lucide-react";
 import { themecolor } from "../config.js";
 import {
