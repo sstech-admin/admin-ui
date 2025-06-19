@@ -29,7 +29,6 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.298.0",
     "moment": "^2.29.4",
-    "node-sass": "^9.0.0",
     "polished": "^4.2.2",
     "rc-banner-anim": "^2.4.5",
     "rc-queue-anim": "^2.0.0",

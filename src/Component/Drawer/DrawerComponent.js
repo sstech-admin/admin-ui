@@ -1,5 +1,5 @@
 import React, { useState, forwardRef, useImperativeHandle } from "react";
-import { Drawer, Form, Input, Button, Upload, notification } from "antd";
+import { Drawer, Form, Upload, notification } from "antd";
 
 const DrawerComponent = forwardRef(({ title, children, trigger }, ref) => {
   const [open, setOpen] = useState(false);
