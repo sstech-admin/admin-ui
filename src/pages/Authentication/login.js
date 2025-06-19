@@ -181,6 +181,7 @@ const Signin = (props) => {
           >
             <Form.Item 
               label={<Text strong>Email</Text>}
+              }
               validateStatus={validation.touched.email && validation.errors.email ? "error" : ""}
               help={validation.touched.email && validation.errors.email ? validation.errors.email : ""}
             >
@@ -197,6 +198,7 @@ const Signin = (props) => {
 
             <Form.Item 
               label={<Text strong>Password</Text>}
+              }
               validateStatus={validation.touched.password && validation.errors.password ? "error" : ""}
               help={validation.touched.password && validation.errors.password ? validation.errors.password : ""}
             >
