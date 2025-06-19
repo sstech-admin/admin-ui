@@ -223,6 +223,7 @@ const Dashboard = () => {
               <div style={{ height: '200px', background: 'rgba(0, 0, 0, 0.03)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Typography.Text type="secondary">Dividend Chart Placeholder</Typography.Text>
               </div>
+            }
             </Card>
           </Col>
         </Row>
