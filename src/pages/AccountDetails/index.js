@@ -102,10 +102,6 @@ const AccountDetails = () => {
     fetchTableData();
   }, []);
 
-  const onChange = (pageNumber) => {
-    console.log("onChange Page: ", pageNumber);
-  };
-
   // const DeleteOrUpdateTransactionData = async (Data) => {
   //   try {
   //     setLoading(true);
@@ -353,7 +349,6 @@ const AccountDetails = () => {
                   <Table
                     columns={columns}
                     dataSource={tableData}
-                    // onChange={onChange}
                     responsive={true}
                     pagination={{
                       defaultPageSize: pagination?.defaultPageSize,

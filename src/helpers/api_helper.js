@@ -63,21 +63,18 @@ axios.interceptors.response.use(
   },
   async function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
-    let message;
     const originalRequest = error.config;
     switch (error.status) {
       case 500:
-        message = "Internal Server Error";
         break;
       case 401:
         const newAccessToken = await refreshToken();
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return axios(originalRequest);
       case 404:
-        message = "Sorry! the data you are looking for could not be found";
         break;
       default:
-        message = error.message || error;
+        break;
     }
     // if (error.status !== 200) {
     //   storeData.dispatch(logoutUser());

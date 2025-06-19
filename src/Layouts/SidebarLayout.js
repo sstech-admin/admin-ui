@@ -194,10 +194,6 @@ const SidebarLayout = ({ theme }) => {
 
   const location = useLocation();
   const selectedKey = location.pathname.split("/")[1] || "dashboard";
-  const [activatedItem, setActivatedItem] = useState(() => {
-    const currentPath = location.pathname.replace("/", "");
-    return currentPath || "dashboard";
-  });
   const [openKeys, setOpenKeys] = useState([]);
 
   useEffect(() => {
@@ -211,13 +207,7 @@ const SidebarLayout = ({ theme }) => {
         setOpenKeys([keyToOpen.key]);
       }
     }
-  }, [location.pathname]);
-
-  const toggleActivation = (key) => {
-    setActivatedItem((prevActivatedItem) =>
-      prevActivatedItem === key ? null : key
-    );
-  };
+  }, [location.pathname, items]);
 
   const handleToggleButton = () => {
     const sidebarLayout1 = document.getElementById("sidebar-layout");
