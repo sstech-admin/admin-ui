@@ -7,13 +7,18 @@ import { Menu, Button } from "antd";
 import {
   ChevronLeft,
   ChevronRight,
-  Combine,
+  LayoutDashboard,
   Database,
-  GanttChartSquareIcon,
-  Gauge,
-  HistoryIcon,
-  User2Icon,
-  UserCircle2,
+  BarChart3,
+  Users,
+  UserCircle,
+  Wallet,
+  ArrowRightLeft,
+  FileText,
+  Building,
+  CreditCard,
+  Clock,
+  FileSpreadsheet,
 } from "lucide-react";
 import { themecolor } from "../config.js";
 import {
@@ -56,16 +61,16 @@ const SidebarLayout = ({ theme }) => {
             Dashboard
           </Link>,
           "dashboard",
-          <Gauge size={16} />
+          <LayoutDashboard size={18} />
         ),
         getItem(
           <Link onClick={onPageClick} to="/users">
-            User
+            Users
           </Link>,
           "users",
-          <User2Icon size={16} />
+          <Users size={18} />
         ),
-        getItem("Investor", "Investor", <UserCircle2 size={16} />, [
+        getItem("Investor", "Investor", <UserCircle size={18} />, [
           getItem(
             <Link onClick={onPageClick} to="/investors">
               Investors
@@ -91,7 +96,7 @@ const SidebarLayout = ({ theme }) => {
             "reference-investors"
           ),
         ]),
-        getItem("Transaction", "Transaction", <Combine size={16} />, [
+        getItem("Transaction", "Transaction", <ArrowRightLeft size={18} />, [
           getItem(
             <Link onClick={onPageClick} to="/profit-loss">
               Profit & Loss
@@ -141,7 +146,7 @@ const SidebarLayout = ({ theme }) => {
             "all-withdraws"
           ),
         ]),
-        getItem("Account", "Account", <Database size={16} />, [
+        getItem("Account", "Account", <Building size={18} />, [
           getItem(
             <Link onClick={onPageClick} to="/all-account">
               All Account
@@ -154,7 +159,7 @@ const SidebarLayout = ({ theme }) => {
             Tally Export
           </Link>,
           "Tally Export",
-          <GanttChartSquareIcon size={16} />
+          <FileSpreadsheet size={18} />
         ),
       ],
       "group"
@@ -162,12 +167,10 @@ const SidebarLayout = ({ theme }) => {
   ];
 
   const [collapsed, setCollapsed] = useState(false);
-  // const [isClick, setIsClick] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    // setIsClick(true);
-    updateWindowDimensions(); // Initialize windowWidth state
+    updateWindowDimensions();
     window.addEventListener("resize", updateWindowDimensions);
 
     return () => {
@@ -203,18 +206,18 @@ const SidebarLayout = ({ theme }) => {
   });
   const [openKeys, setOpenKeys] = useState([]);
 
-useEffect(() => {
-  // auto-expand based on path
-  const pathSegments = location.pathname.split("/");
-  if (pathSegments.length > 1) {
-    const keyToOpen = items[0].children.find(group =>
-      group.children?.some(child => location.pathname.includes(child.key))
-    );
-    if (keyToOpen) {
-      setOpenKeys([keyToOpen.key]);
+  useEffect(() => {
+    // auto-expand based on path
+    const pathSegments = location.pathname.split("/");
+    if (pathSegments.length > 1) {
+      const keyToOpen = items[0].children.find(group =>
+        group.children?.some(child => location.pathname.includes(child.key))
+      );
+      if (keyToOpen) {
+        setOpenKeys([keyToOpen.key]);
+      }
     }
-  }
-}, [location.pathname]);
+  }, [location.pathname]);
 
   const toggleActivation = (key) => {
     setActivatedItem((prevActivatedItem) =>
@@ -223,9 +226,8 @@ useEffect(() => {
   };
 
   const handleToggleButton = () => {
-    // setIsClick((prevIsClick) => !prevIsClick); // Use the previous stateSD
     const sidebarLayout1 = document.getElementById("sidebar-layout");
-    sidebarLayout1.style.display = "none"; //isClick ? "none" : "block";
+    sidebarLayout1.style.display = "none";
   };
 
   return (
@@ -241,14 +243,14 @@ useEffect(() => {
           <img
             alt="Brand logo"
             src={theme === "dark" ? BrandlightLogo : BrandLogo}
-            height={25}
+            height={30}
             style={{ lineHeight: "24px" }}
             className="brand-dark-logo ant-mx-auto"
           />
           <img
             alt="Brand sm logo"
             src={BrandSmLogo}
-            height={24}
+            height={30}
             style={{ lineHeight: "24px" }}
             className="brand-sm-logo ant-mx-auto"
           />
@@ -270,15 +272,19 @@ useEffect(() => {
         </StyleBrandLogo>
         <div>
           <StyleSimpleBar>
-          <Menu
-            selectedKeys={[selectedKey]}
-            openKeys={openKeys}
-            onOpenChange={setOpenKeys}
-            mode="inline"
-            theme="light"
-            items={items}
-            collapsedWidth="100"
-          />
+            <Menu
+              selectedKeys={[selectedKey]}
+              openKeys={openKeys}
+              onOpenChange={setOpenKeys}
+              mode="inline"
+              theme="light"
+              items={items}
+              collapsedWidth="100"
+              style={{ 
+                borderRight: 'none',
+                fontWeight: 500
+              }}
+            />
           </StyleSimpleBar>
         </div>
       </StyleSider>

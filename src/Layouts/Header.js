@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Button, Col, Popover, Row, Typography } from "antd";
+import { Avatar, Badge, Button, Col, Dropdown, Row, Space, Typography } from "antd";
 import { Header } from "antd/es/layout/layout";
 import BrandLogo from "../assets/images/ainfinitylogo.png";
 import { Link } from "react-router-dom";
 import { styled } from "styled-components";
 import { themecolor } from "../config.js";
-import { FileOutput, LogOut, LogOutIcon } from "lucide-react";
+import { Bell, LogOut, Moon, Search, Settings, Sun, User } from "lucide-react";
 
 import feviconDharma from "../assets/images/feviconDharma.png";
 import usecustomStyles from "../Common/customStyles";
@@ -30,9 +30,10 @@ const StyleHeader = styled(Header)`
   border-color: ${({ theme }) => theme.token.colorBorder};
   z-index: 999;
   background: ${({ theme }) => theme.token.colorBgContainer};
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  height: 64px;
 
   @media screen and (max-width: 768px) {
-    /* Apply the responsive style without considering RTL or LTR */
     left: 0;
     right: 0;
   }
@@ -42,67 +43,92 @@ const HeaderContainer = styled.ul`
   font-size: 15px;
   padding-inline: 0;
   display: flex;
-  gap: 10px;
+  gap: 16px;
   margin: 0;
   justify-content: end;
+  align-items: center;
 
   .ant-avatar {
     background-color: transparent;
-    transition: all 0.5s ease;
+    transition: all 0.3s ease;
     &:hover {
       background-color: ${({ theme }) => theme.token.colorBorder};
     }
   }
 `;
 
-const StyleFlagDropdown = styled.div`
-  min-width: 145px;
-
-  ul {
-    li {
-      padding: 5px 0;
-      a {
-        transition: all 0.5s ease;
-        &:hover {
-          color: ${customStyles.colorPrimary};
-        }
-      }
+const SearchContainer = styled.div`
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+  
+  .search-input {
+    background-color: ${({ theme }) => theme.token.colorBgContainer};
+    border-radius: 8px;
+    padding-left: 40px;
+    height: 40px;
+    border: 1px solid ${({ theme }) => theme.token.colorBorder};
+    
+    &:hover, &:focus {
+      border-color: ${({ theme }) => theme.token.colorPrimary};
+      box-shadow: none;
     }
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: ${({ theme }) => theme.token.colorTextDescription};
+    z-index: 1;
   }
 `;
 
-const profileContentPopover = (
-  <StyleFlagDropdown>
-    <ul
-      style={{ padding: "6px", listStyleType: "none" }}
-      className="ant-pl-0 ant-mb-0"
-    >
-      <li>
-        <Text type="secondary" style={{ fontSize: "13px" }}>
-          Welcome Admin!
-        </Text>
-      </li>
-
-      <li>
-        <Link to="/logout">
-          <Text type="secondary">
-            {" "}
-            <FileOutput className="ant-mr-1" size={16} />
-          </Text>
-          <Text> Logout</Text>
-        </Link>
-      </li>
-    </ul>
-  </StyleFlagDropdown>
-);
+const profileMenu = [
+  {
+    key: '1',
+    label: (
+      <Link to="/user-profile">
+        <Space>
+          <User size={14} />
+          <span>Profile</span>
+        </Space>
+      </Link>
+    ),
+  },
+  {
+    key: '2',
+    label: (
+      <Link to="/settings">
+        <Space>
+          <Settings size={14} />
+          <span>Settings</span>
+        </Space>
+      </Link>
+    ),
+  },
+  {
+    type: 'divider',
+  },
+  {
+    key: '3',
+    label: (
+      <Link to="/logout">
+        <Space>
+          <LogOut size={14} />
+          <span>Logout</span>
+        </Space>
+      </Link>
+    ),
+  },
+];
 
 const HeaderLayout = ({ darkMode, handleToggleMode }) => {
-  // const [isClick, setIsClick] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    // setIsClick(false);
-    updateWindowDimensions(); // Initialize windowWidth state
+    updateWindowDimensions();
     window.addEventListener("resize", updateWindowDimensions);
 
     return () => {
@@ -115,12 +141,10 @@ const HeaderLayout = ({ darkMode, handleToggleMode }) => {
   };
 
   const handleToggleButton = () => {
-    // setIsClick((prevIsClick) => !prevIsClick); // Use the previous stateSD
     const sidebarLayout = document.getElementById("sidebar-layout");
-    sidebarLayout.style.display = "block"; //isClick ? "none" : "block";
+    sidebarLayout.style.display = "block";
   };
 
-  // Set the visibility of the sidebar based on the isClick state
   useEffect(() => {
     const sidebarLayout = document.getElementById("sidebar-layout");
     const customDesktopMenuunflodIcon = document.getElementById(
@@ -139,40 +163,11 @@ const HeaderLayout = ({ darkMode, handleToggleMode }) => {
       }
     }
   }, [windowWidth]);
-  const [hovered, setHovered] = useState(false);
 
-  const buttonStyle = {
-    backgroundColor: hovered ? '#ff4d4d' : '#f0f0f0',
-    color: hovered ? '#fff' : '#000',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: '50%',
-    padding: '10px',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    position: 'relative',
-    width: '40px',
-    boxShadow: hovered ? '0 2px 5px rgba(0,0,0,0.2)' : '',
-    height: '40px',
-  };
-
-  const textStyle = {
-    position: 'absolute',
-    right: '50px',
-    whiteSpace: 'nowrap',
-    backgroundColor: '#fff',
-    color: '#ff4d4d',
-    padding: '10px',
-    borderRadius: '5px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-    display: hovered ? 'block' : 'none',
-    fontSize: '14px',
-  };
   return (
     <React.Fragment>
       <StyleHeader id="antHeaderMain">
-        <Row align="middle" gutter={[16, 24]}>
+        <Row align="middle" gutter={[16, 24]} style={{ height: '100%' }}>
           {windowWidth < 768 && (
             <Col span={4} lg={1}>
               <img
@@ -181,53 +176,73 @@ const HeaderLayout = ({ darkMode, handleToggleMode }) => {
                 style={{ display: "none" }}
                 alt=""
               />
-              <Button type="primary" onClick={handleToggleButton}>
+              <Button type="text" onClick={handleToggleButton}>
                 <MenuUnfoldOutlined />
               </Button>
             </Col>
           )}
 
-          <Col span={6} lg={8} className="ant-ml-auto">
+          <Col xs={12} sm={12} md={8} lg={8}>
+            <SearchContainer>
+              <Search size={16} className="search-icon" />
+              <input 
+                className="search-input" 
+                placeholder="Search..." 
+                style={{ width: '100%' }}
+              />
+            </SearchContainer>
+          </Col>
+
+          <Col xs={12} sm={12} md={16} lg={16}>
             <HeaderContainer className="ant-topbar-head list-unstyled">
-              {/* <li>
-                <Link>
-                  <NotificationDropdown />
-                </Link>
-              </li> */}
-              {/* <li>
+              <li>
                 <div
                   onClick={handleToggleMode}
                   style={{
-                    marginTop: "26px",
-                    display: "flex",
-                    marginRight: customStyles.marginXS,
                     cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "8px",
+                    backgroundColor: darkMode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.03)"
                   }}
                 >
-                  {darkMode === "dark" ? <Moon size={22} /> : <Sun size={22} />}
+                  {darkMode === "dark" ? <Moon size={18} /> : <Sun size={18} />}
                 </div>
-              </li> */}
+              </li>
               <li>
-                <Popover
-                  placement="bottomRight"
-                  // content={profileContentPopover}
-                  trigger={["click"]}
-                >
-                  <Badge offset={[-3, 5]}>
-                    <Link to="/logout">
-                    <div
-                        style={{ display: 'flex', alignItems: 'center', position: 'relative' }}
-                        onMouseEnter={() => setHovered(true)}
-                        onMouseLeave={() => setHovered(false)}
-                      >
-                        <div style={buttonStyle}>
-                          <LogOut color={hovered ? '#fff' : '#000'} size={20} />
-                        </div>
-                        <span style={textStyle}>Logout</span>
-                      </div>
-                    </Link>
-                  </Badge>
-                </Popover>
+                <Badge count={3} size="small">
+                  <div
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
+                      backgroundColor: "rgba(0, 0, 0, 0.03)"
+                    }}
+                  >
+                    <Bell size={18} />
+                  </div>
+                </Badge>
+              </li>
+              <li>
+                <Dropdown menu={{ items: profileMenu }} placement="bottomRight" trigger={["click"]}>
+                  <div style={{ cursor: "pointer" }}>
+                    <Avatar 
+                      size={40} 
+                      src={feviconDharma}
+                      style={{ 
+                        backgroundColor: "#f0f9ff",
+                        border: "2px solid #e2e8f0"
+                      }}
+                    />
+                  </div>
+                </Dropdown>
               </li>
             </HeaderContainer>
           </Col>

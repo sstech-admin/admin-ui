@@ -1,57 +1,57 @@
 const themecolor = {
   direction: "ltr",
   token: {
-    authbgcolor: "rgb(239,242,247)",
-    colorTextDescription: "#878a99",
+    authbgcolor: "#f8fafc",
+    colorTextDescription: "#64748b",
     //color
-    colorSuccessBg: "#ecfff3",
-    colorInfoBg: "#dbeff3",
-    colorWarningBg: "#fffbe6",
-    colorDangerBg: "#fff1f0",
-    colorYellowBg: "#fffbe6",
-    colorGrayrBg: "#f6f7f8",
-    colorPurpleBg: "#e7dffe",
-    colorGreenBg: "#99cc99",
-    colorRedBg: "#fff0f0",
-    colorLightBlue: "#ecf3ff",
-    colorSuccess: "#55c27f",
-    colorPrimary: "#468e39", //TODO: for Blue Theam #000887 Light Green #5EA43B
+    colorSuccessBg: "#ecfdf5",
+    colorInfoBg: "#f0f9ff",
+    colorWarningBg: "#fffbeb",
+    colorDangerBg: "#fef2f2",
+    colorYellowBg: "#fffbeb",
+    colorGrayrBg: "#f8fafc",
+    colorPurpleBg: "#f5f3ff",
+    colorGreenBg: "#dcfce7",
+    colorRedBg: "#fee2e2",
+    colorLightBlue: "#f0f9ff",
+    colorSuccess: "#10b981",
+    colorPrimary: "#3b82f6", // Changed to blue
     //text
-    textMute: "#878a99",
-    sidebarText: "#333232",
-    textInfo: "#4ab0c1",
-    textDark: "#000",
-    textLight: "#000",
-    contactBg: "#d9e8ff",
-    textBlue: "#438eff",
-    borderGray: " #ebebeb",
-    colorPrimaryBg: "#f0f0f0",
+    textMute: "#64748b",
+    sidebarText: "#1e293b",
+    textInfo: "#0ea5e9",
+    textDark: "#0f172a",
+    textLight: "#f8fafc",
+    contactBg: "#dbeafe",
+    textBlue: "#3b82f6",
+    borderGray: "#e2e8f0",
+    colorPrimaryBg: "#f1f5f9",
     colorSplit: "rgba(5, 5, 5, 0.06)",
     colorFillTertiary: "rgba(0, 0, 0, 0.04)",
-    emailText: "#747373",
-    emailSubText: "#000",
+    emailText: "#64748b",
+    emailSubText: "#0f172a",
     emailSidebar: "rgba(150, 150, 150, 0.08)",
     emailSidebars: "rgba(150, 150, 150, 0.08)",
-    colorBorder: "#e4e4e4", // Privious : #eff2f7
-    colorBgContainer: "#fff",
+    colorBorder: "#e2e8f0",
+    colorBgContainer: "#ffffff",
     //tooltips Data Display
-    colorBgSpotlight: "rgba(0, 0, 0, 0.85)", // tooltip bg color
-    colorTextLightSolid: "#fff", // tooltip color
+    colorBgSpotlight: "rgba(15, 23, 42, 0.85)", // tooltip bg color
+    colorTextLightSolid: "#ffffff", // tooltip color
     //Drawer Feedback
-    colorBgElevated: "#fff", //Drawer bg color
-    colorBgMask: "rgba(0, 0, 0, 0.45)", //Drawer overlay bg
-    colorIcon: "rgba(0, 0, 0, 0.45)", //Drawer close button color
-    colorIconHover: "rgba(0, 0, 0, 0.88)", //Drawer close hover button color
-    colorTextTertiary: "rgba(0, 0, 0, 0.45)",
-    colorTextSecondary: "#000",
-    colorTextLabel: "rgba(0, 0, 0, 0.65)",
+    colorBgElevated: "#ffffff", //Drawer bg color
+    colorBgMask: "rgba(15, 23, 42, 0.45)", //Drawer overlay bg
+    colorIcon: "rgba(15, 23, 42, 0.45)", //Drawer close button color
+    colorIconHover: "rgba(15, 23, 42, 0.88)", //Drawer close hover button color
+    colorTextTertiary: "rgba(15, 23, 42, 0.45)",
+    colorTextSecondary: "#0f172a",
+    colorTextLabel: "rgba(15, 23, 42, 0.65)",
 
     //Spacing and sizes
-    controlHeight: 35,
-    controlHeightLG: 40,
-    controlHeightSM: 24,
+    controlHeight: 40,
+    controlHeightLG: 48,
+    controlHeightSM: 32,
     controlOutlineWidth: 2,
-    fontSizeIcon: 12,
+    fontSizeIcon: 14,
     fontSize: 14,
     fontSizeHeading1: 38,
     fontSizeHeading2: 30,
@@ -69,8 +69,8 @@ const themecolor = {
 
     sizePopupArrow: 18,
     zIndexPopupBase: 1000,
-    controlPaddingHorizontal: 12,
-    controlPaddingHorizontalSM: 8,
+    controlPaddingHorizontal: 16,
+    controlPaddingHorizontalSM: 12,
     boxShadowTertiary:
       "0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)",
     boxShadowSecondary:
@@ -79,25 +79,25 @@ const themecolor = {
     screenMDMax: 991,
     screenSMMax: 767,
     screenXSMax: 575,
-    gray: "#2b313e",
+    gray: "#64748b",
   },
   components: {
     Menu: {
-      headerBgColor: "#fff",
+      headerBgColor: "#ffffff",
       verticalSidebarWidth: 260,
-      groupTitleColor: "#919da9",
-      itemBg: "#fff",
-      itemColor: "#919da9",
-      itemActiveBg: "#f0f8ff",
-      itemHoverBg: "#f0f8ff",
-      itemHoverColor: "#438eff",
+      groupTitleColor: "#64748b",
+      itemBg: "#ffffff",
+      itemColor: "#64748b",
+      itemActiveBg: "#f0f9ff",
+      itemHoverBg: "#f0f9ff",
+      itemHoverColor: "#3b82f6",
       subMenuItemBg: "#ffffff",
-      itemSelectedBg: "#f0f8ff",
-      menuBorderColor: "#eff2f7",
+      itemSelectedBg: "#f0f9ff",
+      menuBorderColor: "#e2e8f0",
     },
     Typography: {
       titleMarginBottom: "1rem",
-      titleMarginTop: "0", // Add the titleMarginTop property here
+      titleMarginTop: "0",
     },
     //navigation
     Anchor: {
@@ -106,11 +106,11 @@ const themecolor = {
     },
     Breadcrumb: {
       iconFontSize: 15,
-      itemColor: "#adb5bd",
-      lastItemColor: "#2b313e",
-      linkColor: "#2b313e",
-      linkHoverColor: "#2b313e",
-      separatorColor: "#adb5bd",
+      itemColor: "#94a3b8",
+      lastItemColor: "#1e293b",
+      linkColor: "#1e293b",
+      linkHoverColor: "#3b82f6",
+      separatorColor: "#94a3b8",
       separatorMargin: 8,
     },
     Pagination: {
@@ -215,7 +215,7 @@ const themecolor = {
     Card: {
       actionsBg: "#ffffff",
       actionsLiMargin: "12px 0",
-      headerFontSize: 15,
+      headerFontSize: 16,
       headerFontSizeSM: 14,
       headerHeight: 55,
       headerHeightSM: 38,
@@ -248,15 +248,13 @@ const themecolor = {
       titleMarginBottom: 10,
     },
     Popover: {
-      // minWidth:                                    177,
-      // width:                                       177,
       zIndexPopup: 1030,
     },
     Segmented: {
       itemActiveBg: "rgba(0, 0, 0, 0.15)",
-      itemColor: "#878a99",
+      itemColor: "#64748b",
       itemHoverBg: "rgba(0, 0, 0, 0.02)",
-      itemHoverColor: "#141821",
+      itemHoverColor: "#0f172a",
       itemSelectedBg: "#ffffff",
     },
     Statistic: {
@@ -264,7 +262,7 @@ const themecolor = {
       titleFontSize: 15,
     },
     Tabs: {
-      cardBg: "#f5f5f5",
+      cardBg: "#f1f5f9",
       cardGutter: 4,
       cardHeight: 40,
       cardPadding: "8px 16px",
@@ -282,13 +280,13 @@ const themecolor = {
       zIndexPopup: 1050,
     },
     Tag: {
-      defaultBg: "#f5f5f5",
-      defaultColor: "#141821",
+      defaultBg: "#f1f5f9",
+      defaultColor: "#0f172a",
     },
     Timeline: {
       itemPaddingBottom: 12,
       dotBorderWidth: 2,
-      tailColor: "#eff2f7",
+      tailColor: "#e2e8f0",
       tailWidth: 2,
     },
     Tooltip: {
@@ -337,87 +335,82 @@ const themecolor = {
     Spin: {
       contentHeight: 400,
     },
-    // Layout: {
-    //     colorBgBody: '#fff',
-    //     colorBgHeader: '#fff',
-    //     colorBgTrigger: '#002140',
-    // },
   },
 };
 
 // Theme colors specific to dark theme
 const darkthemecolors = {
   token: {
-    authbgcolor: "rgb(43,49,62)",
-    colorTextDescription: "#9eb2cd",
+    authbgcolor: "#0f172a",
+    colorTextDescription: "#94a3b8",
     //color
-    colorSuccessBg: "#12512e",
-    colorInfoBg: "#1e464d",
-    colorWarningBg: "#62491d",
-    colorDangerBg: "#ee7b734f",
-    colorYellowBg: "#fffbe6",
-    colorRedBg: "#362b34",
-    colorPurpleBg: "#352764",
-    colorGreenBg: "#99cc99",
-    colorLightBlue: "#232e43",
-    colorSuccess: "#55c27f",
-    colorPrimary: "#468e39", //TODO: for Blue Theam #000887 Light Green #5EA43B
+    colorSuccessBg: "#064e3b",
+    colorInfoBg: "#0c4a6e",
+    colorWarningBg: "#713f12",
+    colorDangerBg: "#7f1d1d",
+    colorYellowBg: "#713f12",
+    colorRedBg: "#7f1d1d",
+    colorPurpleBg: "#4c1d95",
+    colorGreenBg: "#064e3b",
+    colorLightBlue: "#0c4a6e",
+    colorSuccess: "#10b981",
+    colorPrimary: "#3b82f6", // Changed to blue
 
     //text
-    textMute: "#a6b5d2",
-    sidebarText: "#a6b5d2",
-    textInfo: "#fff",
-    textDark: "#4ab0c1",
-    textLight: "#fff",
-    contactBg: "#1b3966",
-    textBlue: "#438eff",
+    textMute: "#94a3b8",
+    sidebarText: "#94a3b8",
+    textInfo: "#ffffff",
+    textDark: "#0ea5e9",
+    textLight: "#ffffff",
+    contactBg: "#1e3a8a",
+    textBlue: "#3b82f6",
 
-    borderGray: "#293b55",
-    colorPrimaryBg: "#24344a",
-    emailText: "#fff",
-    emailSubText: "#fff",
-    emailSidebar: "#142a494d",
-    emailSidebars: "#18283e",
+    borderGray: "#1e293b",
+    colorPrimaryBg: "#1e293b",
+    emailText: "#ffffff",
+    emailSubText: "#ffffff",
+    emailSidebar: "#0f172a",
+    emailSidebars: "#0f172a",
 
-    colorBgContainer: "#152234",
-    colorBgLayout: "#243348",
+    colorBgContainer: "#1e293b",
+    colorBgLayout: "#0f172a",
     colorText: "#FFFFFF",
-    colorTextHeading: "#c6d4e8",
-    colorBorder: "#293b55",
-    colorBorderSecondary: "#293b55",
-    colorTextTertiary: "#859cba",
-    colorTextPlaceholder: "#859cba",
+    colorTextHeading: "#e2e8f0",
+    colorBorder: "#1e293b",
+    colorBorderSecondary: "#1e293b",
+    colorTextTertiary: "#94a3b8",
+    colorTextPlaceholder: "#94a3b8",
     fontFamily: '"Inter", sans-serif',
-    textMuted: "#fff",
-    colorBgElevated: "#19273c",
-    nonauthBg: "#2b313e",
-    colorBgContainerDisabled: "#24344a",
-    colorFill: "#2f415a", // skeleton overlay bg
-    colorFillContent: "#394c66", // skeleton bg
-    colorFillSecondary: "#394c66", // progress's bar bg
-    colorSplit: "#293b55",
-    colorFillTertiary: "#293b55",
-    colorBgSpotlight: "#293b55", // tooltip bg color
-    colorTextQuaternary: "#293b55",
-    colorTextSecondary: "#c6d4e8",
-    colorTextLabel: "#9eb2cd",
+    textMuted: "#ffffff",
+    colorBgElevated: "#0f172a",
+    nonauthBg: "#0f172a",
+    colorBgContainerDisabled: "#1e293b",
+    colorFill: "#1e293b", // skeleton overlay bg
+    colorFillContent: "#334155", // skeleton bg
+    colorFillSecondary: "#334155", // progress's bar bg
+    colorSplit: "#1e293b",
+    colorFillTertiary: "#1e293b",
+    colorBgSpotlight: "#1e293b", // tooltip bg color
+    colorTextQuaternary: "#1e293b",
+    colorTextSecondary: "#e2e8f0",
+    colorTextLabel: "#94a3b8",
   },
   components: {
     Layout: {
-      bodyBg: "#111a27",
-      headerBg: "#152234",
-      colorBgTrigger: "#849ec1",
+      bodyBg: "#0f172a",
+      headerBg: "#1e293b",
+      colorBgTrigger: "#94a3b8",
     },
     Menu: {
-      groupTitleColor: "#859cba",
-      itemBg: "#152234",
-      itemColor: "#849ec1",
-      itemActiveBg: "#0b70ff1a",
-      itemHoverBg: "#0b70ff1a",
-      itemHoverColor: "#438eff",
-      subMenuItemBg: "#152234",
-      itemSelectedBg: "#0b70ff1a",
-      menuBorderColor: "#293b55",
+      groupTitleColor: "#94a3b8",
+      itemBg: "#1e293b",
+      itemColor: "#94a3b8",
+      itemActiveBg: "#3b82f61a",
+      itemHoverBg: "#3b82f61a",
+      itemHoverColor: "#3b82f6",
+      subMenuItemBg: "#1e293b",
+      itemSelectedBg: "#3b82f61a",
+      menuBorderColor: "#1e293b",
     },
     Breadcrumb: {
       iconFontSize: 15,
@@ -441,14 +434,14 @@ const darkthemecolors = {
       zIndexPopup: 1050,
     },
     Radio: {
-      buttonBg: "#152234",
-      buttonCheckedBg: "#152234",
-      buttonCheckedBgDisabled: "#344762",
-      buttonCheckedColorDisabled: "#9dacc1",
-      buttonColor: "#c6d4e8",
+      buttonBg: "#1e293b",
+      buttonCheckedBg: "#1e293b",
+      buttonCheckedBgDisabled: "#334155",
+      buttonCheckedColorDisabled: "#94a3b8",
+      buttonColor: "#e2e8f0",
       buttonPaddingInline: 15,
       buttonSolidCheckedColor: "#fff",
-      dotColorDisabled: "#9dacc1",
+      dotColorDisabled: "#94a3b8",
       dotSize: 8,
       radioSize: 16,
       wrapperMarginInlineEnd: 8,
@@ -459,11 +452,11 @@ const darkthemecolors = {
 const customStyle = {
   token: {
     //Spacing and sizes
-    controlHeight: 35,
-    controlHeightLG: 40,
-    controlHeightSM: 24,
+    controlHeight: 40,
+    controlHeightLG: 48,
+    controlHeightSM: 32,
     controlOutlineWidth: 2,
-    fontSizeIcon: 12,
+    fontSizeIcon: 14,
     fontSize: 14,
     fontSizeHeading1: 38,
     fontSizeHeading2: 30,
@@ -480,8 +473,8 @@ const customStyle = {
     lineWidthFocus: 4,
     sizePopupArrow: 18,
     zIndexPopupBase: 1000,
-    controlPaddingHorizontal: 12,
-    controlPaddingHorizontalSM: 8,
+    controlPaddingHorizontal: 16,
+    controlPaddingHorizontalSM: 12,
     screenLGMax: 1199,
     screenMDMax: 991,
     screenSMMax: 767,
@@ -491,10 +484,10 @@ const customStyle = {
     marginSM: 20,
     marginXS: 14,
     marginXXS: 4,
-    borderRadiusXS: 2,
-    borderRadiusSM: 4,
-    borderRadius: 6,
-    borderRadiusLG: 8,
+    borderRadiusXS: 4,
+    borderRadiusSM: 6,
+    borderRadius: 8,
+    borderRadiusLG: 12,
     padding: 16,
     paddingLG: 22,
     paddingSM: 12,
@@ -502,49 +495,48 @@ const customStyle = {
     paddingXXS: 4,
 
     //colors Palette
-    nonauthBg: "#eff2f7",
+    nonauthBg: "#f8fafc",
     colorBgContainer: "#fff",
     colorBgContainerDisabled: "rgba(0, 0, 0, 0.04)",
-    colorBgLayout: "#f5f5f5",
-    colorText: "#000000",
-    colorTextDisabled: "#adb5bd",
-    colorTextPlaceholder: "#adb5bd",
-    colorTextQuaternary: "rgba(0, 0, 0, 0.45)",
-    colorTextHeading: "rgba(0, 0, 0, 0.88)",
+    colorBgLayout: "#f1f5f9",
+    colorText: "#0f172a",
+    colorTextDisabled: "#94a3b8",
+    colorTextPlaceholder: "#94a3b8",
+    colorTextQuaternary: "rgba(15, 23, 42, 0.45)",
+    colorTextHeading: "rgba(15, 23, 42, 0.88)",
     fontFamily: '"Inter", sans-serif',
-    colorFillAlter: "rgba(0, 0, 0, 0.02)",
-    colorFill: "rgba(0, 0, 0, 0.15)", // skeleton overlay bg
-    colorFillContent: "rgba(0, 0, 0, 0.06)", // skeleton bg
-    colorFillQuaternary: "rgba(0, 0, 0, 0.02)",
-    colorFillSecondary: "rgba(0, 0, 0, 0.06)", // progress's bar bg
-    colorHighlight: "#ff4d4f",
-    colorBorderSecondary: "#f0f0f0",
-    colorError: "#ff4d4f",
-    colorSuccess: "#55c27f",
-    colorGreenBg: "#99cc99",
-    colorSuccessBg: "#ecfff3",
-    colorPrimary: "#468e39", //TODO: for Blue Theam #000887 Light Green #5EA43B
-    colorPrimaryBg: "rgba(67, 142, 255, 0.10)",
-    colorInfo: "#4ab0c1",
-    colorInfoBg: "#dbeff3",
-    colorDanger: "#ff6c6c",
-    colorDangerBg: "#ffe2e2",
-    textMuted: "#a3a3a3",
-    colorWarning: "#f1be46",
-    colorWarningBg: "#fffbe6",
-    colorTextCode: "#f7649f",
-    colorLink: "#438e00", // Privious : #438eff
-    colorLinkActive: "#68a400", // Privious : #68a4ff
-    colorDark: "#000000",
-    colorDarkBg: "#e9ebec",
-    colorLinkHover: "#68a400", // Privious : #68a4ff
-    controlItemBgHover: "rgba(0, 0, 0, 0.04)",
-    bglight: "#000",
-    colorSecondary: "#000887",
-    colorSecondaryBg: "#e7dffe",
+    colorFillAlter: "rgba(15, 23, 42, 0.02)",
+    colorFill: "rgba(15, 23, 42, 0.15)", // skeleton overlay bg
+    colorFillContent: "rgba(15, 23, 42, 0.06)", // skeleton bg
+    colorFillQuaternary: "rgba(15, 23, 42, 0.02)",
+    colorFillSecondary: "rgba(15, 23, 42, 0.06)", // progress's bar bg
+    colorHighlight: "#ef4444",
+    colorBorderSecondary: "#f1f5f9",
+    colorError: "#ef4444",
+    colorSuccess: "#10b981",
+    colorGreenBg: "#dcfce7",
+    colorSuccessBg: "#ecfdf5",
+    colorPrimary: "#3b82f6", // Changed to blue
+    colorPrimaryBg: "rgba(59, 130, 246, 0.10)",
+    colorInfo: "#0ea5e9",
+    colorInfoBg: "#f0f9ff",
+    colorDanger: "#ef4444",
+    colorDangerBg: "#fee2e2",
+    textMuted: "#64748b",
+    colorWarning: "#f59e0b",
+    colorWarningBg: "#fffbeb",
+    colorTextCode: "#ec4899",
+    colorLink: "#3b82f6", // Changed to blue
+    colorLinkActive: "#60a5fa", // Changed to light blue
+    colorDark: "#0f172a",
+    colorDarkBg: "#f1f5f9",
+    colorLinkHover: "#60a5fa", // Changed to light blue
+    controlItemBgHover: "rgba(15, 23, 42, 0.04)",
+    bglight: "#0f172a",
+    colorSecondary: "#4f46e5",
+    colorSecondaryBg: "#f5f3ff",
 
     // heading
-
     h1: 34,
     h2: 30,
     h3: 24,

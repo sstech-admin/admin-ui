@@ -1,103 +1,67 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import {
   Card,
   Col,
-  Dropdown,
-  Flex,
-  Menu,
   message,
-  Modal,
   Row,
-  Segmented,
   Space,
   Table,
   Typography,
   Button,
   Input,
-  Skeleton
+  Skeleton,
+  Tag,
+  Dropdown,
+  Menu,
+  Avatar
 } from "antd";
 import {
-  ClipboardEditIcon,
   EyeIcon,
-  MoreHorizontal,
+  PencilIcon,
   Trash2,
-  Search
+  Search,
+  Plus,
+  Filter,
+  ChevronDown,
+  UserPlus
 } from "lucide-react";
 import usecustomStyles from "../../Common/Hooks/customStyles";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Loader from "../../Component/Loader/Loader";
 import {
   deleteInvestor,
   GetAllInvestor,
-  // updateInvestor,
 } from "../../slices/Invester/investerAPI";
-import { SyncOutlined, UserOutlined, SearchOutlined, CloseOutlined, DownOutlined  } from "@ant-design/icons";
-import { BgcolorGreenBg } from "./Inverstors.styles";
+import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
+
 const Investors = () => {
-  document.title = "home" + process.env.REACT_APP_PAGE_TITLE;
-  const location = useLocation();
-  const pathSegments = location.pathname.split("/");
+  document.title = "Investors" + process.env.REACT_APP_PAGE_TITLE;
+
   const [data, setData] = useState([]);
   const customStyles = usecustomStyles();
   const [loading, setLoading] = useState(false);
   const [loadingInvestors, setLoadingInvestors] = useState(false);
-  const [valueSegmented, setValueSegmented] = useState("Approve");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [messageApiType, contextHolder] = message.useMessage();
   const [paymentTypeId, setPaymentTypeId] = useState(null);
   const formatIndianNumber = (num) =>
     new Intl.NumberFormat("en-IN").format(num);
+  
   const paymentTypeOptions = [
     { label: "Weekly", value: 7 },
     { label: "Monthly", value: 31 },
     { label: "None", value: 0 },
   ];
-  const paymentTypeLabel =
-  paymentTypeOptions.find((item) => item.value === paymentTypeId)?.label || "Payment Type";
+  
   const [pagination, setPagination] = useState({
     total: 0,
     defaultPageSize: 20,
     currentPage: 1,
   });
-  const { confirm } = Modal;
-  // const getActionUpdateInvestorStatus = async (dataofInvester) => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await updateInvestor({
-  //       investorId: dataofInvester?.investorId,
-  //       deletedOnly: true,
-  //       userName: dataofInvester?.userName,
-  //       email: dataofInvester?.email,
-  //       phoneNumber: dataofInvester?.phoneNumber,
-  //       firstName: dataofInvester?.firstName,
-  //       middleName: dataofInvester?.middleName,
-  //       lastName: dataofInvester?.lastName,
-  //       referenceId: 1,
-  //       investorTypeId: dataofInvester?.investorTypeId,
-  //       paymentSystemId: dataofInvester?.paymentSystemId,
-  //       asOfDate: dataofInvester?.asOfDate,
-  //       amount: dataofInvester?.amount,
-  //       toPayORToReceive: dataofInvester?.toPayORToReceive,
-  //       openingBalance: dataofInvester?.openingBalance,
-  //       panCardNumber: dataofInvester?.panCardNumber,
-  //       aadharCardNumber: dataofInvester?.aadharCardNumber,
-  //       investorStatusId: dataofInvester?.investorStatusId === 0 ? 1 : 0,
-  //     });
-  //     if (response?.status === "success") {
-  //       await fetchData();
-  //     }
-  //   } catch (error) {
-  //     messageApiType.open({
-  //       type: "error",
-  //       content: error,
-  //     });
-  //   }
-  //   setLoading(false);
-  // };
+  
+  const { confirm } = message.Modal;
 
   const deletInvestor = async (item) => {
-    console.log("item: ", item);
     try {
       setLoading(true);
       const response = await deleteInvestor({
@@ -126,199 +90,101 @@ const Investors = () => {
 
   const showDeleteConfirm = (Value) => {
     confirm({
-      title: `Are you sure delete this user ${Value.userName}?`,
-      content: "Press Yes for Permenat Delete",
-      okText: "Yes",
+      title: `Are you sure you want to delete ${Value.userName}?`,
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
       okType: "danger",
-      cancelText: "No",
-      cancleType: "danger",
-      autoFocusButton() {
-        console.log("autoFocusButton");
-      },
-      centered: true,
+      cancelText: "Cancel",
       onOk() {
-        console.log("OK");
         deletInvestor(Value);
-      },
-      onCancel() {
-        console.log("Cancel");
-      },
-      okButtonProps: true,
-      confirmLoading: true,
+      }
     });
   };
 
-  const getMenuItems = (record) => [
+  const columns = [
     {
-      label: (
-        <Link
-          to={`/investors/${record.investorId}`}
-          style={{ color: customStyles.colorPrimary }}
-        >
-          View
-        </Link>
-      ),
-      key: "0",
-      icon: <EyeIcon size={14} color={customStyles.colorPrimary} />,
-    },
-    {
-      label: (
-        <Link
-          to={`/add-investors/${record.investorId}`}
-          color={customStyles.colorSecondary}
-          style={{ color: customStyles.colorSecondary }}
-        >
-          Edit
-        </Link>
-      ),
-      key: "1",
-      icon: <ClipboardEditIcon size={14} color={customStyles.colorSecondary} />,
-    },
-    {
-      label: (
-        <Link
-          to="#!"
-          onClick={() => {
-            showDeleteConfirm(record);
-          }}
-        >
-          Delete
-        </Link>
-      ),
-      key: "2",
-      danger: true,
-      icon: <Trash2 size={14} />,
-    },
-  ];
-  const skeletonRows1 = Array.from({ length: 3 }).map((_, index) => ({
-      key: `skeleton-${index}`,
-      firstName: <Skeleton.Input style={{ width: 120 }} active />,
-      investorTypeName: <Skeleton.Input style={{ width: 60 }} active />,
-      paymentSystemName: <Skeleton.Input style={{ width: 50 }} active />,
-      amount: <Skeleton.Input style={{ width: 100 }} active />,
-      action: <Skeleton.Input style={{ width: 100 }} active />,
-      remarks: <Skeleton.Input style={{ width: 100 }} active />,
-    }));
-    
-  const tableDataFormat = [
-    {
-      title: "Name",
+      title: "Investor",
       dataIndex: "name",
-      width: "25%",
-      editable: true,
-      align: "center",
-      render: (_, record) => {
-        return (
-          <>
-            <div style={{ textAlign: "center" }}>{`${record?.name ?? ""}`}</div>
-          </>
-        );
-      },
-    },
-    {
-      title: "Username",
-      dataIndex: "userName",
-      width: "15%",
-      editable: true,
-      align: "center",
-      // sorter: (a, b) => a.age - b.age,
+      key: "name",
+      render: (_, record) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Avatar 
+            style={{ 
+              backgroundColor: '#f0f9ff', 
+              color: '#3b82f6',
+              marginRight: '12px',
+              fontWeight: 'bold'
+            }}
+          >
+            {record.name?.charAt(0) || 'U'}
+          </Avatar>
+          <div>
+            <div style={{ fontWeight: 500 }}>{record.name}</div>
+            <div style={{ fontSize: '12px', color: '#64748b' }}>{record.userName}</div>
+          </div>
+        </div>
+      ),
     },
     {
       title: "Payment System",
       dataIndex: "paymentSystemName",
-      width: "15%",
-      editable: true,
-      align: "center",
+      key: "paymentSystem",
+      render: (text) => (
+        <Tag color={text === "Weekly" ? "blue" : "purple"} style={{ borderRadius: '16px', padding: '2px 12px' }}>
+          {text}
+        </Tag>
+      ),
     },
     {
       title: "Amount",
       dataIndex: "amount",
-      width: "20%",
-      editable: true,
-      align: "center",
-      render: (_, record) => {
-        return (
-          <div style={{ textAlign: "center" }}>
-            <div
-              style={{
-                fontSize: 10,
-                color: `${record?.amountColour}`,
-                fontWeight: "bold",
-              }}
-            >
-              {record?.amountText ? `${record?.amountText}` : ""}
-            </div>
-            <div>
-              <div
-                style={{
-                  color: `${record?.amountColour}`,
-                  fontWeight: "bold",
-                  paddingRight: 8,
-                }}
-              >
-                {record?.amount ? formatIndianNumber(record?.amount + (record?.profitOrLossAmount || 0)) : 0}
-              </div>
-            </div>
+      key: "amount",
+      render: (_, record) => (
+        <div>
+          <div
+            style={{
+              color: `${record?.amountColour}`,
+              fontWeight: "600",
+              fontSize: '16px'
+            }}
+          >
+            ₹{formatIndianNumber(record?.amount + (record?.profitOrLossAmount || 0))}
           </div>
-        );
-      },
-      // sorter: (a, b) => a.age - b.age,
+          {record?.amountText && (
+            <div style={{ fontSize: '12px', color: '#64748b' }}>
+              {record?.amountText}
+            </div>
+          )}
+        </div>
+      ),
     },
-  {
-    title: "Action",
-    dataIndex: "Action",
-    width: "30%",
-    align: "center",
-    render: (_, record) => (
-      <Space>
-        {/* View Button */}
-        <Link to={`/investors/${record.investorId}`}>
-          <Button type="text" icon={<EyeIcon size={18} color={customStyles.colorPrimary} />} />
-        </Link>
-
-        {/* Edit Button */}
-        <Link to={`/add-investors/${record.investorId}`}>
-          <Button type="text" icon={<ClipboardEditIcon size={18} color={customStyles.colorSecondary} />} />
-        </Link>
-
-        {/* Delete Button */}
-        <Button
-          type="text"
-          danger
-          icon={<Trash2 size={18} />}
-          onClick={() => showDeleteConfirm(record)}
-        />
-      </Space>
-    ),
-  },
-
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Space>
+          <Button 
+            type="text" 
+            icon={<EyeIcon size={18} />} 
+            style={{ color: '#3b82f6' }}
+            onClick={() => window.location.href = `/investors/${record.investorId}`}
+          />
+          <Button 
+            type="text" 
+            icon={<PencilIcon size={18} />} 
+            style={{ color: '#10b981' }}
+            onClick={() => window.location.href = `/add-investors/${record.investorId}`}
+          />
+          <Button 
+            type="text" 
+            icon={<Trash2 size={18} />} 
+            danger
+            onClick={() => showDeleteConfirm(record)}
+          />
+        </Space>
+      ),
+    },
   ];
-
-  const skeletonRows = Array.from({ length: 3 }).map((_, index) => {
-    const skeletonRow = { key: `skeleton-${index}` };
-  
-    tableDataFormat.forEach((column) => {
-      skeletonRow[column.dataIndex] = (
-        <Skeleton.Input style={{ width: column.width || 100 }} active />
-      );
-    });
-  
-    return skeletonRow;
-  });
-
-  if (pathSegments.includes("approve")) {
-    tableDataFormat.unshift({
-      title: "Invetore ID",
-      dataIndex: "userName",
-      width: "10%",
-      editable: true,
-      align: "center",
-    });
-  }
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
 
   useEffect(() => {
     fetchData();
@@ -339,7 +205,7 @@ const Investors = () => {
       }
       
       const response = await GetAllInvestor(payload);
-      console.log("response: ", response);
+      
       if (response.success === true) {
         setData(response.data.results);
         setPagination((pre) => ({
@@ -367,258 +233,119 @@ const Investors = () => {
     setLoadingInvestors(false);
   };
 
-  const [tableParams, setTableParams] = useState({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
-  });
-
-  const handleTableChange = (pagination, filters, sorter) => {
-    console.log("pagination: ", pagination);
-    setTableParams({
-      pagination,
-      filters,
-      ...sorter,
-    });
-
-    // `dataSource` is useless since `pageSize` changed
-    if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([]);
-    }
-  };
-
-  // Search 
   const handleSearch = () => {
-    console.log("Searching for:", searchInputValue);
-    // Call your API here
     fetchData();
-
   };
 
   const handleClear = () => {
     setSearchInputValue("");
-    console.log("Clear Search for:", searchInputValue);
   };
+
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: 'all',
+          label: 'All Payment Types',
+          onClick: () => setPaymentTypeId(null)
+        },
+        ...paymentTypeOptions.map(option => ({
+          key: option.value,
+          label: option.label,
+          onClick: () => setPaymentTypeId(option.value)
+        }))
+      ]}
+    />
+  );
+
   return (
     <>
-      <div>{contextHolder}</div>
-
-      <>
-        <Typography.Title
-          level={5}
-          style={{ margin: `${customStyles.margin}px 0px` }}
-        >
-          Investors
-        </Typography.Title>
-
-        <Row gutter={[24]}>
-          <Col
-            xs={24}
-            className="gutter-row"
-            style={{ marginBottom: customStyles.margin }}
-          >
-            <Card
-              // title="Filter in Tree"
-              style={{ marginBottom: customStyles.margin }}
+      {contextHolder}
+      <div className="page-container" style={{ padding: '0 0 24px' }}>
+        <div className="page-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            Investors
+          </Typography.Title>
+          <Link to="/add-investors">
+            <Button 
+              type="primary" 
+              icon={<UserPlus size={16} />}
+              size="large"
+              style={{ borderRadius: '8px', height: '40px' }}
             >
-              {/* <Flex
-                gap="small"
-                align="flex-start"
-                vertical
-                style={{ backgroundColor: "white", marginBottom: 20 }}
-              >
-                <Segmented
-                  options={[
-                    {
-                      label: (
-                        <div
-                          style={{
-                            padding: 4,
-                            color: customStyles.colorPrimary,
-                          }}
-                        >
-                          <UserOutlined
-                            style={{
-                              fontSize: 14,
-                              color: customStyles.colorPrimary,
-                            }}
-                          />{" "}
-                          <span>Active</span>
-                        </div>
-                      ),
-                      value: "Approve",
-                    },
-                    {
-                      label: (
-                        <div
-                          style={{
-                            padding: 4,
-                            color: customStyles.colorSecondary,
-                          }}
-                        >
-                          <SyncOutlined style={{ fontSize: 14 }} />
-                          {"  "}
-                          <span>Pending</span>
-                        </div>
-                      ),
-                      value: "Pendding",
-                    },
-                  ]}
-                  value={valueSegmented}
-                  onChange={(value) => {
-                    console.log(value);
-                    setValueSegmented(value); // string
-                  }}
-                />
-              </Flex> */}
-              {loading ? (
-                <div style={{ marginTop: 100 }}>
-                  <Loader />
-                </div>
-              ) : (
-                <div style={{ overflowX: "auto", overflowY: "auto" }}>
-                  <Space
-                    size={[24, 24]}
-                    wrap
-                    block={false}
-                    style={{ marginBottom: 15 }}
-                  >
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Input
-                      placeholder="Search..."
-                      value={searchInputValue}
-                      prefix={<SearchOutlined style={{ color: "#aaa" }} />}
-                      onChange={(e) => setSearchInputValue(e.target.value)}
-                      style={{ width: 250 }}
-                      
-                    />
-                    <Button
-                      type="primary"
-                      icon={<SearchOutlined />}
-                      onClick={handleSearch}
-                      disabled={!searchInputValue} // disable if input is empty
-                    >
-                      Search
-                    </Button>
-                    <Button
-                      danger
-                      icon={<CloseOutlined />}
-                      onClick={()=>{setSearchInputValue(""); handleClear()}}
-                      disabled={!searchInputValue}
-                    >
-                      Clear
-                    </Button>
+              Add Investor
+            </Button>
+          </Link>
+        </div>
 
-                    <Row gutter={[24, 24]} style={{marginTop: 0}}>
-                      <Space
-                        size={[24, 24]}
-                        wrap
-                        block={false}
-                        style={{ marginLeft: 15 }}
-                      >
-                        {/* <Flex
-                        horizontal
-                        // gap="small"
-                        // align="flex-start"
-                        wrap="wrap"
-                        flex
-                        style={{ backgroundColor: "white", marginBottom: 30 }}
-                      > */}
-
-                        {/* <Col xs={12} sm={12} md={6} lg={6}> */}
-                        <Dropdown
-                        style={{ borderWidth: 1, borderColor: "#e4e4e4" }}
-                        menu={{
-                          items: [
-                            {
-                              label: "Payment Type",
-                              key: "payment-type-all",
-                              onClick: () => {
-                                setPaymentTypeId(null);
-                              },
-                            },
-                            ...paymentTypeOptions.map((item) => ({
-                              label: item.label,
-                              key: `mode-${item.value}`,
-                              onClick: () => {
-                                setPaymentTypeId(item.value);
-                              },
-                            })),
-                            {
-                              type: "divider",
-                            },
-                          ],
-                          selectable: true,
-                          defaultSelectedKeys: ["payment-type-all"],
-                        }}
-                        trigger={["click"]}
-                      >
-                        <Button
-                          type="text"
-                          style={{
-                            fontSize: "12px",
-                            borderWidth: 1,
-                            borderColor: "#e4e4e4",
-                          }}
-                        >
-                          <Space>
-                            {paymentTypeLabel ||
-                              "Select payment type"}
-                            <DownOutlined />
-                          </Space>
-                        </Button>
-                      </Dropdown>
-                      </Space>
-                    </Row>
-                  </div>
-                  </Space>
-                  <Table
-                    data
-                    loading={loadingInvestors}
-                    columns={tableDataFormat}
-                    dataSource={data}
-                    responsive={true}
-                    style={{ textAlign: "center" }}
-                    // onChange={handleTableChange}
-                    // pagination={tableParams.pagination}
-                    align="center"
-                    pagination={{
-                      defaultPageSize: pagination?.defaultPageSize,
-                      total: pagination?.total,
-                      current: pagination?.currentPage,
-                      showTotal: (total, range) =>
-                        `${range[0]}-${range[1]} of ${total} items`,
-                      showSizeChanger: true,
-                      onChange: async (page, other) => {
-                        await setPagination((pre) => ({
-                          ...pre,
-                          defaultPageSize: other,
-                          currentPage: page,
-                        }));
-                        await fetchData(other, page);
-                      },
-                      pageSizeOptions: [10, 20, 50, 100],
-                    }}
-                  />
-                </div>
-              )}
-            </Card>
-          </Col>
-
-          {/* <Col span={24} className="gutter-row">
-            <Pagination
-              showQuickJumper
-              // onShowSizeChange={() => {}}
-              onChange={onChange}
-              defaultCurrent={3}
-              total={500}
-              responsive={true}
-              // disabled
+        <Card 
+          bordered={false} 
+          style={{ 
+            borderRadius: '12px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+          }}
+        >
+          <div style={{ marginBottom: '24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Input
+              placeholder="Search investors..."
+              value={searchInputValue}
+              onChange={(e) => setSearchInputValue(e.target.value)}
+              prefix={<Search size={16} style={{ color: '#94a3b8' }} />}
+              style={{ 
+                maxWidth: '320px',
+                borderRadius: '8px',
+                height: '40px'
+              }}
+              allowClear
             />
-          </Col> */}
-        </Row>
-      </>
+            
+            <Dropdown overlay={menu} trigger={['click']}>
+              <Button 
+                style={{ 
+                  borderRadius: '8px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <Space>
+                  <Filter size={16} />
+                  {paymentTypeId ? 
+                    paymentTypeOptions.find(opt => opt.value === paymentTypeId)?.label : 
+                    'Filter by Payment Type'}
+                  <ChevronDown size={16} />
+                </Space>
+              </Button>
+            </Dropdown>
+          </div>
+
+          <Table
+            columns={columns}
+            dataSource={data}
+            loading={loadingInvestors}
+            rowKey="investorId"
+            pagination={{
+              defaultPageSize: pagination?.defaultPageSize,
+              total: pagination?.total,
+              current: pagination?.currentPage,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} investors`,
+              showSizeChanger: true,
+              onChange: async (page, pageSize) => {
+                await setPagination((pre) => ({
+                  ...pre,
+                  defaultPageSize: pageSize,
+                  currentPage: page,
+                }));
+                await fetchData(pageSize, page);
+              },
+              pageSizeOptions: [10, 20, 50, 100],
+              style: { marginTop: '16px' }
+            }}
+            style={{ overflowX: 'auto' }}
+          />
+        </Card>
+      </div>
     </>
   );
 };
