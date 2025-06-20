@@ -7,12 +7,13 @@ import { Menu, Button } from "antd";
 import {
   ChevronLeft,
   ChevronRight,
-  LayoutDashboard,
-  Users,
-  UserCircle,
-  ArrowRightLeft,
-  Building,
-  FileSpreadsheet,
+  Combine,
+  Database,
+  GanttChartSquareIcon,
+  Gauge,
+  HistoryIcon,
+  User2Icon,
+  UserCircle2,
 } from "lucide-react";
 import { themecolor } from "../config.js";
 import {
@@ -55,16 +56,16 @@ const SidebarLayout = ({ theme }) => {
             Dashboard
           </Link>,
           "dashboard",
-          <LayoutDashboard size={18} />
+          <Gauge size={16} />
         ),
         getItem(
           <Link onClick={onPageClick} to="/users">
-            Users
+            User
           </Link>,
           "users",
-          <Users size={18} />
+          <User2Icon size={16} />
         ),
-        getItem("Investor", "Investor", <UserCircle size={18} />, [
+        getItem("Investor", "Investor", <UserCircle2 size={16} />, [
           getItem(
             <Link onClick={onPageClick} to="/investors">
               Investors
@@ -90,7 +91,7 @@ const SidebarLayout = ({ theme }) => {
             "reference-investors"
           ),
         ]),
-        getItem("Transaction", "Transaction", <ArrowRightLeft size={18} />, [
+        getItem("Transaction", "Transaction", <Combine size={16} />, [
           getItem(
             <Link onClick={onPageClick} to="/profit-loss">
               Profit & Loss
@@ -140,7 +141,7 @@ const SidebarLayout = ({ theme }) => {
             "all-withdraws"
           ),
         ]),
-        getItem("Account", "Account", <Building size={18} />, [
+        getItem("Account", "Account", <Database size={16} />, [
           getItem(
             <Link onClick={onPageClick} to="/all-account">
               All Account
@@ -153,7 +154,7 @@ const SidebarLayout = ({ theme }) => {
             Tally Export
           </Link>,
           "Tally Export",
-          <FileSpreadsheet size={18} />
+          <GanttChartSquareIcon size={16} />
         ),
       ],
       "group"
@@ -161,10 +162,12 @@ const SidebarLayout = ({ theme }) => {
   ];
 
   const [collapsed, setCollapsed] = useState(false);
+  // const [isClick, setIsClick] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    updateWindowDimensions();
+    // setIsClick(true);
+    updateWindowDimensions(); // Initialize windowWidth state
     window.addEventListener("resize", updateWindowDimensions);
 
     return () => {
@@ -194,24 +197,35 @@ const SidebarLayout = ({ theme }) => {
 
   const location = useLocation();
   const selectedKey = location.pathname.split("/")[1] || "dashboard";
+  const [activatedItem, setActivatedItem] = useState(() => {
+    const currentPath = location.pathname.replace("/", "");
+    return currentPath || "dashboard";
+  });
   const [openKeys, setOpenKeys] = useState([]);
 
-  useEffect(() => {
-    // auto-expand based on path
-    const pathSegments = location.pathname.split("/");
-    if (pathSegments.length > 1) {
-      const keyToOpen = items[0].children.find(group =>
-        group.children?.some(child => location.pathname.includes(child.key))
-      );
-      if (keyToOpen) {
-        setOpenKeys([keyToOpen.key]);
-      }
+useEffect(() => {
+  // auto-expand based on path
+  const pathSegments = location.pathname.split("/");
+  if (pathSegments.length > 1) {
+    const keyToOpen = items[0].children.find(group =>
+      group.children?.some(child => location.pathname.includes(child.key))
+    );
+    if (keyToOpen) {
+      setOpenKeys([keyToOpen.key]);
     }
-  }, [location.pathname, items]);
+  }
+}, [location.pathname]);
+
+  const toggleActivation = (key) => {
+    setActivatedItem((prevActivatedItem) =>
+      prevActivatedItem === key ? null : key
+    );
+  };
 
   const handleToggleButton = () => {
+    // setIsClick((prevIsClick) => !prevIsClick); // Use the previous stateSD
     const sidebarLayout1 = document.getElementById("sidebar-layout");
-    sidebarLayout1.style.display = "none";
+    sidebarLayout1.style.display = "none"; //isClick ? "none" : "block";
   };
 
   return (
@@ -227,14 +241,14 @@ const SidebarLayout = ({ theme }) => {
           <img
             alt="Brand logo"
             src={theme === "dark" ? BrandlightLogo : BrandLogo}
-            height={30}
+            height={25}
             style={{ lineHeight: "24px" }}
             className="brand-dark-logo ant-mx-auto"
           />
           <img
             alt="Brand sm logo"
             src={BrandSmLogo}
-            height={30}
+            height={24}
             style={{ lineHeight: "24px" }}
             className="brand-sm-logo ant-mx-auto"
           />
@@ -256,19 +270,15 @@ const SidebarLayout = ({ theme }) => {
         </StyleBrandLogo>
         <div>
           <StyleSimpleBar>
-            <Menu
-              selectedKeys={[selectedKey]}
-              openKeys={openKeys}
-              onOpenChange={setOpenKeys}
-              mode="inline"
-              theme="light"
-              items={items}
-              collapsedWidth="100"
-              style={{ 
-                borderRight: 'none',
-                fontWeight: 500
-              }}
-            />
+          <Menu
+            selectedKeys={[selectedKey]}
+            openKeys={openKeys}
+            onOpenChange={setOpenKeys}
+            mode="inline"
+            theme="light"
+            items={items}
+            collapsedWidth="100"
+          />
           </StyleSimpleBar>
         </div>
       </StyleSider>

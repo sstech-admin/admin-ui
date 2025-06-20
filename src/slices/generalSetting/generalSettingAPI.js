@@ -12,6 +12,7 @@ export const getAllBulkTransactionAccount = (data) =>
 export const updateAccount = (data) =>
   api.create("/transaction-accounts/updateAccount", data);
 export const deleteAccount = (data) => api.create("/deleteAccount", data);
+export const deleteBulkTransaction = (data) => api.create("/bulk-transactions/deleteBulkTransaction", data);
 export const addAccount = (data) =>
   api.create("/transaction-accounts/addAccount", data);
 export const saveAmount = (data) => api.create("/amount/saveAmount", data);

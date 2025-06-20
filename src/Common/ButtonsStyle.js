@@ -17,8 +17,7 @@ const StyleSuccessButton = styled(Button)`
     &.ant-btn-default {
         color: ${customStyles.colorSuccess};
         border-color: ${customStyles.colorSuccess};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active { 
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) { 
             color: ${lighten(0.1, customStyles.colorSuccess)};
             border-color: ${lighten(0.1, customStyles.colorSuccess)};
         }
@@ -26,8 +25,7 @@ const StyleSuccessButton = styled(Button)`
     &.ant-btn-dashed {
         color: ${customStyles.colorSuccess};
         border-color: ${customStyles.colorSuccess};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active { 
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) { 
             color: ${lighten(0.1, customStyles.colorSuccess)};
             border-color: ${lighten(0.1, customStyles.colorSuccess)};
         }
@@ -35,8 +33,7 @@ const StyleSuccessButton = styled(Button)`
 
     &.ant-btn-text {
         color: ${customStyles.colorSuccess};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active { 
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) { 
             color: ${lighten(0.1, customStyles.colorSuccess)};
             background-color: ${customStyles.colorSuccessBg};
         }
@@ -44,8 +41,7 @@ const StyleSuccessButton = styled(Button)`
 
     &.ant-btn-link{
         color: ${customStyles.colorSuccess};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active {
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) {
             color: ${lighten(0.1, customStyles.colorSuccess)};
         }
     }
@@ -63,8 +59,7 @@ const StyleWarningButton = styled(Button)`
     &.ant-btn-default {
         color: ${customStyles.colorWarning};
         border-color: ${customStyles.colorWarning};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active { 
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) { 
             color: ${lighten(0.1, customStyles.colorWarning)};
             border-color: ${lighten(0.1, customStyles.colorWarning)};
         }
@@ -72,8 +67,7 @@ const StyleWarningButton = styled(Button)`
     &.ant-btn-dashed {
         color: ${customStyles.colorWarning};
         border-color: ${customStyles.colorWarning};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active { 
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) { 
             color: ${lighten(0.1, customStyles.colorWarning)};
             border-color: ${lighten(0.1, customStyles.colorWarning)};
         }
@@ -81,8 +75,7 @@ const StyleWarningButton = styled(Button)`
 
     &.ant-btn-text {
         color: ${customStyles.colorWarning};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active { 
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) { 
             color: ${lighten(0.1, customStyles.colorWarning)};
             background-color: ${customStyles.colorWarningBg};
         }
@@ -90,8 +83,7 @@ const StyleWarningButton = styled(Button)`
 
     &.ant-btn-link{
         color: ${customStyles.colorWarning};
-        &:not(:disabled):not(.ant-btn-disabled):hover,
-        &:not(:disabled):not(.ant-btn-disabled):active {
+        &:is(:not(:disabled):not(.ant-btn-disabled)):is(:hover,:active) {
             color: ${lighten(0.1, customStyles.colorWarning)};
         }
     }

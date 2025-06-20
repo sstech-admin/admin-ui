@@ -9,30 +9,29 @@ import {
   Table,
   Space,
   DatePicker,
-  Typography,
-  Row,
-  Col,
-  Statistic,
-  Tag
+  Modal
 } from "antd";
 import {
   saveAmount,
   getAllAmount,
   saveFinalAmount,
+  deleteBulkTransaction,
 } from "../../slices/generalSetting/generalSettingAPI";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
-import { ArrowUpRight, Calendar, Check, Eye } from "lucide-react";
+import { EyeIcon, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import usecustomStyles from "../../Common/Hooks/customStyles";
 dayjs.extend(utc);
-
-const { Title, Text } = Typography;
 
 const AmountScreen = () => {
   const [dataSource, setDataSource] = useState([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [pnlDate, setPnlDate] = useState(null);
+  const customStyles = usecustomStyles();
+  const { confirm } = Modal;
+  const [messageApiType, contextHolder] = message.useMessage();
 
   useEffect(() => {
     fetchAccounts();
@@ -40,7 +39,6 @@ const AmountScreen = () => {
 
   const fetchAccounts = async () => {
     try {
-      setLoading(true);
       const response = await getAllAmount();
       if (response.success === true) {
         const accounts = response.data.map((account) => ({
@@ -58,23 +56,71 @@ const AmountScreen = () => {
       }
     } catch (error) {
       message.error("Failed to fetch accounts");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleSave = async (values) => {
     try {
-      setLoading(true);
       await saveAmount(values);
-      message.success("Amount saved successfully!");
+      message.success("Account details saved successfully!");
       fetchAccounts();
       form.resetFields();
     } catch (error) {
-      message.error("Failed to save amount");
-    } finally {
-      setLoading(false);
+      message.error("Failed to save account details");
     }
+  };
+
+  const DeletTransaction = async (item) => {
+    try {
+      setLoading(true);
+      const response = await deleteBulkTransaction({
+        bulkTransactionId: item?.bulkTransactionId,
+      });
+      if (response.success === true) {
+        messageApiType.open({
+          type: "success",
+          content: "Transaction deleted successfully",
+        });
+      } else {
+        messageApiType.open({
+          type: "error",
+          content: "Failed to delete Transaction",
+        });
+      }
+    } catch (error) {
+      messageApiType.open({
+        type: "error",
+        content: error,
+      });
+    }
+    setLoading(false);
+  };
+
+
+  const showDeleteConfirm = (Value) => {
+    console.log("Value: ", Value);
+    confirm({
+      title: `Are you sure delete this "${Value.bulkTransactionId}" Transaction?`,
+      // icon: <Icon />,
+      content: "Press Yes for Permenat Delete",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      cancleType: "danger",
+      autoFocusButton() {
+        console.log("autoFocusButton");
+      },
+      centered: true,
+      onOk() {
+        console.log("OK", Value);
+        DeletTransaction(Value);
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+      okButtonProps: true,
+      confirmLoading: true,
+    });
   };
 
   const handleFinalAmount = async (values) => {
@@ -91,8 +137,17 @@ const AmountScreen = () => {
     }
   };
 
+  const formatDate1 = (dateString) => {
+    return dayjs.utc(dateString).format('DD-MMM-YYYY');
+  };
   const formatDate = (dateString) => {
-    return dayjs.utc(dateString).format('DD MMM YYYY');
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
   const columns = [
@@ -100,199 +155,173 @@ const AmountScreen = () => {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      render: (text) => (
-        <Text strong style={{ color: '#3b82f6' }}>₹{parseFloat(text).toLocaleString()}</Text>
-      ),
     },
+    // {
+    //   title: "Account Type",
+    //   dataIndex: "accountType",
+    //   key: "accountType",
+    // },
     {
       title: "Tag",
       dataIndex: "tag",
       key: "tag",
-      render: (tag) => (
-        <Tag color={tag === "New" ? "blue" : "orange"} style={{ borderRadius: '16px', padding: '2px 12px' }}>
-          {tag}
-        </Tag>
-      ),
     },
     {
       title: "Date",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      render: (text) => formatDate(text),
+      render: (_, record) => {
+        return <>{formatDate1(record?.updatedAt)}</>;
+      },
     },
     {
       title: "Status",
       dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        let color;
-        
+      editable: true,
+      align: "center",
+      render: (_, record) => {
+        let status = record.status;
+        let statusStyle = {};
+
+        // Set style based on status
         if (status === "Pending") {
-          color = "gold";
+          statusStyle = {
+            backgroundColor: "#FFC107",
+            color: "#000",
+            padding: "7px 10px",
+            borderRadius: "50px",
+            fontWeight: "bold",
+            fontSize: "14px",
+          };
         } else if (status === "Completed") {
-          color = "green";
+          statusStyle = {
+            backgroundColor: "#468e39",
+            color: "white",
+            padding: "7px 10px",
+            borderRadius: "50px",
+            fontWeight: "bold",
+            fontSize: "14px",
+          };
         } else if (status === "Failed") {
-          color = "red";
-        } else {
-          color = "default";
+          statusStyle = {
+            backgroundColor: "#DC3545",
+            color: "white",
+            padding: "7px 10px",
+            borderRadius: "50px",
+            fontWeight: "bold",
+            fontSize: "14px",
+          };
         }
-        
-        return (
-          <Tag color={color} style={{ borderRadius: '16px', padding: '2px 12px' }}>
-            {status || "Unknown"}
-          </Tag>
-        );
+
+        return <span style={statusStyle}>{status}</span>;
       },
     },
     {
       title: "Action",
-      key: "action",
-      render: (_, record) => (
-        record?.bulkTransactionId ? (
-          <Link to={`/all-bulk-transaction/${record?.bulkTransactionId}`}>
-            <Button 
-              type="text" 
-              icon={<Eye size={18} />} 
-              style={{ color: '#3b82f6' }}
-            />
-          </Link>
-        ) : null
-      ),
+      dataIndex: "Action",
+      width: "5%",
+      align: "center",
+      render: (_, record) => {
+        return (
+          <Space size={12}>
+            {record?.bulkTransactionId ? 
+            <Link to={`/all-bulk-transaction/${record?.bulkTransactionId}`}>
+              <EyeIcon
+                onClick={() => {
+                  console.log("On Show Icone Press", record);
+                }}
+                className="hovered-icon"
+                color={customStyles.colorPrimary}
+              />
+            </Link>
+            : null }
+
+            {record?.bulkTransactionId ?
+              <Trash2
+                onClick={() => {
+                  showDeleteConfirm(record);
+                }}
+                className="hovered-icon"
+                color={customStyles.colorDanger}
+              /> 
+            : null }
+          </Space>
+        );
+      },
     },
   ];
 
-  // Calculate total amount
-  const totalAmount = dataSource.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-
   return (
-    <div className="page-container" style={{ padding: '0 0 24px' }}>
-      <div className="page-header" style={{ marginBottom: '24px' }}>
-        <Title level={4} style={{ margin: 0 }}>
-          Profit & Loss
-        </Title>
-        <Text type="secondary">
-          Manage profit and loss entries
-        </Text>
-      </div>
+    <>
+    <div>{contextHolder}</div>
 
-      <Row gutter={[24, 24]}>
-        <Col xs={24} lg={8}>
-          <Card 
-            bordered={false} 
-            style={{ 
-              borderRadius: '12px',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+    <Card title={"Profit & Loss"} style={{ margin: `10px 0px` }}>
+      <Form form={form} onFinish={handleSave}>
+        <Form.Item
+          name="amount"
+          label="Amount"
+          rules={[{ required: true, message: "Please input the amount!" }]}
+        >
+          <InputNumber placeholder="Enter amount" />
+        </Form.Item>
+        <Form.Item
+          name="date"
+          label="Date"
+          rules={[{ required: true, message: "Please select a Date!" }]}
+          getValueProps={(value) => ({
+            value: value ? dayjs(value, 'YYYY-MM-DD') : null,
+          })}
+          getValueFromEvent={(date) => (date ? date.format('YYYY-MM-DD') : null)}
+        >
+          <DatePicker
+            placeholder="DD MMM YYYY"
+            format="DD MMM YYYY"
+            style={{ width: 160 }}
+            disabledDate={(current) => current && current > dayjs().endOf('day')}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="tag"
+          label="Tag"
+          rules={[
+            { required: true, message: "Please select a tag!" },
+          ]}
+        >
+          <Select placeholder="Select tag">
+            <Select.Option value="Old">Old</Select.Option>
+            <Select.Option value="New">New</Select.Option>
+          </Select>
+        </Form.Item>
+        <Space>
+          <Button type="primary" htmlType="submit">
+            Save
+          </Button>
+          <Button
+            type="primary"
+            loading={loading}
+            onClick={() => {
+              form
+                .validateFields()
+                .then((values) => {
+                  handleFinalAmount(values);
+                })
+                .catch((error) => {
+                  console.log("Validation failed:", error);
+                });
             }}
           >
-            <Statistic 
-              title="Total P&L Amount" 
-              value={totalAmount} 
-              precision={2}
-              prefix="₹"
-              suffix={<ArrowUpRight size={16} style={{ color: '#10b981' }} />}
-              valueStyle={{ color: '#3b82f6' }}
-            />
-            <div style={{ marginTop: '24px' }}>
-              <Form form={form} layout="vertical" onFinish={handleSave}>
-                <Form.Item
-                  name="amount"
-                  label="Amount"
-                  rules={[{ required: true, message: "Please input the amount!" }]}
-                >
-                  <InputNumber 
-                    placeholder="Enter amount" 
-                    style={{ width: '100%', borderRadius: '8px', height: '40px' }}
-                    formatter={value => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value.replace(/₹\s?|(,*)/g, '')}
-                  />
-                </Form.Item>
-                
-                <Form.Item
-                  name="date"
-                  label="Date"
-                  rules={[{ required: true, message: "Please select a Date!" }]}
-                  getValueProps={(value) => ({
-                    value: value ? dayjs(value, 'YYYY-MM-DD') : null,
-                  })}
-                  getValueFromEvent={(date) => (date ? date.format('YYYY-MM-DD') : null)}
-                >
-                  <DatePicker
-                    placeholder="Select date"
-                    format="DD MMM YYYY"
-                    style={{ width: '100%', borderRadius: '8px', height: '40px' }}
-                    disabledDate={(current) => current && current > dayjs().endOf('day')}
-                    suffixIcon={<Calendar size={16} />}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="tag"
-                  label="Tag"
-                  rules={[
-                    { required: true, message: "Please select a tag!" },
-                  ]}
-                >
-                  <Select 
-                    placeholder="Select tag"
-                    style={{ width: '100%', borderRadius: '8px', height: '40px' }}
-                  >
-                    <Select.Option value="Old">Old</Select.Option>
-                    <Select.Option value="New">New</Select.Option>
-                  </Select>
-                </Form.Item>
-                
-                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                  <Button 
-                    type="primary" 
-                    htmlType="submit"
-                    style={{ borderRadius: '8px', height: '40px' }}
-                    loading={loading}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    type="default"
-                    style={{ borderRadius: '8px', height: '40px' }}
-                    loading={loading}
-                    onClick={() => {
-                      form
-                        .validateFields()
-                        .then((values) => {
-                          handleFinalAmount(values);
-                        })
-                        .catch((error) => {
-                          console.log("Validation failed:", error);
-                        });
-                    }}
-                  >
-                    Final Amount
-                  </Button>
-                </Space>
-              </Form>
-            </div>
-          </Card>
-        </Col>
-        
-        <Col xs={24} lg={16}>
-          <Card 
-            title="P&L History" 
-            bordered={false} 
-            style={{ 
-              borderRadius: '12px',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-            }}
-          >
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              loading={loading}
-              pagination={{ pageSize: 10 }}
-              style={{ overflowX: 'auto' }}
-            />
-          </Card>
-        </Col>
-      </Row>
-    </div>
+            Final Amount
+          </Button>
+        </Space>
+      </Form>
+      <Table
+        dataSource={dataSource}
+        columns={columns}
+        style={{ marginTop: 20 }}
+      />
+    </Card>
+    </>
   );
 };
 

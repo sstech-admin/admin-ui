@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Button, Col, Dropdown, Row, Space } from "antd";
+import { Badge, Button, Col, Popover, Row, Typography } from "antd";
 import { Header } from "antd/es/layout/layout";
 import BrandLogo from "../assets/images/ainfinitylogo.png";
 import { Link } from "react-router-dom";
 import { styled } from "styled-components";
 import { themecolor } from "../config.js";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { FileOutput, LogOut, LogOutIcon } from "lucide-react";
 
 import feviconDharma from "../assets/images/feviconDharma.png";
+import usecustomStyles from "../Common/customStyles";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
+
+const customStyles = usecustomStyles();
+const { Text } = Typography;
 
 const StyleHeader = styled(Header)`
   padding-inline: 24px;
@@ -60,18 +64,45 @@ const StyleFlagDropdown = styled.div`
       a {
         transition: all 0.5s ease;
         &:hover {
-          color: ${({ theme }) => theme.token.colorPrimary};
+          color: ${customStyles.colorPrimary};
         }
       }
     }
   }
 `;
 
+const profileContentPopover = (
+  <StyleFlagDropdown>
+    <ul
+      style={{ padding: "6px", listStyleType: "none" }}
+      className="ant-pl-0 ant-mb-0"
+    >
+      <li>
+        <Text type="secondary" style={{ fontSize: "13px" }}>
+          Welcome Admin!
+        </Text>
+      </li>
+
+      <li>
+        <Link to="/logout">
+          <Text type="secondary">
+            {" "}
+            <FileOutput className="ant-mr-1" size={16} />
+          </Text>
+          <Text> Logout</Text>
+        </Link>
+      </li>
+    </ul>
+  </StyleFlagDropdown>
+);
+
 const HeaderLayout = ({ darkMode, handleToggleMode }) => {
+  // const [isClick, setIsClick] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    updateWindowDimensions();
+    // setIsClick(false);
+    updateWindowDimensions(); // Initialize windowWidth state
     window.addEventListener("resize", updateWindowDimensions);
 
     return () => {
@@ -84,10 +115,12 @@ const HeaderLayout = ({ darkMode, handleToggleMode }) => {
   };
 
   const handleToggleButton = () => {
+    // setIsClick((prevIsClick) => !prevIsClick); // Use the previous stateSD
     const sidebarLayout = document.getElementById("sidebar-layout");
-    sidebarLayout.style.display = "block";
+    sidebarLayout.style.display = "block"; //isClick ? "none" : "block";
   };
 
+  // Set the visibility of the sidebar based on the isClick state
   useEffect(() => {
     const sidebarLayout = document.getElementById("sidebar-layout");
     const customDesktopMenuunflodIcon = document.getElementById(
@@ -156,22 +189,32 @@ const HeaderLayout = ({ darkMode, handleToggleMode }) => {
 
           <Col span={6} lg={8} className="ant-ml-auto">
             <HeaderContainer className="ant-topbar-head list-unstyled">
-              <li>
+              {/* <li>
+                <Link>
+                  <NotificationDropdown />
+                </Link>
+              </li> */}
+              {/* <li>
                 <div
                   onClick={handleToggleMode}
                   style={{
                     marginTop: "26px",
                     display: "flex",
-                    marginRight: "14px",
+                    marginRight: customStyles.marginXS,
                     cursor: "pointer",
                   }}
                 >
                   {darkMode === "dark" ? <Moon size={22} /> : <Sun size={22} />}
                 </div>
-              </li>
+              </li> */}
               <li>
-                <Badge offset={[-3, 5]}>
-                  <Link to="/logout">
+                <Popover
+                  placement="bottomRight"
+                  // content={profileContentPopover}
+                  trigger={["click"]}
+                >
+                  <Badge offset={[-3, 5]}>
+                    <Link to="/logout">
                     <div
                         style={{ display: 'flex', alignItems: 'center', position: 'relative' }}
                         onMouseEnter={() => setHovered(true)}
@@ -182,8 +225,9 @@ const HeaderLayout = ({ darkMode, handleToggleMode }) => {
                         </div>
                         <span style={textStyle}>Logout</span>
                       </div>
-                  </Link>
-                </Badge>
+                    </Link>
+                  </Badge>
+                </Popover>
               </li>
             </HeaderContainer>
           </Col>

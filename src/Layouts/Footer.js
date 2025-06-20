@@ -2,6 +2,7 @@ import { Footer } from "antd/es/layout/layout";
 import React from "react";
 import { styled } from "styled-components";
 import { Row } from "antd";
+import { Link } from "react-router-dom";
 import usecustomStyles from "../Common/customStyles";
 import { themecolor } from "../config";
 

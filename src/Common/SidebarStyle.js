@@ -13,11 +13,6 @@ const StyledCollapsedButton = styled(Button)`
     background: ${({ theme }) => theme.components.Menu.itemBg};
     border: 1px solid;
     border-color: ${({ theme }) => theme.token.colorBorder};
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 
      /* RTL Styles */
       ${({ theme }) =>
@@ -29,7 +24,7 @@ const StyledCollapsedButton = styled(Button)`
       ${({ theme }) =>
       theme.direction !== 'rtl' &&
       css`
-        right: -14px;
+        right: -14px;~
       `}
     `;
 
@@ -46,7 +41,6 @@ const StyleBrandLogo = styled.div`
   padding-inline: 14px;
   line-height: 81px;
   justify-content: center;
-  border-bottom: 1px solid ${({ theme }) => theme.token.colorBorder};
 `;
 
 const StyleSider = styled(Sider)`
@@ -57,7 +51,6 @@ const StyleSider = styled(Sider)`
   z-index:1000;
   border-right: 1px solid ${({ theme }) => theme.components.Menu.menuBorderColor};
   background: ${({ theme }) => theme.components.Menu.itemBg};
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
   .demo-logo {
     .brand-sm-logo {
@@ -69,26 +62,11 @@ const StyleSider = styled(Sider)`
     .ant-menu-item {
       margin-top: 0;
       margin-bottom: 0;
-      border-radius: 6px;
-      margin-inline: 8px;
-      padding-inline: 12px;
     }
   }
 
   .ant-menu-inline {
     border-inline-end: none !important;
-  }
-
-  .ant-menu-item {
-    border-radius: 6px;
-    margin-inline: 8px;
-    padding-inline: 12px;
-  }
-
-  .ant-menu-submenu-title {
-    border-radius: 6px;
-    margin-inline: 8px;
-    padding-inline: 12px;
   }
 
   &.ant-layout-sider-collapsed {
