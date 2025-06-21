@@ -6,16 +6,25 @@ import LoginPage from './components/auth/LoginPage';
 import Sidebar from './components/Sidebar';
 import UsersTable from './components/UsersTable';
 import ProfitLoss from './components/ProfitLoss';
+import ViewInvestors from './components/Investors/ViewInvestors';
+import AddInvestor from './components/Investors/AddInvestor/AddInvestor';
+import Dashboard from './components/Dashboard/Dashboard';
 
-const Dashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState('profit-loss');
+const DashboardLayout: React.FC = () => {
+  const [activeSection, setActiveSection] = useState('dashboard');
 
   const renderContent = () => {
     switch (activeSection) {
+      case 'dashboard':
+        return <Dashboard onNavigate={setActiveSection} />;
       case 'user':
         return <UsersTable />;
       case 'profit-loss':
         return <ProfitLoss />;
+      case 'view-investors':
+        return <ViewInvestors />;
+      case 'add-investor':
+        return <AddInvestor onBack={() => setActiveSection('view-investors')} />;
       default:
         return (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
@@ -58,7 +67,7 @@ function App() {
             path="/dashboard" 
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardLayout />
               </ProtectedRoute>
             } 
           />
@@ -66,7 +75,7 @@ function App() {
             path="/*" 
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardLayout />
               </ProtectedRoute>
             } 
           />

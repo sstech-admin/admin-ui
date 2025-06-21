@@ -25,17 +25,24 @@ class ApiService {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        console.log('API Request:', config.method?.toUpperCase(), config.url, config.params);
         return config;
       },
       (error) => {
+        console.error('API Request Error:', error);
         return Promise.reject(error);
       }
     );
 
     // Response interceptor to handle token expiration
     this.api.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log('API Response:', response.status, response.config.url, response.data);
+        return response;
+      },
       async (error) => {
+        console.error('API Response Error:', error.response?.status, error.response?.data);
+        
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
@@ -56,6 +63,44 @@ class ApiService {
   // Auth endpoints
   async login(credentials: { userName: string; password: string }) {
     const response = await this.api.post('/auth/admin/login', credentials);
+    return response.data;
+  }
+
+  // User endpoints
+  async getAllUsers(params: { page: number; limit: number; search: string; userType?: string; status?: string }) {
+    const queryParams = new URLSearchParams({
+      page: params.page.toString(),
+      limit: params.limit.toString(),
+      search: params.search
+    });
+
+    if (params.userType) {
+      queryParams.append('userType', params.userType);
+    }
+    if (params.status) {
+      queryParams.append('status', params.status);
+    }
+
+    const response = await this.api.get(`/users/admin/all?${queryParams.toString()}`);
+    return response.data;
+  }
+
+  // Investor endpoints
+  async getAllInvestors(params: { page: number; limit: number; search: string; investorStatusId?: number; paymentSystem?: string }) {
+    const queryParams = new URLSearchParams({
+      page: params.page.toString(),
+      limit: params.limit.toString(),
+      search: params.search,
+      investorStatusId: (params.investorStatusId || 1).toString()
+    });
+
+    if (params.paymentSystem) {
+      queryParams.append('paymentSystem', params.paymentSystem);
+    }
+
+    console.log('Fetching investors with URL:', `/investor/admin/all?${queryParams.toString()}`);
+    
+    const response = await this.api.get(`/investor/admin/all?${queryParams.toString()}`);
     return response.data;
   }
 
