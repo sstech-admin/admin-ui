@@ -1,8 +1,9 @@
 import React from 'react';
 import { Eye, Filter, ChevronDown, ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 interface ProfitLossEntry {
   id: string;
+  bulkTransactionId: string;
   amount: number;
   tag: string;
   date: string;
@@ -25,6 +26,8 @@ interface TransactionTableProps {
   loading?: boolean;
 }
 
+
+
 const TransactionTable: React.FC<TransactionTableProps> = ({
   entries,
   totalEntries,
@@ -39,6 +42,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   getTagColor,
   loading = false
 }) => {
+  console.log('entries', entries)
+  const navigate = useNavigate();
+  const handleViewBulkTransactions = (bulkTransactionId: string) => {
+    navigate(`/bulk-transaction/${bulkTransactionId}`);
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
       {/* Table Header */}
@@ -171,7 +180,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors">
+                    <button className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
+                      onClick={() => handleViewBulkTransactions(entry.bulkTransactionId)}
+                    >
                       <Eye size={16} />
                     </button>
                   </td>

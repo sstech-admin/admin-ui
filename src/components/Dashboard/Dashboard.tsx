@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   IndianRupee, 
@@ -19,11 +20,8 @@ import RecentActivity from './RecentActivity';
 import TopInvestors from './TopInvestors';
 import QuickActions from './QuickActions';
 
-interface DashboardProps {
-  onNavigate: (section: string) => void;
-}
-
-const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const {
     stats,
     investmentTrends,
@@ -36,7 +34,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   } = useDashboardData();
 
   const handleQuickAction = (action: string) => {
-    onNavigate(action);
+    // Map action keys to routes
+    const routeMap: { [key: string]: string } = {
+      'add-investor': '/investors/add',
+      'view-investors': '/investors',
+      'profit-loss': '/profit-loss',
+      'transactions': '/transactions',
+      'reports': '/investors/reports',
+      'analytics': '/dashboard'
+    };
+
+    const route = routeMap[action];
+    if (route) {
+      navigate(route);
+    }
   };
 
   const handleRefresh = async () => {

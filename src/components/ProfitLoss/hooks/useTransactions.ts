@@ -29,6 +29,7 @@ export const useTransactions = (): UseTransactionsReturn => {
           tag: item.tag || item.type || 'General',
           date: item.date || item.createdAt || new Date().toISOString().split('T')[0],
           status: item.status || 'Completed',
+          bulkTransactionId: item.bulkTransactionId || '',
           category: parseFloat(item.amount) >= 0 ? 'Profit' : 'Loss'
         }));
         

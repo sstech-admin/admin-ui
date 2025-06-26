@@ -1,12 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import AddInvestorForm from './AddInvestorForm';
 import { InvestorFormData } from './types';
 
 interface AddInvestorProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 const AddInvestor: React.FC<AddInvestorProps> = ({ onBack }) => {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate('/investors');
+    }
+  };
+
   const handleSubmit = async (formData: InvestorFormData): Promise<void> => {
     try {
       console.log('Submitting investor data:', formData);
@@ -42,7 +53,7 @@ const AddInvestor: React.FC<AddInvestorProps> = ({ onBack }) => {
 
   return (
     <AddInvestorForm
-      onBack={onBack}
+      onBack={handleBack}
       onSubmit={handleSubmit}
     />
   );

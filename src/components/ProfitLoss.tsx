@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   IndianRupee, 
   TrendingUp, 
@@ -25,6 +25,9 @@ const ProfitLoss: React.FC = () => {
   // API data
   const { transactions, loading, error, refetch } = useTransactions();
   
+  useEffect(()=>{
+    console.log('TRANSA', transactions)
+  },[transactions])
   // Form state
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
@@ -84,7 +87,7 @@ const ProfitLoss: React.FC = () => {
       Tag: entry.tag,
       Date: entry.date,
       Category: entry.category,
-      Status: entry.status
+      Status: entry.status,
     }));
     
     // Convert to CSV string

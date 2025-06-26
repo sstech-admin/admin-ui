@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Home, 
   Users, 
@@ -17,17 +18,19 @@ import {
   ArrowUpDown,
   Plus,
   List,
-  Minus
+  Minus,
+  Building2,
+  Clock,
+  UserPlus,
+  Link2,
+  icons
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
-interface SidebarProps {
-  activeSection: string;
-  onSectionChange: (section: string) => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => {
+const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isInvestorOpen, setIsInvestorOpen] = useState(false);
   const [isTransactionOpen, setIsTransactionOpen] = useState(true);
@@ -37,63 +40,65 @@ const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => 
     { 
       name: 'Dashboard', 
       icon: Home, 
-      key: 'dashboard',
+      path: '/dashboard',
       hasSubmenu: false 
     },
     { 
       name: 'User', 
       icon: Users, 
-      key: 'user',
+      path: '/users',
       hasSubmenu: false 
     },
     { 
       name: 'Investor', 
       icon: TrendingUp, 
-      key: 'investor',
+      path: '/investors',
       hasSubmenu: true,
       isOpen: isInvestorOpen,
       setIsOpen: setIsInvestorOpen,
       submenuItems: [
-        { name: 'View Investors', key: 'view-investors' },
-        { name: 'Add Investor', key: 'add-investor' },
-        { name: 'Reports', key: 'investor-reports' }
+        { name: 'View Investors', path: '/investors', icon: Users },
+        { name: 'Add Investor', path: '/investors/add', icon: Plus },
+        { name: 'Pending Investors', path: '/investors/pending', icon: Clock },
+        { name: 'Referrals', path: '/investors/referrals', icon: Link2 }
       ]
     },
     { 
       name: 'Transaction', 
       icon: CreditCard, 
-      key: 'transaction',
+      path: '/transactions',
       hasSubmenu: true,
       isOpen: isTransactionOpen,
       setIsOpen: setIsTransactionOpen,
       submenuItems: [
-        { name: 'Profit & Loss', key: 'profit-loss', icon: IndianRupee },
-        { name: 'Payouts', key: 'payouts', icon: PayoutIcon },
-        { name: 'All Bulk Transaction', key: 'bulk-transaction', icon: ArrowUpDown },
-        { name: 'Transactions', key: 'transactions', icon: List },
-        { name: 'Pending Transaction', key: 'pending-transaction', icon: CreditCard },
-        { name: 'Add Transaction', key: 'add-transaction', icon: Plus },
-        { name: 'List Add Funds', key: 'list-add-funds', icon: Plus },
-        { name: 'List Withdraw Funds', key: 'list-withdraw-funds', icon: Minus }
+        { name: 'Profit & Loss', path: '/profit-loss', icon: IndianRupee },
+        { name: 'Payouts', path: '/payouts', icon: PayoutIcon },
+        { name: 'All Bulk Transaction', path: '/bulk-transactions', icon: ArrowUpDown },
+        { name: 'Transactions', path: '/transactions', icon: List },
+        { name: 'Pending Transaction', path: '/pending-transactions', icon: CreditCard },
+        { name: 'Add Transaction', path: '/add-transaction', icon: Plus },
+        { name: 'List Add Funds', path: '/add-funds', icon: Plus },
+        { name: 'List Withdraw Funds', path: '/withdraw-funds', icon: Minus }
       ]
     },
     { 
       name: 'Account', 
       icon: Folder, 
-      key: 'account',
+      path: '/account-settings',
       hasSubmenu: true,
       isOpen: isAccountOpen,
       setIsOpen: setIsAccountOpen,
       submenuItems: [
-        { name: 'Account Settings', key: 'account-settings' },
-        { name: 'Profile', key: 'profile' },
-        { name: 'Security', key: 'security' }
+        { name: 'All Accounts', path: '/all-accounts', icon: Building2 },
+        { name: 'Account Settings', path: '/account-settings' },
+        { name: 'Profile', path: '/profile' },
+        { name: 'Security', path: '/security' }
       ]
     },
     { 
       name: 'Tally Export', 
       icon: FileText, 
-      key: 'tally-export',
+      path: '/tally-export',
       hasSubmenu: false 
     }
   ];
@@ -102,12 +107,23 @@ const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => 
     logout();
   };
 
-  const isActiveItem = (key: string) => {
-    return activeSection === key;
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
+  const isActiveItem = (path: string) => {
+    return location.pathname === path;
   };
 
   const isActiveSubmenu = (submenuItems: any[]) => {
-    return submenuItems?.some(item => item.key === activeSection);
+    return submenuItems?.some(item => location.pathname === item.path);
+  };
+
+  const isParentActive = (item: any) => {
+    if (item.hasSubmenu) {
+      return isActiveSubmenu(item.submenuItems);
+    }
+    return isActiveItem(item.path);
   };
 
   return (
@@ -127,7 +143,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => 
                   className="h-8 w-auto object-contain"
                 />
                 <div className="ml-3">
-                  <p className="text-xs text-gray-500 font-medium">Dashboard</p>
+                  <p className="text-xs text-gray-500 font-medium"></p>
                 </div>
               </div>
             </div>
@@ -183,14 +199,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => 
             <button
               onClick={() => {
                 if (!item.hasSubmenu) {
-                  onSectionChange(item.key);
-                }
-                if (item.hasSubmenu && item.setIsOpen) {
-                  item.setIsOpen(!item.isOpen);
+                  handleNavigation(item.path);
+                } else {
+                  if (item.setIsOpen) {
+                    item.setIsOpen(!item.isOpen);
+                  }
+                  // Also navigate to the main path for parent items
+                  if (item.path) {
+                    handleNavigation(item.path);
+                  }
                 }
               }}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActiveItem(item.key) || (item.hasSubmenu && isActiveSubmenu(item.submenuItems))
+                isParentActive(item)
                   ? 'bg-gradient-to-r from-cyan-50 to-orange-50 border border-cyan-200 shadow-sm'
                   : 'hover:bg-gray-50'
               }`}
@@ -199,14 +220,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => 
                 <item.icon 
                   size={20} 
                   className={`${
-                    isActiveItem(item.key) || (item.hasSubmenu && isActiveSubmenu(item.submenuItems))
+                    isParentActive(item)
                       ? 'text-cyan-600' 
                       : 'text-gray-500 group-hover:text-gray-700'
                   } transition-colors`} 
                 />
                 {!isCollapsed && (
                   <span className={`text-sm font-medium ${
-                    isActiveItem(item.key) || (item.hasSubmenu && isActiveSubmenu(item.submenuItems))
+                    isParentActive(item)
                       ? 'text-gray-900' 
                       : 'text-gray-700 group-hover:text-gray-900'
                   } transition-colors`}>
@@ -229,10 +250,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => 
               <div className="ml-6 mt-2 space-y-1">
                 {item.submenuItems.map((subItem) => (
                   <button
-                    key={subItem.key}
-                    onClick={() => onSectionChange(subItem.key)}
+                    key={subItem.path}
+                    onClick={() => handleNavigation(subItem.path)}
                     className={`w-full text-left px-4 py-2 text-sm rounded-lg transition-colors flex items-center space-x-2 ${
-                      isActiveItem(subItem.key)
+                      isActiveItem(subItem.path)
                         ? 'text-cyan-600 bg-cyan-50 font-medium'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
