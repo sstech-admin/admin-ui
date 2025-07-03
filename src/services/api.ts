@@ -60,9 +60,36 @@ class ApiService {
     );
   }
 
+  // Get base URL
+  getBaseUrl(): string {
+    return BASE_URL;
+  }
+
   // Auth endpoints
   async login(credentials: { userName: string; password: string }) {
     const response = await this.api.post('/auth/admin/login', credentials);
+    return response.data;
+  }
+
+  // Check PAN Card endpoint
+  async checkPanCard(panCardNumber: string) {
+    const response = await this.api.post('/user-finance/checkPanCard', { panCardNumber });
+    return response.data;
+  }
+
+  // Add Investor endpoint
+  async addInvestor(formData: FormData) {
+    const response = await this.api.post('/investor/admin/addInvestor', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  }
+
+  // Approve Investor endpoint
+  async approveInvestor(investorId: string) {
+    const response = await this.api.patch(`/investor/admin/approve/${investorId}`);
     return response.data;
   }
 
@@ -128,25 +155,35 @@ class ApiService {
     return response.data;
   }
 
+  // Profit & Loss endpoints
+  async saveAmount(payload: { amount: number; date: string; tag: string }) {
+    const response = await this.api.post('/amount/saveAmount', payload);
+    return response.data;
+  }
+
+  async finalAmount(payload: { amount: number; date: string; tag: string }) {
+    const response = await this.api.post('/amount/finalAmount', payload);
+    return response.data;
+  }
+
   // Add Funds endpoints
-  async getAddFundsRequests(params: { page: number; limit: number; search?: string; transactionStatusId?: number | null }) {
-    const queryParams = new URLSearchParams({
-      transactionTypeId: '1', // Always 1 for Add Funds
-      page: params.page.toString(),
-      limit: params.limit.toString()
+  async addFunds(formData: FormData) {
+    const response = await this.api.post('/transaction/admin/addFunds', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
+    return response.data;
+  }
 
-    if (params.search) {
-      queryParams.append('search', params.search);
-    }
 
-    if (params.transactionStatusId !== undefined && params.transactionStatusId !== null) {
-      queryParams.append('transactionStatusId', params.transactionStatusId.toString());
-    }
-
-    console.log('Fetching add funds with URL:', `/transaction/admin/getAddWithdrawRequest?${queryParams.toString()}`);
-    
-    const response = await this.api.get(`/transaction/admin/getAddWithdrawRequest?${queryParams.toString()}`);
+  // Add Funds endpoints
+  async uploadTdsCertificate(formData: FormData) {
+    const response = await this.api.post('/tds-certificates/admin', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   }
 
@@ -274,6 +311,11 @@ class ApiService {
 
   async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response: AxiosResponse<T> = await this.api.delete(url, config);
+    return response.data;
+  }
+
+  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response: AxiosResponse<T> = await this.api.patch(url, data, config);
     return response.data;
   }
 

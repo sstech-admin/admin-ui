@@ -6,7 +6,8 @@ import {
   BarChart3,
   ArrowUpRight,
   ArrowDownRight,
-  Activity
+  Activity,
+  AlertCircle
 } from 'lucide-react';
 
 // Import reusable components
@@ -20,26 +21,35 @@ import TransactionTable from './ProfitLoss/TransactionTable';
 import { useTransactions } from './ProfitLoss/hooks/useTransactions';
 import { useStatistics } from './ProfitLoss/hooks/useStatistics';
 import { formatAmount, formatDate, getAmountColor, getTagColor } from './ProfitLoss/utils';
+import { apiService } from '../services/api';
 
 const ProfitLoss: React.FC = () => {
   // API data
   const { transactions, loading, error, refetch } = useTransactions();
   
-  useEffect(()=>{
-    console.log('TRANSA', transactions)
-  },[transactions])
   // Form state
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
   const [selectedTag, setSelectedTag] = useState('');
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
   
   // Filter state
   const [filterTag, setFilterTag] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // Loading states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
+  
+  // Notification state
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+    visible: boolean;
+  } | null>(null);
 
   // Options
-  const tagOptions = ['New', 'Old', 'Investment', 'Dividend', 'Loss', 'Profit', 'Trading', 'Bonus'];
+  const tagOptions = ['New', 'Old'];
   const filterOptions = ['All', 'New', 'Old', 'Investment', 'Dividend', 'Loss', 'Profit', 'Trading', 'Bonus'];
 
   // Calculate statistics using custom hook
@@ -48,21 +58,95 @@ const ProfitLoss: React.FC = () => {
   // Filter entries
   const filteredEntries = filterTag === 'All' ? transactions : transactions.filter(entry => entry.tag === filterTag);
 
-  // Event handlers
-  const handleSave = () => {
-    if (!amount || !date || !selectedTag) {
-      alert('Please fill in all required fields');
-      return;
-    }
-    console.log('Saving entry:', { amount: parseFloat(amount), date, tag: selectedTag });
-    // Reset form
-    setAmount('');
-    setDate('');
-    setSelectedTag('');
+  // Show notification
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    setNotification({ message, type, visible: true });
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
   };
 
-  const handleFinalAmount = () => {
-    console.log('Final Amount:', statistics.netAmount);
+  // Event handlers
+  const handleSave = async () => {
+    if (!amount || !date || !selectedTag) {
+      showNotification('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const payload = {
+        amount: parseFloat(amount),
+        date,
+        tag: selectedTag
+      };
+      
+      console.log('Saving transaction:', payload);
+      
+      const response = await apiService.post('/amount/saveAmount', payload);
+      
+      if (response.success) {
+        showNotification('Transaction saved successfully!', 'success');
+        
+        // Reset form
+        setAmount('');
+        setDate(new Date().toISOString().split('T')[0]);
+        setSelectedTag('');
+        
+        // Refresh data
+        await refetch();
+      } else {
+        throw new Error(response.message || 'Failed to save transaction');
+      }
+    } catch (error: any) {
+      console.error('Error saving transaction:', error);
+      showNotification(error.message || 'Failed to save transaction', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFinalAmount = async () => {
+    if (!amount || !date || !selectedTag) {
+      showNotification('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    setIsFinalizing(true);
+    
+    try {
+      const payload = {
+        amount: parseFloat(amount),
+        date,
+        tag: selectedTag
+      };
+      
+      console.log('Finalizing amount:', payload);
+      
+      const response = await apiService.post('/amount/finalAmount', payload);
+      
+      if (response.success) {
+        showNotification('Final amount calculated successfully!', 'success');
+        
+        // Reset form
+        setAmount('');
+        setDate(new Date().toISOString().split('T')[0]);
+        setSelectedTag('');
+        
+        // Refresh data
+        await refetch();
+      } else {
+        throw new Error(response.message || 'Failed to calculate final amount');
+      }
+    } catch (error: any) {
+      console.error('Error calculating final amount:', error);
+      showNotification(error.message || 'Failed to calculate final amount', 'error');
+    } finally {
+      setIsFinalizing(false);
+    }
   };
 
   const handleTagSelect = (tag: string) => {
@@ -92,7 +176,7 @@ const ProfitLoss: React.FC = () => {
     
     // Convert to CSV string
     const csvString = [
-      Object.keys(csvData[0]).join(','),
+      Object.keys(csvData[0] || {}).join(','),
       ...csvData.map(row => Object.values(row).join(','))
     ].join('\n');
     
@@ -115,6 +199,27 @@ const ProfitLoss: React.FC = () => {
         loading={loading}
         error={error}
       />
+
+      {/* Notification */}
+      {notification && notification.visible && (
+        <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${
+          notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        }`}>
+          {notification.type === 'success' ? (
+            <div className="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>{notification.message}</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <AlertCircle size={20} />
+              <span>{notification.message}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Loading State */}
       {loading && (
@@ -203,6 +308,8 @@ const ProfitLoss: React.FC = () => {
         onSave={handleSave}
         onFinalAmount={handleFinalAmount}
         getTagColor={getTagColor}
+        isSubmitting={isSubmitting}
+        isFinalizing={isFinalizing}
       />
 
       {/* Transaction Table */}

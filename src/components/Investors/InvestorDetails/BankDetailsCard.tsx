@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, CreditCard, Hash } from 'lucide-react';
+import { Building2, CreditCard, Hash, User } from 'lucide-react';
 import { InvestorProfile } from './types';
 
 interface BankDetailsCardProps {

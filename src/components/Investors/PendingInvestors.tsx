@@ -300,7 +300,7 @@ const PendingInvestors: React.FC = () => {
       <ConfirmationDialog
         isOpen={isConfirmDialogOpen}
         title={`Are you sure delete this user ${investorToDelete?.username}?`}
-        message="Press Yes for Permenat Delete"
+        message="Press Yes for Permanent Delete"
         confirmText="Yes"
         cancelText="No"
         onConfirm={confirmDeleteInvestor}

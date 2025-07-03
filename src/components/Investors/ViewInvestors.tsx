@@ -102,7 +102,7 @@ const ViewInvestors: React.FC = () => {
 
   const handleEditInvestor = (investor: Investor) => {
     console.log('Edit investor:', investor);
-    // Implement edit investor modal/page
+    navigate(`/investors/edit/${investor.id}`);
   };
 
   const handleDeleteInvestor = (investor: Investor) => {
@@ -300,7 +300,7 @@ const ViewInvestors: React.FC = () => {
       <ConfirmationDialog
         isOpen={isConfirmDialogOpen}
         title={`Are you sure delete this user ${investorToDelete?.username}?`}
-        message="Press Yes for Permenat Delete"
+        message="Press Yes for Permanent Delete"
         confirmText="Yes"
         cancelText="No"
         onConfirm={confirmDeleteInvestor}

@@ -14,6 +14,8 @@ interface TransactionFormProps {
   onSave: () => void;
   onFinalAmount: () => void;
   getTagColor: (tag: string) => string;
+  isSubmitting: boolean;
+  isFinalizing: boolean;
 }
 
 const TransactionForm: React.FC<TransactionFormProps> = ({
@@ -28,7 +30,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   onTagDropdownToggle,
   onSave,
   onFinalAmount,
-  getTagColor
+  getTagColor,
+  isSubmitting,
+  isFinalizing
 }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
@@ -74,6 +78,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           </label>
           <div className="relative">
             <button
+              type="button"
               onClick={onTagDropdownToggle}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between"
             >
@@ -90,6 +95,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                 {tagOptions.map((tag) => (
                   <button
+                    type="button"
                     key={tag}
                     onClick={() => onTagSelect(tag)}
                     className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl last:rounded-b-xl flex items-center justify-between"
@@ -107,18 +113,26 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       {/* Action Buttons */}
       <div className="flex items-center space-x-4">
         <button
+          type="button"
           onClick={onSave}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:from-emerald-600 hover:to-green-600 transition-all shadow-md"
+          disabled={isSubmitting}
+          className={`flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:from-emerald-600 hover:to-green-600 transition-all shadow-md ${
+            isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+          }`}
         >
           <Save size={18} />
-          <span className="font-medium">Save Transaction</span>
+          <span className="font-medium">{isSubmitting ? 'Saving...' : 'Save Transaction'}</span>
         </button>
         <button
+          type="button"
           onClick={onFinalAmount}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all shadow-md"
+          disabled={isFinalizing}
+          className={`flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all shadow-md ${
+            isFinalizing ? 'opacity-70 cursor-not-allowed' : ''
+          }`}
         >
           <Calculator size={18} />
-          <span className="font-medium">Calculate Final Amount</span>
+          <span className="font-medium">{isFinalizing ? 'Processing...' : 'Calculate Final Amount'}</span>
         </button>
       </div>
     </div>

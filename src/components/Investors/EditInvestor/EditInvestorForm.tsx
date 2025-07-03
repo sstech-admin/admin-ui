@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Save, ArrowLeft, Loader2, CheckCircle, AlertCircle, Plus, Minus, IndianRupee, ChevronDown } from 'lucide-react';
-import { InvestorFormData, FormErrors, Reference, PaymentSystem, Account, PanCardType } from './types';
-import { validateForm, validateSingleField } from './validation';
-import FormSection from './FormSection';
-import FormField from './FormField';
-import FileUpload from './FileUpload';
+import { InvestorFormData, FormErrors, Reference, PaymentSystem, Account, PanCardType } from '../AddInvestor/types';
+import { validateForm, validateSingleField } from '../AddInvestor/validation';
+import FormSection from '../AddInvestor/FormSection';
+import FormField from '../AddInvestor/FormField';
+import FileUpload from '../AddInvestor/FileUpload';
 import { apiService } from '../../../services/api';
-import ReferenceSearchDropdown from './ReferenceSearchDropdown';
+import ReferenceSearchDropdown from '../AddInvestor/ReferenceSearchDropdown';
 import { debounce } from 'lodash';
 
-interface AddInvestorFormProps {
+interface EditInvestorFormProps {
+  investorData: any;
   onBack: () => void;
   onSubmit: (data: InvestorFormData) => Promise<void>;
 }
 
-const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) => {
+const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBack, onSubmit }) => {
   const [formData, setFormData] = useState<InvestorFormData>({
     nameAsPanCard: '',
     firstName: '',
@@ -73,6 +74,45 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   const [panCardStatus, setPanCardStatus] = useState<'valid' | 'invalid' | null>(null);
   const [panCardError, setPanCardError] = useState<string | null>(null);
 
+  // Populate form data from investor data
+  useEffect(() => {
+    if (investorData) {
+      setFormData({
+        // userName: investorData.userName || '',
+        nameAsPanCard: investorData.nameAsPerPanCard || '',
+        firstName: investorData.firstName || '',
+        lastName: investorData.lastName || '',
+        email: investorData.email || '',
+        phoneNumber: investorData.phoneNumber?.replace('+91', '') || '',
+        amount: investorData.amount || 500000,
+        paymentSystem: investorData.paymentSystemName || '',
+        referencePerson: investorData.referenceId || '',
+        paymentReceivedAccount: '',
+        date: new Date().toISOString().split('T')[0],
+        bankName: investorData.bankName || '',
+        bankAccountNumber: investorData.bankAccountNumber || '',
+        ifsc: investorData.ifscCode || '',
+        nomineeName: investorData.nomineeName || '',
+        nomineeRelation: investorData.nomineeRelation || '',
+        nomineeAadharNumber: investorData.nomineeAadharCardNumber || '',
+        panCardAccountType: investorData.panCardTypeName || 'Individual',
+        panCardNumber: investorData.panCardNumber || '',
+        aadharCard: investorData.aadharCardNumber || '',
+        addressLine1: investorData.address1 || '',
+        addressLine2: investorData.address2 || '',
+        district: investorData.district || '',
+        state: investorData.state || '',
+        pinCode: investorData.pinCode || '',
+        country: investorData.country || 'India',
+        description: investorData.description || '',
+        activeInvestor: investorData.investorStatusId === 1,
+      });
+
+      // Set PAN card as valid since it's already in the system
+      setPanCardStatus('valid');
+    }
+  }, [investorData]);
+
   // Fetch payment systems
   useEffect(() => {
     const fetchPaymentSystems = async () => {
@@ -106,6 +146,16 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
         const response = await apiService.get('/references');
         if (response && response.results) {
           setReferences(response.results);
+          
+          // Set selected reference if we have referenceId
+          if (investorData?.referenceId) {
+            const foundReference = response.results.find(
+              (ref: Reference) => ref.referenceId === investorData.referenceId
+            );
+            if (foundReference) {
+              setSelectedReference(foundReference);
+            }
+          }
         }
       } catch (error) {
         console.error('Error fetching references:', error);
@@ -142,7 +192,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
     };
 
     fetchReferences();
-  }, []);
+  }, [investorData]);
 
   // Fetch accounts
   useEffect(() => {
@@ -267,6 +317,13 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
 
   // PAN card validation
   const handleCheckPanCard = debounce(async (input: string) => {
+    // Skip validation if it's the same as the original PAN
+    if (input.toUpperCase() === investorData.panCardNumber) {
+      setPanCardError(null);
+      setPanCardStatus("valid");
+      return;
+    }
+
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 
     if (!input || !panRegex.test(input.toUpperCase())) {
@@ -329,104 +386,21 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
     setSubmitError(null);
 
     try {
-      // Create FormData for file uploads
-      const submitData = new FormData();
+      await onSubmit(formData);
+      setSubmitSuccess(true);
       
-      // Generate a random username in the format RAI1234
-      // const userName = undefined;
-      // submitData.append("userName", null);
+      // Show success notification
+      showNotification('Investor updated successfully!', 'success');
       
-      submitData.append("nameAsPerPanCard", formData.nameAsPanCard);
-      submitData.append("firstName", formData.firstName);
-      submitData.append("lastName", formData.lastName);
-      submitData.append("email", formData.email);
-      
-      // Format phone number with +91 prefix
-      const phoneNumber = formData.phoneNumber.startsWith('+91') 
-        ? formData.phoneNumber 
-        : `+91${formData.phoneNumber}`;
-      submitData.append("phoneNumber", phoneNumber);
-      
-      submitData.append("amount", formData.amount.toString());
-      submitData.append("paymentSystemId", paymentSystems.find(ps => ps.name === formData.paymentSystem)?.paymentSystemId.toString() || "");
-      submitData.append("referenceId", formData.referencePerson || "");
-      
-      submitData.append("bankName", formData.bankName);
-      submitData.append("bankAccountNumber", formData.bankAccountNumber);
-      submitData.append("ifscCode", formData.ifsc);
-      submitData.append("nomineeName", formData.nomineeName);
-      submitData.append("nomineeRelation", formData.nomineeRelation);
-      submitData.append("nomineeAadharCardNumber", formData.nomineeAadharNumber);
-      
-      // Get panCardTypeId from the selected label
-      const panCardTypeId = panCardTypes.find(type => type.label === formData.panCardAccountType)?.id.toString() || "1";
-      submitData.append("panCardTypeId", panCardTypeId);
-      
-      submitData.append("panCardNumber", formData.panCardNumber.toUpperCase());
-      submitData.append("aadharCardNumber", formData.aadharCard);
-      submitData.append("address1", formData.addressLine1);
-      submitData.append("address2", formData.addressLine2 || "");
-      submitData.append("district", formData.district);
-      submitData.append("state", formData.state);
-      submitData.append("pinCode", formData.pinCode);
-      submitData.append("country", formData.country);
-      submitData.append("investorStatusId", formData.activeInvestor ? "1" : "0");
-      submitData.append("nameAsPerBank", formData.nameAsPanCard);
-      
-      // Append files
-      if (formData.aadharCardFile) {
-        submitData.append("aadharcard", formData.aadharCardFile);
-      }
-      
-      if (formData.panCardFile) {
-        submitData.append("pancard", formData.panCardFile);
-      }
-      
-      if (formData.chequePassbookFile) {
-        submitData.append("checkbookPassbook", formData.chequePassbookFile);
-      }
-      
-      if (formData.bankStatementFile) {
-        submitData.append("bankStatement", formData.bankStatementFile);
-      }
-      
-      if (formData.signatureFile) {
-        submitData.append("signature", formData.signatureFile);
-      }
-
-      console.log('Submitting investor data with payload:', {
-        nameAsPerPanCard: formData.nameAsPanCard,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phoneNumber,
-        amount: formData.amount,
-        paymentSystemId: paymentSystems.find(ps => ps.name === formData.paymentSystem)?.paymentSystemId,
-        referenceId: formData.referencePerson,
-        // paymentReceivedAccountId: formData.paymentReceivedAccount,
-        // Files are included in FormData but not logged here
-      });
-
-      // Call API to add investor
-      const response = await apiService.addInvestor(submitData);
-      
-      if (response.success) {
-        setSubmitSuccess(true);
-        showNotification('Investor added successfully!', 'success');
-        
-        // Reset form after successful submission
-        setTimeout(() => {
-          setSubmitSuccess(false);
-          onBack();
-        }, 2000);
-      } else {
-        throw new Error(response.message || 'Failed to add investor');
-      }
+      // Navigate back after a short delay
+      setTimeout(() => {
+        setSubmitSuccess(false);
+        onBack();
+      }, 2000);
     } catch (error: any) {
-      console.error('Error adding investor:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to add investor. Please try again.';
-      setSubmitError(errorMessage);
-      showNotification(errorMessage, 'error');
+      console.error('Error updating investor:', error);
+      setSubmitError(error.message || 'Failed to update investor. Please try again.');
+      showNotification(error.message || 'Failed to update investor', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -559,8 +533,8 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Add Investor</h1>
-              <p className="text-gray-600">Create a new investor account with complete details</p>
+              <h1 className="text-2xl font-bold text-gray-900">Edit Investor</h1>
+              <p className="text-gray-600">Update investor information</p>
             </div>
           </div>
         </div>
@@ -572,7 +546,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
           <div className="flex items-center space-x-3">
             <CheckCircle size={24} className="text-green-600" />
             <div>
-              <h3 className="text-green-800 font-semibold">Investor Added Successfully!</h3>
+              <h3 className="text-green-800 font-semibold">Investor Updated Successfully!</h3>
               <p className="text-green-600">Redirecting to investors list...</p>
             </div>
           </div>
@@ -775,95 +749,6 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
           </div>
         </FormSection>
 
-        {/* Payment Details */}
-        <FormSection title="Payment">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Payment Received Account Dropdown */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                <span className="text-red-500 mr-1">*</span>
-                Payment Received Account
-              </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsAccountOpen(!isAccountOpen)}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between ${
-                    errors.paymentReceivedAccount ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                >
-                  <span className={formData.paymentReceivedAccount ? 'text-gray-900' : 'text-gray-400'}>
-                    {accounts.find(acc => acc.accountId === formData.paymentReceivedAccount)?.name || 'Select Account'}
-                  </span>
-                  <ChevronDown 
-                    size={20} 
-                    className={`text-gray-400 transition-transform ${isAccountOpen ? 'rotate-180' : ''}`} 
-                  />
-                </button>
-                
-                {isAccountOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                    {loadingAccounts ? (
-                      <div className="p-4 text-center">
-                        <Loader2 size={20} className="animate-spin mx-auto text-cyan-500 mb-2" />
-                        <p className="text-sm text-gray-500">Loading accounts...</p>
-                      </div>
-                    ) : (
-                      accounts.map(account => (
-                        <div 
-                          key={account.accountId} 
-                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
-                          onClick={() => handleAccountSelect(account.accountId, account.name)}
-                        >
-                          <div>
-                            <span className="text-gray-900">{account.name}</span>
-                            <span className={`ml-2 text-xs ${account.amountColour === 'green' ? 'text-green-600' : 'text-red-600'}`}>
-                              {account.balance.toLocaleString()}
-                            </span>
-                          </div>
-                          {formData.paymentReceivedAccount === account.accountId && (
-                            <CheckCircle size={16} className="text-cyan-500" />
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-              {errors.paymentReceivedAccount && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <AlertCircle size={16} className="mr-1" />
-                  {errors.paymentReceivedAccount}
-                </p>
-              )}
-            </div>
-
-            {/* Date Field */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                <span className="text-red-500 mr-1">*</span>
-                Date
-              </label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleInputChange}
-                onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${
-                  errors.date ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-              />
-              {errors.date && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <AlertCircle size={16} className="mr-1" />
-                  {errors.date}
-                </p>
-              )}
-            </div>
-          </div>
-        </FormSection>
-
         {/* Bank Details */}
         <FormSection title="Bank Details">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1053,7 +938,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               {panCardStatus === 'valid' && (
                 <p className="mt-2 text-sm text-green-600 flex items-center">
                   <CheckCircle size={16} className="mr-1" />
-                  PAN card is valid and available
+                  PAN card is valid
                 </p>
               )}
             </div>
@@ -1178,35 +1063,35 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               name="aadharCardFile"
               file={formData.aadharCardFile}
               onChange={handleFileChange('aadharCardFile')}
-              required
+              existingFileUrl={investorData?.aadharCardURL}
             />
             <FileUpload
               label="Pan Card"
               name="panCardFile"
               file={formData.panCardFile}
               onChange={handleFileChange('panCardFile')}
-              required
+              existingFileUrl={investorData?.panCardURL}
             />
             <FileUpload
               label="Cheque/Passbook File"
               name="chequePassbookFile"
               file={formData.chequePassbookFile}
               onChange={handleFileChange('chequePassbookFile')}
-              required
+              existingFileUrl={investorData?.chequeORPassbookURL}
             />
             <FileUpload
               label="Bank Statement File"
               name="bankStatementFile"
               file={formData.bankStatementFile}
               onChange={handleFileChange('bankStatementFile')}
-              required
+              existingFileUrl={investorData?.bankStatementURL}
             />
             <FileUpload
               label="Signature File"
               name="signatureFile"
               file={formData.signatureFile}
               onChange={handleFileChange('signatureFile')}
-              required
+              existingFileUrl={investorData?.signatureURL}
             />
           </div>
 
@@ -1266,17 +1151,17 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                 {isSubmitting ? (
                   <>
                     <Loader2 size={20} className="animate-spin" />
-                    <span>Adding Investor...</span>
+                    <span>Updating Investor...</span>
                   </>
                 ) : submitSuccess ? (
                   <>
                     <CheckCircle size={20} />
-                    <span>Added Successfully!</span>
+                    <span>Updated Successfully!</span>
                   </>
                 ) : (
                   <>
                     <Save size={20} />
-                    <span>Add Investor</span>
+                    <span>Update Investor</span>
                   </>
                 )}
               </button>
@@ -1288,4 +1173,4 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   );
 };
 
-export default AddInvestorForm;
+export default EditInvestorForm;

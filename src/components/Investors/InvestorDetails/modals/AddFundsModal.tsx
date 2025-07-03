@@ -70,15 +70,31 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ isOpen, onClose, investor
         submitData.append('transactionImage', formData.transactionImage);
       }
 
-      // Call API
-      const response = await apiService.post('/transaction/admin/addFunds', submitData);
+      console.log('Submitting add funds with payload:', {
+        amount: formData.amount,
+        transactionalBankId: investor.transactionalBankId,
+        investorId: investor.id,
+        transactionRefNumber: formData.transactionRefNumber,
+        transactionImage: formData.transactionImage ? formData.transactionImage.name : null
+      });
+
+      // Call API with multipart/form-data
+      const response = await fetch(`${apiService.getBaseUrl()}/transaction/admin/addFunds`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: submitData
+      });
       
-      if (response.success) {
+      const responseData = await response.json();
+      
+      if (responseData.success) {
         showNotification('Funds added successfully!', 'success');
         onSuccess();
         onClose();
       } else {
-        throw new Error(response.message || 'Failed to add funds');
+        throw new Error(responseData.message || 'Failed to add funds');
       }
     } catch (error: any) {
       console.error('Error adding funds:', error);

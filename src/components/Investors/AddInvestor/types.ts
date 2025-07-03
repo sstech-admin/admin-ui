@@ -26,7 +26,7 @@ export interface InvestorFormData {
   nomineeAadharNumber: string;
 
   // Personal Details
-  panCardAccountType: 'Individual' | 'HUF' | 'Minor';
+  panCardAccountType: string;
   panCardNumber: string;
   aadharCard: string;
   addressLine1: string;
@@ -62,4 +62,31 @@ export interface ValidationRule {
 
 export interface ValidationRules {
   [key: string]: ValidationRule;
+}
+
+export interface Reference {
+  id: string;
+  name: string;
+  referenceId: string;
+  deleted: boolean;
+  updatedAt: string;
+  totalInvestors: number;
+}
+
+export interface PaymentSystem {
+  paymentSystemId: number;
+  name: string;
+}
+
+export interface Account {
+  accountId: string;
+  name: string;
+  balance: number;
+  amountColour: string;
+  accountTypeId: number;
+}
+
+export interface PanCardType {
+  id: number;
+  label: string;
 }

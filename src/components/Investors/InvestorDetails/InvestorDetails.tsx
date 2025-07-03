@@ -157,6 +157,8 @@ const InvestorDetails: React.FC = () => {
         error={certificatesError}
         selectedYear={selectedYear}
         onYearChange={handleYearChange}
+        investorId={investorId}
+        refetchCertificates={refetchCertificates}
       />
       
       {/* Transactions */}

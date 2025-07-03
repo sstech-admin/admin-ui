@@ -1,30 +1,45 @@
 import React, { useState, useCallback } from 'react';
-import { 
-  Loader2, 
-  AlertCircle, 
-  Clock, 
-  Search, 
-  RefreshCw, 
-  Download, 
-  Eye, 
-  CheckCircle, 
+import {
+  Loader2,
+  AlertCircle,
+  Clock,
+  Search,
+  RefreshCw,
+  Download,
+  Eye,
+  CheckCircle,
   XCircle,
   ChevronDown,
   X,
   User,
-  Calendar
+  Calendar,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { usePendingInvestors } from './hooks/usePendingInvestors';
 import { PendingInvestor, PendingInvestorAction } from './types';
 import PendingInvestorsPagination from './PendingInvestorsPagination';
+import ConfirmationDialog from '../../common/ConfirmationDialog';
+import { apiService } from '../../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const PendingInvestorsTable: React.FC = () => {
+  const navigate = useNavigate();
   const { investors, loading, error, pagination, filters, setFilters, refetch } = usePendingInvestors();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isPaymentSystemOpen, setIsPaymentSystemOpen] = useState(false);
   const [selectedPaymentSystem, setSelectedPaymentSystem] = useState('All');
+  const [processingInvestorId, setProcessingInvestorId] = useState<string | null>(null);
+  const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [selectedInvestor, setSelectedInvestor] = useState<PendingInvestor | null>(null);
 
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Confirmation dialog state
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [investorToDelete, setInvestorToDelete] = useState<PendingInvestor | null>(null);
   // Payment system options
   const paymentSystemOptions = [
     { value: 'All', label: 'All Payment Systems' },
@@ -38,7 +53,7 @@ const PendingInvestorsTable: React.FC = () => {
   // Debounced search
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-    
+
     const timeoutId = setTimeout(() => {
       setFilters({ search: value, page: 1 });
     }, 500);
@@ -49,9 +64,9 @@ const PendingInvestorsTable: React.FC = () => {
   const handlePaymentSystemChange = (system: string) => {
     setSelectedPaymentSystem(system);
     setIsPaymentSystemOpen(false);
-    setFilters({ 
-      paymentSystem: system === 'All' ? undefined : system, 
-      page: 1 
+    setFilters({
+      paymentSystem: system === 'All' ? undefined : system,
+      page: 1
     });
   };
 
@@ -82,12 +97,12 @@ const PendingInvestorsTable: React.FC = () => {
       'Aadhar Card': investor.aadharCardNumber,
       'Created Date': investor.createdAt ? new Date(investor.createdAt).toLocaleString() : ''
     }));
-    
+
     const csvString = [
       Object.keys(csvData[0] || {}).join(','),
       ...csvData.map(row => Object.values(row).join(','))
     ].join('\n');
-    
+
     const blob = new Blob([csvString], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -107,60 +122,143 @@ const PendingInvestorsTable: React.FC = () => {
     });
   };
 
-  const handleInvestorAction = async (action: PendingInvestorAction) => {
+  const handleTransactionAction = async (action: PendingInvestorAction) => {
     console.log('Pending investor action:', action);
-    
+
     if (action.type === 'approve') {
-      if (window.confirm('Are you sure you want to approve this investor?')) {
-        try {
-          console.log('Approving investor:', action.investorId);
-          // TODO: Implement API call to approve investor
-          // await apiService.post(`/investor/admin/approve/${action.investorId}`);
-          showNotification('Investor approved successfully!', 'success');
-          await refetch();
-        } catch (error) {
-          console.error('Error approving investor:', error);
-          showNotification('Failed to approve investor', 'error');
-        }
+      const investor = investors.find(inv => inv._id === action.investorId);
+      if (investor) {
+        setSelectedInvestor(investor);
+        setIsApproveDialogOpen(true);
       }
     } else if (action.type === 'reject') {
-      if (window.confirm('Are you sure you want to reject this investor? This action cannot be undone.')) {
-        try {
-          console.log('Rejecting investor:', action.investorId);
-          // TODO: Implement API call to reject investor
-          // await apiService.post(`/investor/admin/reject/${action.investorId}`);
-          showNotification('Investor rejected successfully!', 'success');
-          await refetch();
-        } catch (error) {
-          console.error('Error rejecting investor:', error);
-          showNotification('Failed to reject investor', 'error');
-        }
+      const investor = investors.find(inv => inv._id === action.investorId);
+      if (investor) {
+        setSelectedInvestor(investor);
+        setIsRejectDialogOpen(true);
       }
     } else if (action.type === 'view') {
       console.log('Viewing investor:', action.investorId);
       // TODO: Implement view investor modal/page
-    } else if (action.type === 'edit') {
-      console.log('Editing investor:', action.investorId);
-      // TODO: Implement edit investor modal/page
+    }
+  };
+
+
+  // Investor action handlers
+  const handleViewInvestor = (investorId: string) => {
+    console.log('View investor:', investorId);
+    navigate(`/investors/${investorId}`);
+  };
+
+  const handleEditInvestor = (investorId: string) => {
+    console.log('Edit investor:', investorId);
+    // Implement edit investor modal/page
+  };
+
+  const handleDeleteInvestor = (investorId: string) => {
+    console.log('Delete investor:', investorId);
+    // Open confirmation dialog
+    const investor = investors.find(inv => inv._id === investorId);
+      if (investor) {
+        setInvestorToDelete(investor);
+        setIsConfirmDialogOpen(true);
+      }
+  };
+
+  const confirmDeleteInvestor = async () => {
+    if (!investorToDelete) return;
+
+    try {
+      setDeleteLoading(true);
+
+      // Call delete API
+      const response = await apiService.delete(`/investor/admin/delete/${investorToDelete._id}`);
+
+      if (response.success) {
+        // Show success notification
+        showNotification(`Investor ${investorToDelete.name} deleted successfully`, 'success');
+
+        // Refresh the investors list
+        await refetch();
+      } else {
+        throw new Error(response.message || 'Failed to delete investor');
+      }
+    } catch (error: any) {
+      console.error('Error deleting investor:', error);
+      showNotification(error.message || 'Failed to delete investor', 'error');
+    } finally {
+      setDeleteLoading(false);
+      setIsConfirmDialogOpen(false);
+      setInvestorToDelete(null);
+    }
+  };
+
+  const cancelDeleteInvestor = () => {
+    setIsConfirmDialogOpen(false);
+    setInvestorToDelete(null);
+  };
+
+  const handleApproveInvestor = async () => {
+    if (!selectedInvestor) return;
+
+    try {
+      setProcessingInvestorId(selectedInvestor._id);
+
+      // Call API to approve investor
+      const response = await apiService.patch(`/investor/admin/approve/${selectedInvestor._id}`);
+
+      if (response.success) {
+        showNotification(`Investor ${selectedInvestor.name} approved successfully!`, 'success');
+        await refetch();
+      } else {
+        throw new Error(response.message || 'Failed to approve investor');
+      }
+    } catch (error: any) {
+      console.error('Error approving investor:', error);
+      showNotification(error.message || 'Failed to approve investor', 'error');
+    } finally {
+      setProcessingInvestorId(null);
+      setIsApproveDialogOpen(false);
+      setSelectedInvestor(null);
+    }
+  };
+
+  const handleRejectInvestor = async () => {
+    if (!selectedInvestor) return;
+
+    try {
+      setProcessingInvestorId(selectedInvestor._id);
+
+      // TODO: Implement API call to reject investor
+      // await apiService.post(`/investor/admin/reject/${selectedInvestor._id}`);
+
+      showNotification(`Investor ${selectedInvestor.name} rejected successfully!`, 'success');
+      await refetch();
+    } catch (error: any) {
+      console.error('Error rejecting investor:', error);
+      showNotification(error.message || 'Failed to reject investor', 'error');
+    } finally {
+      setProcessingInvestorId(null);
+      setIsRejectDialogOpen(false);
+      setSelectedInvestor(null);
     }
   };
 
   const showNotification = (message: string, type: 'success' | 'error') => {
     // Create a simple toast notification
     const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${
-      type === 'success' ? 'bg-green-500' : 'bg-red-500'
-    }`;
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      }`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     // Animate in
     setTimeout(() => {
       toast.style.transform = 'translateX(0)';
       toast.style.opacity = '1';
     }, 100);
-    
+
     // Remove after 4 seconds
     setTimeout(() => {
       toast.style.transform = 'translateX(100%)';
@@ -243,32 +341,30 @@ const PendingInvestorsTable: React.FC = () => {
                 className="pl-10 pr-4 py-2.5 w-80 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all bg-white"
               />
             </div>
-            
+
             {/* Action Buttons */}
-            <button 
+            <button
               onClick={handleRefresh}
               disabled={loading}
-              className={`flex items-center space-x-2 px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`flex items-center space-x-2 px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
               <span className="text-sm font-medium">{loading ? 'Loading...' : 'Refresh'}</span>
             </button>
-            
-            <button 
+
+            <button
               onClick={handleExport}
               disabled={loading}
-              className={`flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <Download size={18} />
               <span className="text-sm font-medium">Export</span>
             </button>
           </div>
         </div>
-        
+
         {/* Filters Row */}
         <div className="mt-6 flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -277,25 +373,23 @@ const PendingInvestorsTable: React.FC = () => {
               <button
                 onClick={() => setIsPaymentSystemOpen(!isPaymentSystemOpen)}
                 disabled={loading}
-                className={`flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors min-w-[180px] justify-between ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors min-w-[180px] justify-between ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
               >
                 <span className="text-sm font-medium text-gray-700">
                   {selectedPaymentSystem}
                 </span>
                 <ChevronDown size={16} className={`text-gray-400 transition-transform ${isPaymentSystemOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {isPaymentSystemOpen && !loading && (
                 <div className="absolute z-10 w-56 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg">
                   {paymentSystemOptions.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => handlePaymentSystemChange(option.value)}
-                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl last:rounded-b-xl ${
-                        selectedPaymentSystem === option.value ? 'bg-orange-50 text-orange-700' : ''
-                      }`}
+                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl last:rounded-b-xl ${selectedPaymentSystem === option.value ? 'bg-orange-50 text-orange-700' : ''
+                        }`}
                     >
                       {option.label}
                     </button>
@@ -324,11 +418,11 @@ const PendingInvestorsTable: React.FC = () => {
       </div>
 
       {/* Loading State */}
-      {loading && (
+      {(loading || deleteLoading) && (
         <div className="p-12 text-center">
           <div className="flex items-center justify-center space-x-3">
             <Loader2 size={24} className="animate-spin text-orange-500" />
-            <span className="text-gray-600">Loading pending investors...</span>
+            <span className="text-gray-600">{deleteLoading ? 'Processing delete request...' : 'Loading investors...'}</span>
           </div>
         </div>
       )}
@@ -344,7 +438,7 @@ const PendingInvestorsTable: React.FC = () => {
               <div>
                 <h3 className="text-red-800 font-semibold">Error Loading Pending Investors</h3>
                 <p className="text-red-600 text-sm">{error}</p>
-                <button 
+                <button
                   onClick={handleRefresh}
                   className="mt-2 text-red-600 hover:text-red-800 text-sm font-medium underline"
                 >
@@ -367,7 +461,7 @@ const PendingInvestorsTable: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Pending Investors Found</h3>
               <p className="text-gray-600">
                 {filters.search || hasActiveFilters
-                  ? 'No pending investors found matching your filters.' 
+                  ? 'No pending investors found matching your filters.'
                   : 'No pending investor applications at the moment.'
                 }
               </p>
@@ -380,16 +474,13 @@ const PendingInvestorsTable: React.FC = () => {
                     Investor
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Contact
+                    Investor Type
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Amount
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Payment System
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Applied Date
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Action
@@ -412,14 +503,13 @@ const PendingInvestorsTable: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm">
-                        <div className="text-gray-900">{investor.email || 'N/A'}</div>
-                        <div className="text-gray-500">{investor.phoneNumber || 'N/A'}</div>
+                        <div className="text-gray-900">{investor.investorTypeName}</div>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm">
                         <div className="text-xs text-red-500 font-medium">{investor.amountText}</div>
@@ -428,42 +518,47 @@ const PendingInvestorsTable: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getPaymentSystemColor(investor.paymentSystemName)}`}>
                         {investor.paymentSystemName}
                       </span>
                     </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <Calendar size={14} className="mr-2 text-gray-400" />
-                        {formatDate(investor.createdAt)}
-                      </div>
-                    </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
-                        <button 
-                          onClick={() => handleInvestorAction({ type: 'approve', investorId: investor._id })}
-                          className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Approve Investor"
+                        <button
+                          onClick={() => handleTransactionAction({ type: 'approve', investorId: investor._id })}
+                          className="flex items-center space-x-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                          disabled={processingInvestorId === investor._id}
                         >
-                          <CheckCircle size={16} />
+                          {processingInvestorId === investor._id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <CheckCircle size={16} />
+                          )}
+                          <span className="text-sm font-medium">Approve</span>
                         </button>
                         <button 
-                          onClick={() => handleInvestorAction({ type: 'reject', investorId: investor._id })}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Reject Investor"
-                        >
-                          <XCircle size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleInvestorAction({ type: 'view', investorId: investor._id })}
-                          className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                          title="View Details"
+                          onClick={() => handleViewInvestor(investor._id)}
+                          className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
+                          title="View Investor"
                         >
                           <Eye size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleEditInvestor(investor._id)}
+                          className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                          title="Edit Investor"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteInvestor(investor._id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete Investor"
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -489,6 +584,47 @@ const PendingInvestorsTable: React.FC = () => {
           loading={loading}
         />
       )}
+
+      {/* Approve Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isApproveDialogOpen}
+        title="Approve Investor"
+        message={`Are you sure you want to approve ${selectedInvestor?.name}?`}
+        confirmText="Approve"
+        cancelText="Cancel"
+        onConfirm={handleApproveInvestor}
+        onCancel={() => {
+          setIsApproveDialogOpen(false);
+          setSelectedInvestor(null);
+        }}
+        type="info"
+      />
+
+      {/* Reject Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isRejectDialogOpen}
+        title="Reject Investor"
+        message={`Are you sure you want to reject ${selectedInvestor?.name}? This action cannot be undone.`}
+        confirmText="Reject"
+        cancelText="Cancel"
+        onConfirm={handleRejectInvestor}
+        onCancel={() => {
+          setIsRejectDialogOpen(false);
+          setSelectedInvestor(null);
+        }}
+        type="danger"
+      />
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        title={`Are you sure delete this user ${investorToDelete?.name}?`}
+        message="Press Yes for Permanent Delete"
+        confirmText="Yes"
+        cancelText="No"
+        onConfirm={confirmDeleteInvestor}
+        onCancel={cancelDeleteInvestor}
+        type="danger"
+      />
     </div>
   );
 };

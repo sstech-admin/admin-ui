@@ -23,8 +23,9 @@ import WithdrawFunds from './components/WithdrawFunds/WithdrawFunds';
 import AllAccounts from './components/AllAccounts/AllAccounts';
 import TallyExport from './components/TallyExport/TallyExport';
 import NotFound from './components/NotFound';
-import PendingInvestors from './components/Investors/PendingInvestors';
-
+// import PendingInvestors from './components/Investors/PendingInvestors';
+import PendingInvestors from './components/Investors/PendingInvestors/PendingInvestors';
+import EditInvestor from './components/Investors/EditInvestor/EditInvestor';
 const DashboardLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50">
@@ -47,6 +48,7 @@ const DashboardLayout: React.FC = () => {
               <Route path="/investors" element={<ViewInvestors />} />
               <Route path="/investors/pending" element={<PendingInvestors />} />
               <Route path="/investors/add" element={<AddInvestor onBack={() => window.history.back()} />} />
+              <Route path="/investors/edit/:investorId" element={<EditInvestor />} />
               <Route path="/investors/:investorId" element={<InvestorDetails />} />
               <Route path="/investors/referrals" element={<Referrals />} />
               <Route path="/reference-investors/:referenceId" element={<ReferenceInvestors />} />
