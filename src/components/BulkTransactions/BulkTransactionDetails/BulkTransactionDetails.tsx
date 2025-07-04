@@ -282,10 +282,11 @@ const BulkTransactionDetails: React.FC = () => {
             <div>
               <div className="text-sm font-medium text-gray-600 mb-1">Date</div>
               <div className="text-lg font-semibold text-green-600">
-                {new Date(summary.createdAt).toLocaleDateString('en-US', {
+                {new Date(summary.updatedAt).toLocaleString('en-US', {
                   day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
+                  month: 'short',
+                  year: 'numeric',     // Optional: toggle AM/PM
+                  timeZone: 'UTC'       // Optional: to prevent timezone shift
                 })}
               </div>
             </div>
@@ -475,7 +476,8 @@ const BulkTransactionDetails: React.FC = () => {
                             {new Date(transaction.dateTime).toLocaleDateString('en-US', {
                               day: '2-digit',
                               month: 'short',
-                              year: 'numeric'
+                              year: 'numeric',
+                              timeZone: 'UTC' 
                             })}
                           </span>
                         </td>

@@ -155,6 +155,7 @@ class ApiService {
     return response.data;
   }
 
+
   // Profit & Loss endpoints
   async saveAmount(payload: { amount: number; date: string; tag: string }) {
     const response = await this.api.post('/amount/saveAmount', payload);
@@ -206,6 +207,14 @@ class ApiService {
     console.log('Fetching withdraw funds with URL:', `/transaction/admin/getAddWithdrawRequest?${queryParams.toString()}`);
     
     const response = await this.api.get(`/transaction/admin/getAddWithdrawRequest?${queryParams.toString()}`);
+    return response.data;
+  }
+
+
+
+  // Profit & Loss endpoints
+  async deleteBulkTransaction(payload: { bulkTransactionId: string;}) {
+    const response = await this.api.post('/bulk-transactions/deleteBulkTransaction', payload);
     return response.data;
   }
 

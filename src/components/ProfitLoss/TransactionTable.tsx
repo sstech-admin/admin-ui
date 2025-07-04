@@ -1,6 +1,9 @@
-import React from 'react';
-import { Eye, Filter, ChevronDown, ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
+import React, {useState} from 'react';
+import { Eye, Filter, ChevronDown, ArrowUpRight, ArrowDownRight, Loader2, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ConfirmationDialog from '../common/ConfirmationDialog';
+import apiService from '../../services/api';
+
 interface ProfitLossEntry {
   id: string;
   bulkTransactionId: string;
@@ -47,6 +50,81 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   const handleViewBulkTransactions = (bulkTransactionId: string) => {
     navigate(`/bulk-transaction/${bulkTransactionId}`);
   };
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<string>('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  
+  const handleDeleteTransaction = (bulkTransactionId: string) => {
+    console.log('Delete investor:', bulkTransactionId);
+    // Open confirmation dialog
+    setTransactionToDelete(bulkTransactionId);
+    setIsConfirmDialogOpen(true);
+  };
+
+
+  
+  const confirmDeleteTransaction = async () => {
+    if (!transactionToDelete) return;
+    
+    try {
+      setDeleteLoading(true);
+      
+      // Call delete API
+      const response = await apiService.deleteBulkTransaction({
+        bulkTransactionId: transactionToDelete
+      });
+      
+      if (response.success) {
+        // Show success notification
+        showNotification(`Transadtion deleted successfully`, 'success');
+        
+        // Refresh the investors list
+        // await refetch();
+      } else {
+        throw new Error(response.message || 'Failed to delete investor');
+      }
+    } catch (error: any) {
+      console.error('Error deleting investor:', error);
+      showNotification(error.message || 'Failed to delete investor', 'error');
+    } finally {
+      setDeleteLoading(false);
+      setIsConfirmDialogOpen(false);
+      setTransactionToDelete('');
+    }
+  };
+
+  const cancelDeleteTransaction = () => {
+    setIsConfirmDialogOpen(false);
+    setTransactionToDelete('');
+  };
+
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    // Create a simple toast notification
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+      toast.style.transform = 'translateX(0)';
+      toast.style.opacity = '1';
+    }, 100);
+    
+    // Remove after 4 seconds
+    setTimeout(() => {
+      toast.style.transform = 'translateX(100%)';
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 300);
+    }, 4000);
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -56,10 +134,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           <div>
             <h2 className="text-xl font-semibold text-gray-900">Transaction History</h2>
             <p className="text-sm text-gray-600 mt-1">
-              {loading ? (
+              {(loading || deleteLoading) ? (
                 <span className="flex items-center space-x-2">
                   <Loader2 size={14} className="animate-spin" />
-                  <span>Loading transactions...</span>
+                  <span> {deleteLoading ? 'Processing delete request...' : 'Loading transactions...'}</span>
+                  
                 </span>
               ) : (
                 `Showing ${entries.length} of ${totalEntries} transactions`
@@ -185,6 +264,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     >
                       <Eye size={16} />
                     </button>
+                    <button className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
+                      onClick={() => handleDeleteTransaction(entry.bulkTransactionId)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -214,6 +298,18 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           </div>
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        title={`Are you sure delete this transaction?`}
+        message="Press Yes for Permanent Delete"
+        confirmText="Yes"
+        cancelText="No"
+        onConfirm={confirmDeleteTransaction}
+        onCancel={cancelDeleteTransaction}
+        type="danger"
+      />
     </div>
   );
 };
