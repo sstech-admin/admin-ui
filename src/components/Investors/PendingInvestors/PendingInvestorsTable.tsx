@@ -42,11 +42,8 @@ const PendingInvestorsTable: React.FC = () => {
   const [investorToDelete, setInvestorToDelete] = useState<PendingInvestor | null>(null);
   // Payment system options
   const paymentSystemOptions = [
-    { value: 'All', label: 'All Payment Systems' },
+    { value: 'All', label: 'All' },
     { value: 'Monthly', label: 'Monthly' },
-    { value: 'Weekly', label: 'Weekly' },
-    { value: 'Quarterly', label: 'Quarterly' },
-    { value: 'Yearly', label: 'Yearly' },
     { value: 'None', label: 'None' }
   ];
 
@@ -153,6 +150,7 @@ const PendingInvestorsTable: React.FC = () => {
   const handleEditInvestor = (investorId: string) => {
     console.log('Edit investor:', investorId);
     // Implement edit investor modal/page
+      navigate(`/investors/edit/${investorId}`);
   };
 
   const handleDeleteInvestor = (investorId: string) => {

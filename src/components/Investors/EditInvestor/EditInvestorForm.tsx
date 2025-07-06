@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, ArrowLeft, Loader2, CheckCircle, AlertCircle, Plus, Minus, IndianRupee, ChevronDown } from 'lucide-react';
-import { InvestorFormData, FormErrors, Reference, PaymentSystem, Account, PanCardType } from '../AddInvestor/types';
-import { validateForm, validateSingleField } from '../AddInvestor/validation';
+import { InvestorUpdateFormData, FormErrors, Reference, PaymentSystem, Account, PanCardType } from '../AddInvestor/types';
+import { validateForm, validateSingleField } from '../AddInvestor/updateInvestorValidation';
 import FormSection from '../AddInvestor/FormSection';
 import FormField from '../AddInvestor/FormField';
 import FileUpload from '../AddInvestor/FileUpload';
@@ -12,21 +12,17 @@ import { debounce } from 'lodash';
 interface EditInvestorFormProps {
   investorData: any;
   onBack: () => void;
-  onSubmit: (data: InvestorFormData) => Promise<void>;
+  onSubmit: (data: InvestorUpdateFormData) => Promise<void>;
 }
 
 const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBack, onSubmit }) => {
-  const [formData, setFormData] = useState<InvestorFormData>({
+  const [formData, setFormData] = useState<InvestorUpdateFormData>({
     nameAsPanCard: '',
-    firstName: '',
-    lastName: '',
     email: '',
     phoneNumber: '',
     amount: 500000, // Default amount
     paymentSystem: '',
     referencePerson: '',
-    paymentReceivedAccount: '',
-    date: new Date().toISOString().split('T')[0],
     bankName: '',
     bankAccountNumber: '',
     ifsc: '',
@@ -80,15 +76,11 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
       setFormData({
         // userName: investorData.userName || '',
         nameAsPanCard: investorData.nameAsPerPanCard || '',
-        firstName: investorData.firstName || '',
-        lastName: investorData.lastName || '',
         email: investorData.email || '',
         phoneNumber: investorData.phoneNumber?.replace('+91', '') || '',
         amount: investorData.amount || 500000,
         paymentSystem: investorData.paymentSystemName || '',
         referencePerson: investorData.referenceId || '',
-        paymentReceivedAccount: '',
-        date: new Date().toISOString().split('T')[0],
         bankName: investorData.bankName || '',
         bankAccountNumber: investorData.bankAccountNumber || '',
         ifsc: investorData.ifscCode || '',
@@ -160,32 +152,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
       } catch (error) {
         console.error('Error fetching references:', error);
         // Fallback data
-        setReferences([
-          {
-            id: "67f7a173eb52c64544c295b4",
-            name: "Smit Patel",
-            referenceId: "bae074ff-88f2-497f-8e56-ded52c79031d",
-            deleted: false,
-            updatedAt: "2025-04-10T10:46:11.916Z",
-            totalInvestors: 0
-          },
-          {
-            id: "67f7a182eb52c64544c295b7",
-            name: "Akhil Ramani",
-            referenceId: "3c258366-ddf1-412f-8e81-6927fb3e2863",
-            deleted: false,
-            updatedAt: "2025-04-10T10:46:26.137Z",
-            totalInvestors: 0
-          },
-          {
-            id: "67f7a189eb52c64544c295ba",
-            name: "Dharma",
-            referenceId: "24f07be5-d27b-4ea7-9652-d979fd488268",
-            deleted: false,
-            updatedAt: "2025-06-03T04:57:15.035Z",
-            totalInvestors: 1732
-          }
-        ]);
+        setReferences([]);
       } finally {
         setLoadingReferences(false);
       }
@@ -378,6 +345,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length > 0) {
+      console.log('ERRRO', Object.keys(formErrors))
       setSubmitError('Please fix the errors above before submitting.');
       return;
     }
@@ -579,7 +547,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
               required
               placeholder="Investor Name As Per Pan Card"
             />
-            <FormField
+            {/* <FormField
               label="First Name"
               name="firstName"
               value={formData.firstName}
@@ -598,7 +566,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
               error={errors.lastName}
               required
               placeholder="Investor Last Name"
-            />
+            /> */}
             <FormField
               label="Email"
               name="email"
@@ -869,6 +837,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
                 <span className="text-red-500 mr-1">*</span>
                 Pan Card Account Type
               </label>
+
               <div className="grid grid-cols-3 gap-2">
                 {loadingPanCardTypes ? (
                   <div className="col-span-3 flex items-center space-x-2">
@@ -876,14 +845,10 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
                     <span className="text-sm text-gray-500">Loading options...</span>
                   </div>
                 ) : (
-                  panCardTypes.map(type => (
-                    <label 
-                      key={type.id} 
-                      className={`flex items-center justify-center px-4 py-3 border rounded-xl cursor-pointer transition-all ${
-                        formData.panCardAccountType === type.label 
-                          ? 'bg-cyan-50 border-cyan-500 text-cyan-700' 
-                          : 'border-gray-300 hover:bg-gray-50'
-                      }`}
+                  panCardTypes.map((type) => (
+                    <label
+                      key={type.id}
+                      className="flex items-center space-x-2 p-2 cursor-pointer"
                     >
                       <input
                         type="radio"
@@ -891,14 +856,15 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
                         value={type.label}
                         checked={formData.panCardAccountType === type.label}
                         onChange={handleInputChange}
-                        className="sr-only"
+                        className="text-cyan-600 focus:ring-cyan-500"
                       />
-                      <span className="text-sm font-medium">{type.label}</span>
+                      <span className="text-sm">{type.label}</span>
                     </label>
                   ))
                 )}
               </div>
             </div>
+
 
             {/* PAN Card Number with validation */}
             <div>
@@ -1106,11 +1072,8 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
               rows={4}
             />
           </div>
-        </FormSection>
 
-        {/* Active Investor Toggle */}
-        <FormSection title="">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 mt-5">
             <input
               type="checkbox"
               name="activeInvestor"

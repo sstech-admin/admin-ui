@@ -29,10 +29,8 @@ const InvestorTableHeader: React.FC<InvestorTableHeaderProps> = ({
   totalInvestors
 }) => {
   const paymentTypeOptions = [
-    { value: 'All', label: 'All Payment Types' },
+    { value: 'All', label: 'All' },
     { value: 'Monthly', label: 'Monthly' },
-    { value: 'Quarterly', label: 'Quarterly' },
-    { value: 'Yearly', label: 'Yearly' },
     { value: 'None', label: 'None' }
   ];
 
@@ -119,11 +117,6 @@ const InvestorTableHeader: React.FC<InvestorTableHeaderProps> = ({
           >
             <Download size={18} />
             <span className="text-sm font-medium">Export</span>
-          </button>
-          
-          <button className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-orange-500 text-white rounded-xl hover:from-cyan-600 hover:to-orange-600 transition-all shadow-md">
-            <Plus size={18} />
-            <span className="text-sm font-medium">Add Investor</span>
           </button>
         </div>
       </div>

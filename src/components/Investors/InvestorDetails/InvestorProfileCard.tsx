@@ -9,7 +9,10 @@ import {
   TrendingUp, 
   TrendingDown, 
   Tag, 
-  Percent 
+  Percent, 
+  PhoneCall,
+  Edit2,
+  Edit
 } from 'lucide-react';
 import { InvestorProfile } from './types';
 
@@ -70,7 +73,9 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
             </span>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 flex">{profile.name} 
+              <Edit size={15}/>
+            </h2>
             <div className="flex items-center space-x-2 mt-1">
               <span className="text-sm text-gray-600">@{profile.userName}</span>
               <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
@@ -115,10 +120,10 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
         
         <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-100">
           <div className="flex items-center space-x-3 mb-2">
-            <Percent size={18} className="text-orange-600" />
-            <span className="text-sm font-medium text-gray-700">Return Percentage</span>
+            <PhoneCall size={18} className="text-orange-600" />
+            <span className="text-sm font-medium text-gray-700">Phone Number</span>
           </div>
-          <div className="text-sm font-semibold text-gray-900">{profile.returnInPercentage}%</div>
+          <div className="text-sm font-semibold text-gray-900">{profile.phoneNumber}</div>
         </div>
         
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">

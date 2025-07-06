@@ -93,6 +93,10 @@ class ApiService {
     return response.data;
   }
 
+  async updateTransaction(formData: { transactionId: string; transactionStatusId: number; }) {
+    const response = await this.api.post('/transaction/admin/updateTransactionStatus', formData);
+    return response.data;
+  }
   // User endpoints
   async getAllUsers(params: { page: number; limit: number; search: string; userType?: string; status?: string }) {
     const queryParams = new URLSearchParams({

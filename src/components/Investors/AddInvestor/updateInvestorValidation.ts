@@ -6,16 +6,6 @@ export const validationRules: ValidationRules = {
     minLength: 2,
     maxLength: 100,
   },
-  firstName: {
-    required: true,
-    minLength: 2,
-    maxLength: 50,
-  },
-  lastName: {
-    required: true,
-    minLength: 2,
-    maxLength: 50,
-  },
   email: {
     required: true,
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -38,18 +28,6 @@ export const validationRules: ValidationRules = {
   referencePerson: {
     required: true,
     minLength: 2,
-  },
-  paymentReceivedAccount: {
-    required: true,
-  },
-  date: {
-    required: true,
-    custom: (value: string) => {
-      const selectedDate = new Date(value);
-      const today = new Date();
-      if (selectedDate > today) return 'Date cannot be in the future';
-      return null;
-    },
   },
   bankName: {
     required: true,

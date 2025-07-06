@@ -47,6 +47,49 @@ export interface InvestorFormData {
   // Status
   activeInvestor: boolean;
 }
+export interface InvestorUpdateFormData {
+  // Basic Details
+  nameAsPanCard: string;
+  email: string;
+  phoneNumber: string;
+
+  // Investment Details
+  amount: number;
+  paymentSystem: string;
+  referencePerson: string;
+
+  // Bank Details
+  bankName: string;
+  bankAccountNumber: string;
+  ifsc: string;
+
+  // Nominee Details
+  nomineeName: string;
+  nomineeRelation: string;
+  nomineeAadharNumber: string;
+
+  // Personal Details
+  panCardAccountType: string;
+  panCardNumber: string;
+  aadharCard: string;
+  addressLine1: string;
+  addressLine2: string;
+  district: string;
+  state: string;
+  pinCode: string;
+  country: string;
+
+  // Documents
+  aadharCardFile?: File;
+  panCardFile?: File;
+  chequePassbookFile?: File;
+  bankStatementFile?: File;
+  signatureFile?: File;
+  description: string;
+
+  // Status
+  activeInvestor: boolean;
+}
 
 export interface FormErrors {
   [key: string]: string;

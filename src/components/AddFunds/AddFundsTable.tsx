@@ -18,6 +18,7 @@ import { useAddFunds } from './hooks/useAddFunds';
 import { AddFundsRequest, StatusOption } from './types';
 import AddFundsPagination from './AddFundsPagination';
 import AddFundsDetailDialog from './AddFundsDetailDialog';
+import { formatAmountIndian, maskString } from '../../utils/utils';
 
 const AddFundsTable: React.FC = () => {
   const { requests, loading, error, pagination, filters, setFilters, refetch } = useAddFunds();
@@ -382,12 +383,12 @@ const AddFundsTable: React.FC = () => {
                         
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-lg font-bold text-emerald-600">
-                            {formatAmount(request.amount)}
+                            {formatAmountIndian(request.amount)}
                           </div>
                         </td>
                         
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-mono text-gray-900">{request.transactionRefNumber}</span>
+                          <span className="text-sm font-mono text-gray-900">{maskString(request.transactionRefNumber)}</span>
                         </td>
                         
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -445,6 +446,7 @@ const AddFundsTable: React.FC = () => {
       <AddFundsDetailDialog
         request={selectedRequest}
         isOpen={isDetailDialogOpen}
+        refetchData={refetch}
         onClose={() => {
           setIsDetailDialogOpen(false);
           setSelectedRequest(null);

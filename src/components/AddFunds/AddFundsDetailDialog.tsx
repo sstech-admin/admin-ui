@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, User, Calendar, CreditCard, FileText, Image, Tag, DollarSign, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { AddFundsRequest } from './types';
+import apiService from '../../services/api';
+import { showNotification } from '../../utils/utils';
 
 interface AddFundsDetailDialogProps {
   request: AddFundsRequest | null;
   isOpen: boolean;
   onClose: () => void;
+  refetchData: () => void;
 }
 
-const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, isOpen, onClose }) => {
+const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, isOpen, onClose, refetchData }) => {
   if (!isOpen || !request) return null;
-
+  const [loading, setLoading] = useState(false);
   const formatAmount = (amount: number): string => {
     if (amount >= 10000000) {
       return `₹${(amount / 10000000).toFixed(1)}Cr`;
@@ -62,6 +65,33 @@ const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, is
   const withdrawStatusInfo = getWithdrawStatusInfo(request.withdrawStatus);
   const StatusIcon = statusInfo.icon;
 
+  const handleClose = () => {
+    onClose(); // Close the dialog
+    refetchData(); // Always refetch when closing
+
+  };
+
+  const handleTransaction = async (status: number) => {
+      if (!request) return;
+      setLoading(true);
+      try {
+        const updatedTransactionStatusBodyData = {
+          transactionId: request.transactionId,
+          transactionStatusId: status,
+        };
+
+        await apiService.updateTransaction(updatedTransactionStatusBodyData);
+        onClose(); // Close the modal
+        showNotification(status === 1
+            ? "Transaction request has been approved."
+            : "Transaction request has been rejected.", 'success')
+        onClose();
+      } catch (error: any) {
+        showNotification(error?.message || "Something went wrong!", 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -129,14 +159,6 @@ const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, is
                 <label className="block text-sm font-medium text-gray-600 mb-1">Username</label>
                 <div className="text-lg font-semibold text-gray-900">{request.userName}</div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
-                <div className="text-gray-900">{request.email}</div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Phone Number</label>
-                <div className="text-gray-900">{request.phoneNumber || 'Not provided'}</div>
-              </div>
             </div>
           </div>
 
@@ -166,50 +188,6 @@ const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, is
             </div>
           </div>
 
-          {/* Withdrawal Information */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <DollarSign size={20} className="mr-2 text-gray-600" />
-              Withdrawal Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Withdraw Status</label>
-                <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${withdrawStatusInfo.color}`}>
-                  {withdrawStatusInfo.label}
-                </span>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Withdraw Amount</label>
-                <div className="text-gray-900 font-semibold">{formatAmount(request.withdrawAmount)}</div>
-              </div>
-              {request.withdrawLastUpdated && (
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Last Withdraw Update</label>
-                  <div className="text-gray-900">{formatDate(request.withdrawLastUpdated)}</div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Tags Breakdown */}
-          {Object.keys(request.tagsBreakdown).length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Tag size={20} className="mr-2 text-gray-600" />
-                Tags Breakdown
-              </h3>
-              <div className="space-y-3">
-                {Object.entries(request.tagsBreakdown).map(([tag, amount]) => (
-                  <div key={tag} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="font-medium text-gray-700">{tag}</span>
-                    <span className="font-semibold text-gray-900">{formatAmount(amount)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Note */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -232,7 +210,7 @@ const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, is
                 <img
                   src={request.transactionImage}
                   alt="Transaction proof"
-                  className="max-w-full h-auto rounded-lg shadow-md"
+                  className="max-w-full h-72 rounded-lg shadow-md"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -241,40 +219,47 @@ const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, is
               </div>
             </div>
           )}
-
-          {/* System Information */}
-          <div className="bg-gray-50 rounded-2xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">System Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-600">Transaction ID:</span>
-                <div className="font-mono text-gray-900 break-all">{request.transactionId}</div>
-              </div>
-              <div>
-                <span className="font-medium text-gray-600">Account ID:</span>
-                <div className="font-mono text-gray-900 break-all">{request.accountId}</div>
-              </div>
-              <div>
-                <span className="font-medium text-gray-600">Investor ID:</span>
-                <div className="font-mono text-gray-900 break-all">{request.investorId}</div>
-              </div>
-              <div>
-                <span className="font-medium text-gray-600">Created By:</span>
-                <div className="font-mono text-gray-900 break-all">{request.createdBy}</div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-8 py-4 border-t border-gray-200 rounded-b-2xl">
+        <div className="bg-gray-50 px-8 py-4 border-t border-gray-200 rounded-b-2xl sticky bottom-0">
           <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Close
-            </button>
+            {
+              request.transactionStatusId != 1 ? (
+               <>
+               <button 
+                  disabled={loading}
+                  onClick={()=>{handleTransaction(1)}}
+                  className={`flex mr-5 items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all shadow-md ${
+                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <CheckCircle className='mr-2'/>
+                    Approve
+                </button>
+
+                <button 
+                  onClick={()=>{handleTransaction(2)}}
+                  disabled={loading}
+                    className={`flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-md ${
+                      loading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <XCircle className='mr-2'/>
+                    Reject
+                </button>
+                </>
+              ) :
+              (
+                <button
+                  onClick={onClose}
+                  className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Close
+                </button>
+              )
+            }
+            
           </div>
         </div>
       </div>

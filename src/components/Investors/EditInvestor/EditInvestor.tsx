@@ -59,7 +59,7 @@ const EditInvestor: React.FC = () => {
       });
 
       // Call API to update investor
-      const response = await apiService.post(`/investor/admin/updateInvestor/${investorId}`, submitData, {
+      const response = await apiService.put(`/investor/admin/updateInvestor/${investorId}`, submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

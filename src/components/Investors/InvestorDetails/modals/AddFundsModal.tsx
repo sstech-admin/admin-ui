@@ -9,23 +9,30 @@ interface AddFundsModalProps {
   investor: InvestorProfile | null;
   onSuccess: () => void;
 }
-
 interface AddFundsFormData {
   amount: number;
+  dateTime: string; // e.g., "2025-07-05"
   transactionRefNumber: string;
   transactionImage: File | null;
+  type: string;
 }
 
+
 const AddFundsModal: React.FC<AddFundsModalProps> = ({ isOpen, onClose, investor, onSuccess }) => {
-  const [formData, setFormData] = useState<AddFundsFormData>({
-    amount: 500000,
+const [formData, setFormData] = useState<AddFundsFormData>({
+    amount: 50000,
+    dateTime: new Date().toISOString().split('T')[0],
     transactionRefNumber: '',
-    transactionImage: null
+    transactionImage: null,
+    type: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  
+  const [date, setDate] = useState<string>(() => {
+  // Set today's date by default
+    return new Date().toISOString().split('T')[0];
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen || !investor) return null;
@@ -133,13 +140,13 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ isOpen, onClose, investor
   };
 
   const incrementAmount = () => {
-    setFormData(prev => ({ ...prev, amount: prev.amount + 100000 }));
+    setFormData(prev => ({ ...prev, amount: prev.amount + 50000 }));
     setErrors(prev => ({ ...prev, amount: '' }));
   };
 
   const decrementAmount = () => {
-    if (formData.amount > 100000) {
-      setFormData(prev => ({ ...prev, amount: prev.amount - 100000 }));
+    if (formData.amount > 50000) {
+      setFormData(prev => ({ ...prev, amount: prev.amount - 50000 }));
       setErrors(prev => ({ ...prev, amount: '' }));
     }
   };
@@ -235,6 +242,46 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ isOpen, onClose, investor
                 <Plus size={20} />
               </button>
             </div>
+          </div>
+
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <span className="text-red-500">*</span> Date
+            </label>
+            <div className="relative">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
+              />
+            </div>  
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <span className="text-red-500">*</span> Type
+            </label>
+            <div className="flex gap-4">
+              {['New', 'Old'].map((option) => (
+                <label
+                  key={option}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer transition-colors `}
+                >
+                  <input
+                    type="radio"
+                    name="type"
+                    value={option}
+                    checked={formData.type === option}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
+                    // className="accent-cyan-500"
+                  />
+                  <span className="text-sm font-medium">{option}</span>
+                </label>
+              ))}
+            </div>
+            {errors.type && <p className="mt-2 text-sm text-red-600">{errors.type}</p>}
           </div>
 
           <div className="border-t border-gray-200 pt-6">

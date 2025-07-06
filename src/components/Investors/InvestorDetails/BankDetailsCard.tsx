@@ -68,16 +68,6 @@ const BankDetailsCard: React.FC<BankDetailsCardProps> = ({ profile, loading }) =
           <div className="text-gray-900 pl-6">{profile.nameAsPerBank}</div>
         </div>
       )}
-      
-      {profile.transactionalBankName && (
-        <div className="mt-4 bg-gray-50 p-4 rounded-lg">
-          <div className="flex items-center space-x-2 mb-1">
-            <Building2 size={16} className="text-gray-400" />
-            <span className="text-sm font-medium text-gray-600">Transactional Bank</span>
-          </div>
-          <div className="text-gray-900 pl-6">{profile.transactionalBankName}</div>
-        </div>
-      )}
     </div>
   );
 };

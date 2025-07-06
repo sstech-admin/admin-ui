@@ -7,10 +7,13 @@ import {
   CreditCard, 
   ChevronLeft, 
   ChevronRight,
-  Tag
+  Tag,
+  Eye,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { InvestorTransaction, TransactionsPagination } from './types';
-
+import { formatAmountIndian } from '../../../utils/utils';
 interface TransactionsCardProps {
   transactions: InvestorTransaction[];
   loading: boolean;
@@ -26,16 +29,16 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   pagination,
   onPageChange
 }) => {
-  const formatAmount = (amount: number): string => {
-    if (amount >= 10000000) {
-      return `₹${(amount / 10000000).toFixed(1)}Cr`;
-    } else if (amount >= 100000) {
-      return `₹${(amount / 100000).toFixed(1)}L`;
-    } else if (amount >= 1000) {
-      return `₹${(amount / 1000).toFixed(1)}K`;
-    }
-    return `₹${amount.toLocaleString()}`;
-  };
+  // const formatAmount = (amount: number): string => {
+  //   if (amount >= 10000000) {
+  //     return `₹${(amount / 10000000).toFixed(1)}Cr`;
+  //   } else if (amount >= 100000) {
+  //     return `₹${(amount / 100000).toFixed(1)}L`;
+  //   } else if (amount >= 1000) {
+  //     return `₹${(amount / 1000).toFixed(1)}K`;
+  //   }
+  //   return `₹${amount.toLocaleString()}`;
+  // };
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -159,6 +162,9 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Date
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
@@ -172,7 +178,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                           <ArrowDownRight size={16} className="text-red-500 mr-2" />
                         )}
                         <span className={`text-sm font-bold ${transaction.amountColour === 'green' ? 'text-green-600' : 'text-red-600'}`}>
-                          {transaction.amountColour === 'green' ? '+' : '-'}{formatAmount(Math.abs(transaction.amount))}
+                          {transaction.amountColour === 'green' ? '+' : '-'}{formatAmountIndian(transaction.amount)}
                         </span>
                       </div>
                     </td>
@@ -208,6 +214,28 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm text-gray-900">{formatDate(transaction.createdAt)}</span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
+                          title="View Investor"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button 
+                          className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                          title="Edit Investor"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete Investor"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      </td>
                   </tr>
                 ))}
               </tbody>

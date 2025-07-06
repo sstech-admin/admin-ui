@@ -23,6 +23,7 @@ export interface InvestorProfile {
   profitOrLossAmountColour: string;
   userName: string;
   email: string;
+  phoneNumber: string;
   address1: string;
   address2: string;
   district: string;

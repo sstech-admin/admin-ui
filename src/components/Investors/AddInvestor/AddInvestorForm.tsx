@@ -110,32 +110,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
       } catch (error) {
         console.error('Error fetching references:', error);
         // Fallback data
-        setReferences([
-          {
-            id: "67f7a173eb52c64544c295b4",
-            name: "Smit Patel",
-            referenceId: "bae074ff-88f2-497f-8e56-ded52c79031d",
-            deleted: false,
-            updatedAt: "2025-04-10T10:46:11.916Z",
-            totalInvestors: 0
-          },
-          {
-            id: "67f7a182eb52c64544c295b7",
-            name: "Akhil Ramani",
-            referenceId: "3c258366-ddf1-412f-8e81-6927fb3e2863",
-            deleted: false,
-            updatedAt: "2025-04-10T10:46:26.137Z",
-            totalInvestors: 0
-          },
-          {
-            id: "67f7a189eb52c64544c295ba",
-            name: "Dharma",
-            referenceId: "24f07be5-d27b-4ea7-9652-d979fd488268",
-            deleted: false,
-            updatedAt: "2025-06-03T04:57:15.035Z",
-            totalInvestors: 1732
-          }
-        ]);
+        setReferences([]);
       } finally {
         setLoadingReferences(false);
       }
@@ -886,6 +861,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               error={errors.bankAccountNumber}
               required
               placeholder="Investor Bank Account Number"
+
             />
             <FormField
               label="IFSC"
@@ -991,14 +967,10 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                     <span className="text-sm text-gray-500">Loading options...</span>
                   </div>
                 ) : (
-                  panCardTypes.map(type => (
-                    <label 
-                      key={type.id} 
-                      className={`flex items-center justify-center px-4 py-3 border rounded-xl cursor-pointer transition-all ${
-                        formData.panCardAccountType === type.label 
-                          ? 'bg-cyan-50 border-cyan-500 text-cyan-700' 
-                          : 'border-gray-300 hover:bg-gray-50'
-                      }`}
+                  panCardTypes.map((type) => (
+                    <label
+                      key={type.id}
+                      className="flex items-center space-x-2 p-2 cursor-pointer"
                     >
                       <input
                         type="radio"
@@ -1006,14 +978,15 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                         value={type.label}
                         checked={formData.panCardAccountType === type.label}
                         onChange={handleInputChange}
-                        className="sr-only"
+                        className="text-cyan-600 focus:ring-cyan-500"
                       />
-                      <span className="text-sm font-medium">{type.label}</span>
+                      <span className="text-md">{type.label}</span>
                     </label>
                   ))
                 )}
               </div>
             </div>
+
 
             {/* PAN Card Number with validation */}
             <div>
@@ -1098,54 +1071,17 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               required
               placeholder="District"
             />
-            
-            {/* State Dropdown */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                <span className="text-red-500 mr-1">*</span>
-                State
-              </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsStateOpen(!isStateOpen)}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between ${
-                    errors.state ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                >
-                  <span className={formData.state ? 'text-gray-900' : 'text-gray-400'}>
-                    {formData.state || 'Select State'}
-                  </span>
-                  <ChevronDown 
-                    size={20} 
-                    className={`text-gray-400 transition-transform ${isStateOpen ? 'rotate-180' : ''}`} 
-                  />
-                </button>
-                
-                {isStateOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                    {stateOptions.map(option => (
-                      <div 
-                        key={option.value} 
-                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
-                        onClick={() => handleStateSelect(option.value)}
-                      >
-                        <span className="text-gray-900">{option.label}</span>
-                        {formData.state === option.value && (
-                          <CheckCircle size={16} className="text-cyan-500" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {errors.state && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <AlertCircle size={16} className="mr-1" />
-                  {errors.state}
-                </p>
-              )}
-            </div>
+
+            <FormField
+              label="State"
+              name="state"
+              value={formData.state}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+              error={errors.district}
+              required
+              placeholder="State"
+            />
             
             <FormField
               label="PinCode"
@@ -1221,11 +1157,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               rows={4}
             />
           </div>
-        </FormSection>
-
-        {/* Active Investor Toggle */}
-        <FormSection title="">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 mt-5">
             <input
               type="checkbox"
               name="activeInvestor"
