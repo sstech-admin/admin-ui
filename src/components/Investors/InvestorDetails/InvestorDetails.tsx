@@ -13,6 +13,7 @@ import TDSCertificatesCard from './TDSCertificatesCard';
 import TransactionsCard from './TransactionsCard';
 import AddFundsModal from './modals/AddFundsModal';
 import WithdrawFundsModal from './modals/WithdrawFundsModal';
+import InvestorExportModal from './modals/InvestorExportModal';
 
 const InvestorDetails: React.FC = () => {
   const { investorId } = useParams<{ investorId: string }>();
@@ -46,6 +47,7 @@ const InvestorDetails: React.FC = () => {
 
   // Modal states
   const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState(false);
+  const [isInvestorExportModalOpen, setIsInvestorExportModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
 
   // Handle page change for transactions
@@ -108,7 +110,7 @@ const InvestorDetails: React.FC = () => {
           // TODO: Implement statement functionality
           alert('Statement functionality is not implemented yet');
         }}
-        onExport={handleExport}
+        onExport={()=>{setIsInvestorExportModalOpen(true)}}
       />
       
       {/* Main Loading State */}
@@ -185,6 +187,17 @@ const InvestorDetails: React.FC = () => {
         <WithdrawFundsModal
           isOpen={isWithdrawModalOpen}
           onClose={() => setIsWithdrawModalOpen(false)}
+          investor={profile}
+          onSuccess={handleModalSuccess}
+        />
+      )}
+
+      {/* Export Option */}
+
+      {isInvestorExportModalOpen && (
+        <InvestorExportModal
+          isOpen={isInvestorExportModalOpen}
+          onClose={() => setIsInvestorExportModalOpen(false)}
           investor={profile}
           onSuccess={handleModalSuccess}
         />

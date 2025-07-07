@@ -97,6 +97,14 @@ class ApiService {
     const response = await this.api.post('/transaction/admin/updateTransactionStatus', formData);
     return response.data;
   }
+
+
+  async exportInvestorData(formData: { investorId: string; type: string; }) {
+    const response = await this.api.post('export-data/admin/exportInvestorData', formData, {
+      timeout: 60000, // 60 seconds
+    });
+    return response.data;
+  }
   // User endpoints
   async getAllUsers(params: { page: number; limit: number; search: string; userType?: string; status?: string }) {
     const queryParams = new URLSearchParams({

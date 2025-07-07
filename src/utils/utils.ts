@@ -47,3 +47,28 @@ export const showNotification = (message: string, type: 'success' | 'error') => 
       }, 300);
     }, 4000);
   };
+
+  // ConvertExcel.js
+export function convertExcel(bufferData: ArrayBuffer | Uint8Array, filename: string): void {
+  const byteArray = bufferData instanceof Uint8Array
+    ? bufferData
+    : new Uint8Array(bufferData);
+
+  const blob = new Blob([byteArray], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = filename;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+  

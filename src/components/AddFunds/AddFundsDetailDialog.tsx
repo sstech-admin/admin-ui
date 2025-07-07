@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, User, Calendar, CreditCard, FileText, Image, Tag, DollarSign, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { AddFundsRequest } from './types';
 import apiService from '../../services/api';
-import { showNotification } from '../../utils/utils';
+import { formatAmountIndian, showNotification } from '../../utils/utils';
 
 interface AddFundsDetailDialogProps {
   request: AddFundsRequest | null;
@@ -120,7 +120,7 @@ const AddFundsDetailDialog: React.FC<AddFundsDetailDialogProps> = ({ request, is
                 <DollarSign size={24} className="text-emerald-600" />
                 <span className="text-sm font-medium text-emerald-700">Request Amount</span>
               </div>
-              <div className="text-3xl font-bold text-emerald-800">{formatAmount(request.amount)}</div>
+              <div className="text-3xl font-bold text-emerald-800">{formatAmountIndian(request.amount)}</div>
             </div>
 
             <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-200">

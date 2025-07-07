@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useBulkTransactionDetails } from './hooks/useBulkTransactionDetails';
@@ -27,6 +27,20 @@ const BulkTransactionDetails: React.FC = () => {
   const [loadingPending, setLoadingPending] = useState(false);
   const [completedError, setCompletedError] = useState<string | null>(null);
   const [pendingError, setPendingError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+    // Debounced search
+    const handleSearchChange = useCallback((value: string) => {
+      setSearchTerm(value);
+      
+      // Debounce search API call
+      const timeoutId = setTimeout(() => {
+        console.log('Searching for:', value);
+        fetchCompletedTransactions(1, 20, value)
+      }, 300);
+  
+      return () => clearTimeout(timeoutId);
+    }, [setFilters]);
   const [completedPagination, setCompletedPagination] = useState({
     page: 1,
     limit: 20,
@@ -41,14 +55,14 @@ const BulkTransactionDetails: React.FC = () => {
   });
 
   // Fetch completed transactions
-  const fetchCompletedTransactions = async (page = 1, limit = 20) => {
+  const fetchCompletedTransactions = async (page = 1, limit = 20, search = '') => {
     if (!bulkTransactionId) return;
     
     try {
       setLoadingCompleted(true);
       setCompletedError(null);
       
-      const response = await apiService.get(`/transaction/admin/all?bulkTransactionId=${bulkTransactionId}&transactionStatusId=1&page=${page}&limit=${limit}`);
+      const response = await apiService.get(`/transaction/admin/all?bulkTransactionId=${bulkTransactionId}&transactionStatusId=1&page=${page}&limit=${limit}&search=${search}`);
       
       if (response.success && response.data) {
         setCompletedTransactions(response.data.results);
@@ -364,6 +378,7 @@ const BulkTransactionDetails: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search..."
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               />
             </div>

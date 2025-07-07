@@ -15,6 +15,7 @@ import {
   Edit
 } from 'lucide-react';
 import { InvestorProfile } from './types';
+import { useNavigate } from 'react-router-dom';
 
 interface InvestorProfileCardProps {
   profile: InvestorProfile | null;
@@ -22,6 +23,8 @@ interface InvestorProfileCardProps {
 }
 
 const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, loading }) => {
+    const navigate = useNavigate();
+  
   if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
@@ -63,6 +66,10 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
     return name.split(' ').map(n => n[0]).join('').substring(0, 2);
   };
 
+  const handleViewInvestor = (id: string) => {
+    navigate(`/investors/edit/${id}`);
+  };
+  
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
       <div className="flex items-start justify-between mb-8">
@@ -73,9 +80,17 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
             </span>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 flex">{profile.name} 
-              <Edit size={15}/>
+            <h2 className="flex items-center text-2xl font-bold text-gray-900">
+              {profile.name}
+              <button
+                className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+                aria-label="Edit Name"
+                onClick={()=>{handleViewInvestor(profile.id)}}
+              >
+                <Edit size={16} className="text-gray-700" />
+              </button>
             </h2>
+
             <div className="flex items-center space-x-2 mt-1">
               <span className="text-sm text-gray-600">@{profile.userName}</span>
               <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
