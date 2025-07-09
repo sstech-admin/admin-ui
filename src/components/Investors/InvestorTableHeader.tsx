@@ -29,9 +29,9 @@ const InvestorTableHeader: React.FC<InvestorTableHeaderProps> = ({
   totalInvestors
 }) => {
   const paymentTypeOptions = [
-    { value: 'All', label: 'All' },
-    { value: 'Monthly', label: 'Monthly' },
-    { value: 'None', label: 'None' }
+    { value: '', label: 'All' },
+    { value: '31', label: 'Monthly' },
+    { value: '7', label: 'None' }
   ];
 
   return (

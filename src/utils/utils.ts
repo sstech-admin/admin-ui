@@ -71,4 +71,9 @@ export function convertExcel(bufferData: ArrayBuffer | Uint8Array, filename: str
   URL.revokeObjectURL(url);
 }
 
+export const paymentTypeOptions = [
+    { value: '', label: 'All' },
+    { value: '31', label: 'Monthly' },
+    { value: '7', label: 'None' }
+  ];
   

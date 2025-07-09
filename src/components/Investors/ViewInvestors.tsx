@@ -39,7 +39,7 @@ const ViewInvestors: React.FC = () => {
     setPaymentTypeFilter(paymentType);
     setIsPaymentFilterOpen(false);
     setFilters({ 
-      paymentSystem: paymentType === 'All' ? undefined : paymentType, 
+      paymentSystem: paymentType === 'All' ? '' : paymentType, 
       page: 1 
     });
   };

@@ -47,7 +47,7 @@ export const useBulkTransactions = (): UseBulkTransactionsReturn => {
         queryParams.append('transactionType', filters.transactionType);
       }
       if (filters.paymentSystem) {
-        queryParams.append('paymentSystem', filters.paymentSystem);
+        queryParams.append('paymentSystemId', filters.paymentSystem);
       }
       if (filters.status) {
         queryParams.append('status', filters.status);

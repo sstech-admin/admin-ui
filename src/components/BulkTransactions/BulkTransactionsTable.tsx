@@ -63,14 +63,15 @@ const BulkTransactionsTable: React.FC = () => {
     });
   };
 
-  const handlePaymentSystemChange = (system: string) => {
-    setSelectedPaymentSystem(system);
+  const handlePaymentSystemChange = (systemName: string, systemId?: number) => {
+    setSelectedPaymentSystem(systemName);
     setIsPaymentSystemOpen(false);
     setFilters({ 
-      paymentSystem: system === 'All' ? undefined : system, 
+      paymentSystem: systemName === 'All' ? undefined : systemId,
       page: 1 
     });
-  };
+    };
+
 
   const handleStatusChange = (status: string) => {
     setSelectedStatus(status);
@@ -307,28 +308,31 @@ const BulkTransactionsTable: React.FC = () => {
               </button>
               
               {isPaymentSystemOpen && !loading && !loadingSystems && (
-                <div className="absolute z-10 w-48 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg">
-                  <button
-                    onClick={() => handlePaymentSystemChange('All')}
-                    className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl ${
-                      selectedPaymentSystem === 'All' ? 'bg-cyan-50 text-cyan-700' : ''
-                    }`}
-                  >
-                    All Payment Systems
-                  </button>
-                  {paymentSystems.map((system) => (
+                  <div className="absolute z-10 w-48 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg">
                     <button
-                      key={system.paymentSystemId}
-                      onClick={() => handlePaymentSystemChange(system.name)}
-                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors last:rounded-b-xl ${
-                        selectedPaymentSystem === system.name ? 'bg-cyan-50 text-cyan-700' : ''
+                      onClick={() => handlePaymentSystemChange('All')}
+                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl ${
+                        selectedPaymentSystem === 'All' ? 'bg-cyan-50 text-cyan-700' : ''
                       }`}
                     >
-                      {system.name}
+                      All Payment Systems
                     </button>
-                  ))}
-                </div>
-              )}
+                    {paymentSystems.map((system, idx) => (
+                      <button
+                        key={system.paymentSystemId}
+                        onClick={() => handlePaymentSystemChange(system.name, system.paymentSystemId)}
+                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                          idx === paymentSystems.length - 1 ? 'last:rounded-b-xl' : ''
+                        } ${
+                          selectedPaymentSystem === system.name ? 'bg-cyan-50 text-cyan-700' : ''
+                        }`}
+                      >
+                        {system.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
             </div>
 
             {/* Status Filter */}

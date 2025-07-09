@@ -49,7 +49,7 @@ export interface BulkTransactionsFilters {
   limit: number;
   search: string;
   transactionType?: string;
-  paymentSystem?: string;
+  paymentSystem?: number;
   status?: string;
   dateFrom?: string;
   dateTo?: string;
