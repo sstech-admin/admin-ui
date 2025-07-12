@@ -81,7 +81,7 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
           </div>
           <div>
             <h2 className="flex items-center text-2xl font-bold text-gray-900">
-              {profile.name}
+            {profile.userName} - {profile.name}
               <button
                 className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
                 aria-label="Edit Name"
@@ -92,7 +92,6 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
             </h2>
 
             <div className="flex items-center space-x-2 mt-1">
-              <span className="text-sm text-gray-600">@{profile.userName}</span>
               <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
                 Active
               </span>

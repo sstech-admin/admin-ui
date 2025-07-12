@@ -61,7 +61,6 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
 
   const handleAccountChange = (accountId: string, accountName: string) => {
     setSelectedAccount(accountName);
-    alert(accountId)
     setFormData(prev => ({ ...prev, transactionalBankId : accountId }));
     setIsAccountOpen(false);
   };

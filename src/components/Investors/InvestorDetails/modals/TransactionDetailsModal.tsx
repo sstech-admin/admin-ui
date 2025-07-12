@@ -47,7 +47,7 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
             </div>
             <div>
               <p className="text-xs text-gray-500">Mode</p>
-              <p className="text-base font-medium">{transaction.transactionMode}</p>
+              <p className="text-base font-medium">{transaction.transactionMode} - {transaction.tag}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">Type</p>

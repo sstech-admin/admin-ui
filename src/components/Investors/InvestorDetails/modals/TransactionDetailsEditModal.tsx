@@ -101,7 +101,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-gray-500">Mode</p>
-              <p className="text-base font-medium">{transaction.transactionMode}</p>
+              <p className="text-base font-medium">{transaction.transactionMode} - {transaction.tag}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">Type</p>

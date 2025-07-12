@@ -48,7 +48,6 @@ const [formData, setFormData] = useState<AddFundsFormData>({
 
   const handleAccountChange = (accountId: string, accountName: string) => {
     setSelectedAccount(accountName);
-    alert(accountId)
     setFormData(prev => ({ ...prev, transactionalBankId : accountId }));
     setIsAccountOpen(false);
   };
