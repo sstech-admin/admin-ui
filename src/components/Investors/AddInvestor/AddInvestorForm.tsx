@@ -24,6 +24,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
     amount: 500000, // Default amount
     paymentSystem: '',
     referencePerson: '',
+    tag: 'New',
     // paymentReceivedAccount: '',
     date: new Date().toISOString().split('T')[0],
     bankName: '',
@@ -59,7 +60,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   const [loadingReferences, setLoadingReferences] = useState(false);
   const [loadingAccounts, setLoadingAccounts] = useState(false);
   const [loadingPanCardTypes, setLoadingPanCardTypes] = useState(false);
-  
+
   // Selected reference state
   const [selectedReference, setSelectedReference] = useState<Reference | null>(null);
 
@@ -212,9 +213,9 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
+
     let processedValue: any = value;
-    
+
     if (type === 'number') {
       processedValue = value === '' ? 0 : parseFloat(value);
     } else if (type === 'checkbox') {
@@ -263,7 +264,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
     } catch (error: any) {
       setPanCardError(
         error?.response?.data?.message ||
-          "Failed to verify PAN card. Please try again."
+        "Failed to verify PAN card. Please try again."
       );
       setPanCardStatus("invalid");
     }
@@ -272,7 +273,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     const error = validateSingleField(name, value, formData);
-    
+
     if (error) {
       setErrors(prev => ({
         ...prev,
@@ -290,7 +291,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
     const formErrors = validateForm(formData);
     setErrors(formErrors);
@@ -306,37 +307,39 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
     try {
       // Create FormData for file uploads
       const submitData = new FormData();
-      
+
       // Generate a random username in the format RAI1234
       // const userName = undefined;
       // submitData.append("userName", null);
-      
+
       submitData.append("nameAsPerPanCard", formData.nameAsPanCard);
       submitData.append("firstName", formData.firstName);
       submitData.append("lastName", formData.lastName);
       submitData.append("email", formData.email);
-      
+
       // Format phone number with +91 prefix
-      const phoneNumber = formData.phoneNumber.startsWith('+91') 
-        ? formData.phoneNumber 
+      const phoneNumber = formData.phoneNumber.startsWith('+91')
+        ? formData.phoneNumber
         : `+91${formData.phoneNumber}`;
       submitData.append("phoneNumber", phoneNumber);
-      
+      submitData.append("tag", formData.tag);
+      submitData.append("date", formData.date);
+
       submitData.append("amount", formData.amount.toString());
       submitData.append("paymentSystemId", paymentSystems.find(ps => ps.name === formData.paymentSystem)?.paymentSystemId.toString() || "");
       submitData.append("referenceId", formData.referencePerson || "");
-      
+
       submitData.append("bankName", formData.bankName);
       submitData.append("bankAccountNumber", formData.bankAccountNumber);
       submitData.append("ifscCode", formData.ifsc);
       submitData.append("nomineeName", formData.nomineeName);
       submitData.append("nomineeRelation", formData.nomineeRelation);
       submitData.append("nomineeAadharCardNumber", formData.nomineeAadharNumber);
-      
+
       // Get panCardTypeId from the selected label
       const panCardTypeId = panCardTypes.find(type => type.label === formData.panCardAccountType)?.id.toString() || "1";
       submitData.append("panCardTypeId", panCardTypeId);
-      
+
       submitData.append("panCardNumber", formData.panCardNumber.toUpperCase());
       submitData.append("aadharCardNumber", formData.aadharCard);
       submitData.append("address1", formData.addressLine1);
@@ -347,24 +350,24 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
       submitData.append("country", formData.country);
       submitData.append("investorStatusId", formData.activeInvestor ? "1" : "0");
       submitData.append("nameAsPerBank", formData.nameAsPanCard);
-      
+
       // Append files
       if (formData.aadharCardFile) {
         submitData.append("aadharcard", formData.aadharCardFile);
       }
-      
+
       if (formData.panCardFile) {
         submitData.append("pancard", formData.panCardFile);
       }
-      
+
       if (formData.chequePassbookFile) {
         submitData.append("checkbookPassbook", formData.chequePassbookFile);
       }
-      
+
       if (formData.bankStatementFile) {
         submitData.append("bankStatement", formData.bankStatementFile);
       }
-      
+
       if (formData.signatureFile) {
         submitData.append("signature", formData.signatureFile);
       }
@@ -384,11 +387,11 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
 
       // Call API to add investor
       const response = await apiService.addInvestor(submitData);
-      
+
       if (response.success) {
         setSubmitSuccess(true);
         showNotification('Investor added successfully!', 'success');
-        
+
         // Reset form after successful submission
         setTimeout(() => {
           setSubmitSuccess(false);
@@ -474,9 +477,9 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   // Handle reference selection
   const handleReferenceSelect = (reference: Reference) => {
     setSelectedReference(reference);
-    setFormData(prev => ({ 
-      ...prev, 
-      referencePerson: reference.referenceId 
+    setFormData(prev => ({
+      ...prev,
+      referencePerson: reference.referenceId
     }));
     if (errors.referencePerson) {
       setErrors(prev => ({ ...prev, referencePerson: '' }));
@@ -496,19 +499,18 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   const showNotification = (message: string, type: 'success' | 'error') => {
     // Create a simple toast notification
     const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${
-      type === 'success' ? 'bg-green-500' : 'bg-red-500'
-    }`;
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      }`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     // Animate in
     setTimeout(() => {
       toast.style.transform = 'translateX(0)';
       toast.style.opacity = '1';
     }, 100);
-    
+
     // Remove after 4 seconds
     setTimeout(() => {
       toast.style.transform = 'translateX(100%)';
@@ -656,9 +658,8 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                       }
                     }}
                     onBlur={handleBlur}
-                    className={`w-full pl-10 pr-4 py-3 border-t border-b border-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-center text-xl font-bold ${
-                      errors.amount ? 'border-red-300 bg-red-50' : ''
-                    }`}
+                    className={`w-full pl-10 pr-4 py-3 border-t border-b border-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-center text-xl font-bold ${errors.amount ? 'border-red-300 bg-red-50' : ''
+                      }`}
                   />
                 </div>
                 <button
@@ -690,19 +691,18 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                 <button
                   type="button"
                   onClick={() => setIsPaymentSystemOpen(!isPaymentSystemOpen)}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between ${
-                    errors.paymentSystem ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between ${errors.paymentSystem ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    }`}
                 >
                   <span className={formData.paymentSystem ? 'text-gray-900' : 'text-gray-400'}>
                     {formData.paymentSystem || 'Select Payment System'}
                   </span>
-                  <ChevronDown 
-                    size={20} 
-                    className={`text-gray-400 transition-transform ${isPaymentSystemOpen ? 'rotate-180' : ''}`} 
+                  <ChevronDown
+                    size={20}
+                    className={`text-gray-400 transition-transform ${isPaymentSystemOpen ? 'rotate-180' : ''}`}
                   />
                 </button>
-                
+
                 {isPaymentSystemOpen && (
                   <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                     {loadingPaymentSystems ? (
@@ -712,8 +712,8 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                       </div>
                     ) : (
                       paymentSystems.map(system => (
-                        <div 
-                          key={system.paymentSystemId} 
+                        <div
+                          key={system.paymentSystemId}
                           className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
                           onClick={() => handlePaymentSystemSelect(system.paymentSystemId, system.name)}
                         >
@@ -753,64 +753,34 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
         {/* Payment Details */}
         <FormSection title="Payment">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Payment Received Account Dropdown */}
+            {/* Account Type Radio Buttons */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
                 <span className="text-red-500 mr-1">*</span>
-                Payment Received Account
+                Account Type
               </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsAccountOpen(!isAccountOpen)}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between ${
-                    errors.paymentReceivedAccount ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                >
-                  <span className={formData.paymentReceivedAccount ? 'text-gray-900' : 'text-gray-400'}>
-                    {accounts.find(acc => acc.accountId === formData.paymentReceivedAccount)?.name || 'Select Account'}
-                  </span>
-                  <ChevronDown 
-                    size={20} 
-                    className={`text-gray-400 transition-transform ${isAccountOpen ? 'rotate-180' : ''}`} 
-                  />
-                </button>
-                
-                {isAccountOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                    {loadingAccounts ? (
-                      <div className="p-4 text-center">
-                        <Loader2 size={20} className="animate-spin mx-auto text-cyan-500 mb-2" />
-                        <p className="text-sm text-gray-500">Loading accounts...</p>
-                      </div>
-                    ) : (
-                      accounts.map(account => (
-                        <div 
-                          key={account.accountId} 
-                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
-                          onClick={() => handleAccountSelect(account.accountId, account.name)}
-                        >
-                          <div>
-                            <span className="text-gray-900">{account.name}</span>
-                            <span className={`ml-2 text-xs ${account.amountColour === 'green' ? 'text-green-600' : 'text-red-600'}`}>
-                              {account.balance.toLocaleString()}
-                            </span>
-                          </div>
-                          {formData.paymentReceivedAccount === account.accountId && (
-                            <CheckCircle size={16} className="text-cyan-500" />
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
+
+
+              <div className="flex gap-4">
+                {['New', 'Old'].map((option) => (
+                  <label
+                    key={option}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer transition-colors `}
+                  >
+                    <input
+                      type="radio"
+                      name="tag"
+                      value={option}
+                      checked={formData.tag === option}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, tag: e.target.value }))}
+                    // className="accent-cyan-500"
+                    />
+                    <span className="text-sm font-medium">{option}</span>
+                  </label>
+                ))}
               </div>
-              {errors.paymentReceivedAccount && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <AlertCircle size={16} className="mr-1" />
-                  {errors.paymentReceivedAccount}
-                </p>
-              )}
+              {errors.type && <p className="mt-2 text-sm text-red-600">{errors.type}</p>}
+
             </div>
 
             {/* Date Field */}
@@ -825,9 +795,8 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                 value={formData.date}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${
-                  errors.date ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${errors.date ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
               />
               {errors.date && (
                 <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -889,7 +858,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               required
               placeholder="Nominee Name"
             />
-            
+
             {/* Nominee Relation Dropdown */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -900,24 +869,23 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                 <button
                   type="button"
                   onClick={() => setIsRelationOpen(!isRelationOpen)}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between ${
-                    errors.nomineeRelation ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-left flex items-center justify-between ${errors.nomineeRelation ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    }`}
                 >
                   <span className={formData.nomineeRelation ? 'text-gray-900' : 'text-gray-400'}>
                     {formData.nomineeRelation || 'Select Nominee Relation'}
                   </span>
-                  <ChevronDown 
-                    size={20} 
-                    className={`text-gray-400 transition-transform ${isRelationOpen ? 'rotate-180' : ''}`} 
+                  <ChevronDown
+                    size={20}
+                    className={`text-gray-400 transition-transform ${isRelationOpen ? 'rotate-180' : ''}`}
                   />
                 </button>
-                
+
                 {isRelationOpen && (
                   <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                     {relationOptions.map(option => (
-                      <div 
-                        key={option.value} 
+                      <div
+                        key={option.value}
                         className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
                         onClick={() => handleRelationSelect(option.value)}
                       >
@@ -937,7 +905,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                 </p>
               )}
             </div>
-            
+
             <FormField
               label="Nominee Aadhar Card Number"
               name="nomineeAadharNumber"
@@ -1002,13 +970,12 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                   onChange={handleInputChange}
                   onBlur={handleBlur}
                   placeholder="Enter PAN Card Number"
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${
-                    errors.panCardNumber || panCardStatus === 'invalid' 
-                      ? 'border-red-300 bg-red-50' 
-                      : panCardStatus === 'valid'
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${errors.panCardNumber || panCardStatus === 'invalid'
+                    ? 'border-red-300 bg-red-50'
+                    : panCardStatus === 'valid'
                       ? 'border-green-300 bg-green-50'
                       : 'border-gray-300'
-                  }`}
+                    }`}
                 />
                 {panCardStatus === 'valid' && (
                   <CheckCircle size={20} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" />
@@ -1030,7 +997,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
                 </p>
               )}
             </div>
-            
+
             <FormField
               label="Aadhar Card"
               name="aadharCard"
@@ -1082,7 +1049,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               required
               placeholder="State"
             />
-            
+
             <FormField
               label="PinCode"
               name="pinCode"
@@ -1189,11 +1156,10 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               <button
                 type="submit"
                 disabled={isSubmitting || submitSuccess}
-                className={`flex items-center space-x-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${
-                  isSubmitting || submitSuccess
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white'
-                }`}
+                className={`flex items-center space-x-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${isSubmitting || submitSuccess
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white'
+                  }`}
               >
                 {isSubmitting ? (
                   <>

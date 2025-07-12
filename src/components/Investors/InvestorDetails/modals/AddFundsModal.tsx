@@ -17,6 +17,7 @@ interface AddFundsFormData {
   transactionalBankId: string;
   transactionImage: File | null;
   type: string;
+  tag: string;
 }
 
 
@@ -28,6 +29,7 @@ const [formData, setFormData] = useState<AddFundsFormData>({
     transactionalBankId:'',
     transactionImage: null,
     type: '',
+    tag: 'New'
   });
   const { accounts, loading: loadingAccounts } = useAccounts();
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -86,12 +88,15 @@ const [formData, setFormData] = useState<AddFundsFormData>({
       submitData.append('transactionalBankId', formData.transactionalBankId.toString());
       submitData.append('investorId', investor.id);
       submitData.append('transactionRefNumber', formData.transactionRefNumber);
-      
+      submitData.append('tag', formData.tag);
+
       if (formData.transactionImage) {
         submitData.append('transactionImage', formData.transactionImage);
       }
 
+
       console.log('Submitting add funds with payload:', {
+        tag: formData.tag,
         amount: formData.amount,
         transactionalBankId: investor.transactionalBankId,
         investorId: investor.id,
@@ -285,10 +290,10 @@ const [formData, setFormData] = useState<AddFundsFormData>({
                 >
                   <input
                     type="radio"
-                    name="type"
+                    name="tag"
                     value={option}
-                    checked={formData.type === option}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
+                    checked={formData.tag === option}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, tag: e.target.value }))}
                     // className="accent-cyan-500"
                   />
                   <span className="text-sm font-medium">{option}</span>
