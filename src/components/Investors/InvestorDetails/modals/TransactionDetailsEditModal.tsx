@@ -56,6 +56,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
   };
 
   const handleChange = (key: string, value: any) => {
+    console.log(`Updating ${key} to ${value}`);
     setFormData((prev) => ({
       ...prev,
       [key]: value,
@@ -215,10 +216,11 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
 
             <div>
               <label className="block text-xs text-gray-500 mb-1">Date</label>
+              
               <input
                 type="date"
                 value={formData.date}
-                onChange={(e) => handleChange("createdAt", e.target.value)}
+                onChange={(e) => handleChange("date", e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
               />
             </div>
