@@ -76,6 +76,7 @@ export interface InvestorTransaction {
   _id: string;
   tag: string;
   withdrawStatus: string;
+  transactionBank: string;
   withdrawAmount: number;
   withdrawTransactionReferenceIds: string[];
   amount: number;

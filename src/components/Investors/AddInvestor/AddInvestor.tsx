@@ -14,7 +14,7 @@ const AddInvestor: React.FC<AddInvestorProps> = ({ onBack }) => {
     if (onBack) {
       onBack();
     } else {
-      navigate('/investors');
+      navigate('/investors/pending');
     }
   };
 

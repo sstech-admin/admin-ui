@@ -24,7 +24,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
     amount: 500000, // Default amount
     paymentSystem: '',
     referencePerson: '',
-    paymentReceivedAccount: '',
+    // paymentReceivedAccount: '',
     date: new Date().toISOString().split('T')[0],
     bankName: '',
     bankAccountNumber: '',

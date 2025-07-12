@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Minus, Plus, IndianRupee, Building2, AlertTriangle } from 'lucide-react';
 import { InvestorProfile } from '../types';
 import { apiService } from '../../../../services/api';
+import { useAccounts } from '../../../PendingTransactions/hooks/useAccounts';
 
 interface WithdrawFundsModalProps {
   isOpen: boolean;
@@ -18,12 +19,14 @@ interface WithdrawalAmounts {
 interface WithdrawFundsFormData {
   withdrawType: 'Capital' | 'Profit';
   amount: number;
+  transactionalBankId: string;
 }
 
 const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose, investor, onSuccess }) => {
   const [formData, setFormData] = useState<WithdrawFundsFormData>({
     withdrawType: 'Capital',
-    amount: 0
+    amount: 0,
+    transactionalBankId: '',
   });
   
   const [withdrawalAmounts, setWithdrawalAmounts] = useState<WithdrawalAmounts>({
@@ -31,6 +34,9 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
     capitalAmount: 0
   });
   
+  const { accounts, loading: loadingAccounts } = useAccounts();
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState('All');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +58,13 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
   }, [formData.withdrawType]);
 
   if (!isOpen || !investor) return null;
+
+  const handleAccountChange = (accountId: string, accountName: string) => {
+    setSelectedAccount(accountName);
+    alert(accountId)
+    setFormData(prev => ({ ...prev, transactionalBankId : accountId }));
+    setIsAccountOpen(false);
+  };
 
   const fetchWithdrawalAmounts = async () => {
     if (!investor) return;
@@ -102,6 +115,10 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
       newErrors.amount = `Amount cannot exceed ${formatAmount(maxAmount)}`;
     }
 
+    if(!formData.transactionalBankId){
+      newErrors.transactionalBankId = 'Please selec a valid Transactional Bank';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -124,7 +141,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
       const payload = {
         amount: finalAmount,
         type: formData.withdrawType,
-        transactionalBankId: investor.transactionalBankId,
+        transactionalBankId: formData.transactionalBankId,
         investorId: investor.id,
       };
 
@@ -390,6 +407,69 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
                 </>
               )}
             </div>
+          </div>
+          
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Details</h3>
+            <div className="mb-4 relative">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <span className="text-red-500">*</span>
+                Select Transactional Bank
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsAccountOpen((prev) => !prev)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-left flex justify-between items-center hover:border-cyan-400 transition-colors"
+              >
+                <span>{selectedAccount}</span>
+                <svg
+                  className={`w-4 h-4 transform transition-transform ${
+                    isAccountOpen ? 'rotate-180' : ''
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {isAccountOpen && !loadingAccounts && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  <button
+                    onClick={() => handleAccountChange('All', 'All')}
+                    className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl ${
+                      selectedAccount === 'All' ? 'bg-cyan-50 text-cyan-700' : ''
+                    }`}
+                  >
+                    All Accounts
+                  </button>
+                  {accounts.map((account) => (
+                    <button
+                      key={account.accountId}
+                      onClick={() => handleAccountChange(account.accountId, account.name)}
+                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                        selectedAccount === account.name ? 'bg-cyan-50 text-cyan-700' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{account.name}</span>
+                        <span
+                          className={`text-xs ${
+                            account.amountColour === 'green' ? 'text-green-600' : 'text-red-600'
+                          }`}
+                        >
+                          {formatAmount(account.balance)}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {errors.transactionalBankId && (
+              <p className="mt-2 text-sm text-red-600">{errors.transactionalBankId}</p>
+            )}
           </div>
 
           {/* Bank Details */}

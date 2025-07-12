@@ -105,6 +105,14 @@ class ApiService {
     });
     return response.data;
   }
+
+
+  async editTransactionData(transaction_id:string, formData: { amount: number; transactionalBankId: string; date: string }) {
+    const response = await this.api.post(`transaction/admin/updateTransaction/${transaction_id}`, formData, {
+      timeout: 60000, // 60 seconds
+    });
+    return response.data;
+  }
   // User endpoints
   async getAllUsers(params: { page: number; limit: number; search: string; userType?: string; status?: string }) {
     const queryParams = new URLSearchParams({

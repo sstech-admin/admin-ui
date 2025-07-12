@@ -39,9 +39,9 @@ export const validationRules: ValidationRules = {
     required: true,
     minLength: 2,
   },
-  paymentReceivedAccount: {
-    required: true,
-  },
+  // paymentReceivedAccount: {
+  //   required: true,
+  // },
   date: {
     required: true,
     custom: (value: string) => {

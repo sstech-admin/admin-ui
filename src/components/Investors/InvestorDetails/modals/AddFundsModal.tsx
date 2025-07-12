@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, Upload, Minus, Plus, IndianRupee } from 'lucide-react';
 import { InvestorProfile } from '../types';
 import { apiService } from '../../../../services/api';
+import { useAccounts } from '../../../PendingTransactions/hooks/useAccounts';
 
 interface AddFundsModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface AddFundsFormData {
   amount: number;
   dateTime: string; // e.g., "2025-07-05"
   transactionRefNumber: string;
+  transactionalBankId: string;
   transactionImage: File | null;
   type: string;
 }
@@ -23,9 +25,13 @@ const [formData, setFormData] = useState<AddFundsFormData>({
     amount: 50000,
     dateTime: new Date().toISOString().split('T')[0],
     transactionRefNumber: '',
+    transactionalBankId:'',
     transactionImage: null,
     type: '',
   });
+  const { accounts, loading: loadingAccounts } = useAccounts();
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState('All');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -37,6 +43,14 @@ const [formData, setFormData] = useState<AddFundsFormData>({
 
   if (!isOpen || !investor) return null;
 
+
+  const handleAccountChange = (accountId: string, accountName: string) => {
+    setSelectedAccount(accountName);
+    alert(accountId)
+    setFormData(prev => ({ ...prev, transactionalBankId : accountId }));
+    setIsAccountOpen(false);
+  };
+  
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
@@ -69,7 +83,7 @@ const [formData, setFormData] = useState<AddFundsFormData>({
       // Create FormData for file upload
       const submitData = new FormData();
       submitData.append('amount', formData.amount.toString());
-      submitData.append('transactionalBankId', investor.transactionalBankId.toString());
+      submitData.append('transactionalBankId', formData.transactionalBankId.toString());
       submitData.append('investorId', investor.id);
       submitData.append('transactionRefNumber', formData.transactionRefNumber);
       
@@ -345,8 +359,64 @@ const [formData, setFormData] = useState<AddFundsFormData>({
           </div>
 
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Details</h3>
-            
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Details 123</h3>
+            <div className="mb-4 relative">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <span className="text-red-500">*</span>
+                Select Transactional Bank
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsAccountOpen((prev) => !prev)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-left flex justify-between items-center hover:border-cyan-400 transition-colors"
+              >
+                <span>{selectedAccount}</span>
+                <svg
+                  className={`w-4 h-4 transform transition-transform ${
+                    isAccountOpen ? 'rotate-180' : ''
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {isAccountOpen && !loadingAccounts && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  <button
+                    onClick={() => handleAccountChange('All', 'All')}
+                    className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl ${
+                      selectedAccount === 'All' ? 'bg-cyan-50 text-cyan-700' : ''
+                    }`}
+                  >
+                    All Accounts
+                  </button>
+                  {accounts.map((account) => (
+                    <button
+                      key={account.accountId}
+                      onClick={() => handleAccountChange(account.accountId, account.name)}
+                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                        selectedAccount === account.name ? 'bg-cyan-50 text-cyan-700' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{account.name}</span>
+                        <span
+                          className={`text-xs ${
+                            account.amountColour === 'green' ? 'text-green-600' : 'text-red-600'
+                          }`}
+                        >
+                          {formatAmount(account.balance)}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Transaction Reference Number */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">

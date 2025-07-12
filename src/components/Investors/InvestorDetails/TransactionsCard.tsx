@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ArrowUpRight, 
   ArrowDownRight, 
@@ -14,12 +14,28 @@ import {
 } from 'lucide-react';
 import { InvestorTransaction, TransactionsPagination } from './types';
 import { formatAmountIndian } from '../../../utils/utils';
+import TransactionDetailsModal from './modals/TransactionDetailsModal';
+import TransactionDetailsEditModal from './modals/TransactionDetailsEditModal';
 interface TransactionsCardProps {
   transactions: InvestorTransaction[];
   loading: boolean;
   error: string | null;
   pagination: TransactionsPagination;
   onPageChange: (page: number) => void;
+}
+interface InvestorTransactionDetails {
+  transactionId: string;
+  amount: number;
+  transactionRefNumber: string;
+  transactionStatus: string;
+  transactionType: string;
+  transactionMode: string;
+  transactionBank?: string;
+  createdAt: string;
+  transactionImage?: string;
+  amountColour: string;
+  note?: string;
+  // etc...
 }
 
 const TransactionsCard: React.FC<TransactionsCardProps> = ({ 
@@ -39,6 +55,9 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   //   }
   //   return `₹${amount.toLocaleString()}`;
   // };
+  const [selectedTransaction, setSelectedTransaction] = useState<InvestorTransaction | null>(null);;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -154,7 +173,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                     Mode
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Tag
+                    Transactional Bank
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
@@ -196,8 +215,8 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                     </td>
                     
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getTagColor(transaction.tag)}`}>
-                        {transaction.tag}
+                      <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border`}>
+                        {transaction?.transactionBank ? transaction?.transactionBank : 'NA'}
                       </span>
                     </td>
                     
@@ -218,19 +237,27 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                       <div className="flex items-center space-x-2">
                         <button 
                           className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
-                          title="View Investor"
+                          title="View Transaction"
+                          onClick={() => {
+                            setSelectedTransaction(transaction);
+                            setIsModalOpen(true);
+                          }}
                         >
                           <Eye size={16} />
                         </button>
                         <button 
                           className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                          title="Edit Investor"
+                          title="Edit Transaction"
+                          onClick={() => {
+                            setSelectedTransaction(transaction);
+                            setIsEditModalOpen(true);
+                          }}
                         >
                           <Edit size={16} />
                         </button>
                         <button 
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete Investor"
+                          title="Delete Transaction"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -272,6 +299,17 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
               </div>
             </div>
           )}
+          <TransactionDetailsModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              transaction={selectedTransaction}
+            />
+          <TransactionDetailsEditModal
+              isOpen={isEditModalOpen}
+              onClose={() => setIsEditModalOpen(false)}
+              transaction={selectedTransaction}
+            />
+
         </>
       )}
     </div>

@@ -30,39 +30,7 @@ export const useAccounts = (): UseAccountsReturn => {
     } catch (err: any) {
       console.error('Error fetching accounts:', err);
       setError(err.message || 'Failed to load accounts');
-      
-      // Fallback to mock data
-      const mockAccounts: Account[] = [
-        {
-          accountId: "85d4f0cb-49ec-4eef-9c21-3758e8ae6c39",
-          name: "Dharma HDFC",
-          balance: 6450000,
-          amountColour: "green",
-          accountTypeId: 3
-        },
-        {
-          accountId: "93f9fd53-a4ce-4c42-b83d-da7cab0d97ef",
-          name: "Dharma IDFC",
-          balance: 0,
-          amountColour: "green",
-          accountTypeId: 3
-        },
-        {
-          accountId: "8b94ea62-ded3-472b-af9e-f348d0b2d8f8",
-          name: "AINFINITY",
-          balance: -29237610,
-          amountColour: "red",
-          accountTypeId: 3
-        },
-        {
-          accountId: "29dbf1a7-350a-455e-86e2-409dc4c2f3ee",
-          name: "TDS",
-          balance: 0,
-          amountColour: "green",
-          accountTypeId: 3
-        }
-      ];
-      setAccounts(mockAccounts);
+      setAccounts([]);
     } finally {
       setLoading(false);
     }

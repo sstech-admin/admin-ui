@@ -1,7 +1,7 @@
 import { InvestorFormData, FormErrors, ValidationRules } from './types';
 
 export const validationRules: ValidationRules = {
-  nameAsPanCard: {
+  nameAsPerPanCard: {
     required: true,
     minLength: 2,
     maxLength: 100,
@@ -22,10 +22,10 @@ export const validationRules: ValidationRules = {
       return null;
     },
   },
-  paymentSystem: {
+  paymentSystemId: {
     required: true,
   },
-  referencePerson: {
+  referenceId: {
     required: true,
     minLength: 2,
   },
@@ -37,7 +37,7 @@ export const validationRules: ValidationRules = {
     required: true,
     pattern: /^\d{8,17}$/,
   },
-  ifsc: {
+  ifscCode: {
     required: true,
     pattern: /^[A-Z]{4}0[A-Z0-9]{6}$/,
   },
@@ -48,22 +48,22 @@ export const validationRules: ValidationRules = {
   nomineeRelation: {
     required: true,
   },
-  nomineeAadharNumber: {
+  nomineeAadharCardNumber: {
     required: true,
     pattern: /^\d{12}$/,
   },
-  panCardAccountType: {
+  panCardTypeId: {
     required: true,
   },
   panCardNumber: {
     required: true,
     pattern: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
   },
-  aadharCard: {
+  aadharCardNumber: {
     required: true,
     pattern: /^\d{12}$/,
   },
-  addressLine1: {
+  address1: {
     required: true,
     minLength: 5,
   },

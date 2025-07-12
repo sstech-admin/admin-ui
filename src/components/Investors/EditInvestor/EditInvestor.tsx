@@ -58,6 +58,8 @@ const EditInvestor: React.FC = () => {
         }
       });
 
+      console.log('SUBNI', submitData)
+
       // Call API to update investor
       const response = await apiService.put(`/investor/admin/updateInvestor/${investorId}`, submitData, {
         headers: {
