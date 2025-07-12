@@ -8,12 +8,14 @@ interface TransactionDetailsEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   transaction: any;
+  onSuccess: () => void;
 }
 
 const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = ({
   isOpen,
   onClose,
   transaction,
+  onSuccess
 }) => {
   const { accounts, loading: loadingAccounts } = useAccounts();
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -65,8 +67,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
       setLoading(true);
       await apiService.editTransactionData(transaction.transactionId, formData);
       showNotification('Transaction updated successfully!', 'success');
-      showNotification('Transaction updated successfully!', 'success');
-      onClose();
+      onSuccess();
     } catch (error:any) {
       console.error("Error updating transaction:", error);
       const errorMessage = error.response?.data?.message || error.message || 'Failed to update transaction. Please try again.';

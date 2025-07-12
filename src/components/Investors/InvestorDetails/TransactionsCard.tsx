@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Loader2, 
-  AlertCircle, 
-  CreditCard, 
-  ChevronLeft, 
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  Loader2,
+  AlertCircle,
+  CreditCard,
+  ChevronLeft,
   ChevronRight,
   Tag,
   Eye,
@@ -16,12 +16,16 @@ import { InvestorTransaction, TransactionsPagination } from './types';
 import { formatAmountIndian } from '../../../utils/utils';
 import TransactionDetailsModal from './modals/TransactionDetailsModal';
 import TransactionDetailsEditModal from './modals/TransactionDetailsEditModal';
+import ConfirmationDialog from '../../common/ConfirmationDialog';
+import apiService from '../../../services/api';
+
 interface TransactionsCardProps {
   transactions: InvestorTransaction[];
   loading: boolean;
   error: string | null;
   pagination: TransactionsPagination;
   onPageChange: (page: number) => void;
+  refetchTransactions: () => void; // Add this prop
 }
 interface InvestorTransactionDetails {
   transactionId: string;
@@ -38,12 +42,13 @@ interface InvestorTransactionDetails {
   // etc...
 }
 
-const TransactionsCard: React.FC<TransactionsCardProps> = ({ 
-  transactions, 
-  loading, 
-  error, 
+const TransactionsCard: React.FC<TransactionsCardProps> = ({
+  transactions,
+  loading,
+  error,
   pagination,
-  onPageChange
+  onPageChange,
+  refetchTransactions,
 }) => {
   // const formatAmount = (amount: number): string => {
   //   if (amount >= 10000000) {
@@ -55,9 +60,71 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   //   }
   //   return `₹${amount.toLocaleString()}`;
   // };
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+
   const [selectedTransaction, setSelectedTransaction] = useState<InvestorTransaction | null>(null);;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleEditSuccess = () => {
+    showNotification('Transaction updated successfully', 'success');
+    refetchTransactions(); // Refresh transactions after edit
+    setIsEditModalOpen(false);
+  };
+
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    // Create a simple toast notification
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      }`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => {
+      toast.style.transform = 'translateX(0)';
+      toast.style.opacity = '1';
+    }, 100);
+
+    // Remove after 4 seconds
+    setTimeout(() => {
+      toast.style.transform = 'translateX(100%)';
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 300);
+    }, 4000);
+  };
+
+  const confirmDeleteTransaction = async () => {
+    console.log('Deleting transaction:', selectedTransaction);
+  
+    try {
+      if (selectedTransaction?.transactionId) {
+        const response = await apiService.deleteTransactionById(selectedTransaction.transactionId);
+  
+        if (response.success) {
+          showNotification(`Transaction deleted successfully`, 'success');
+          refetchTransactions(); // Refresh transactions after delete
+        } else {
+          throw new Error(response.message || 'Failed to delete transaction');
+        }
+      }
+    } catch (error: any) {
+      console.error('Error deleting transaction:', error);
+      showNotification(error.message || 'Failed to delete transaction', 'error');
+    } finally {
+      setIsConfirmDialogOpen(false);
+    }
+  };
+
+  const cancelDeleteTransaction = () => {
+    setIsConfirmDialogOpen(false);
+  };
+
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -122,7 +189,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
       <h3 className="text-lg font-semibold text-gray-900 mb-6 pb-2 border-b border-gray-100">
         Transaction History
       </h3>
-      
+
       {/* Loading State */}
       {loading && (
         <div className="py-8 text-center">
@@ -132,7 +199,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
           </div>
         </div>
       )}
-      
+
       {/* Error State */}
       {error && !loading && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
@@ -144,7 +211,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
           </div>
         </div>
       )}
-      
+
       {/* Empty State */}
       {!loading && !error && transactions.length === 0 && (
         <div className="py-12 text-center">
@@ -155,7 +222,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
           </p>
         </div>
       )}
-      
+
       {/* Transactions Table */}
       {!loading && !error && transactions.length > 0 && (
         <>
@@ -201,41 +268,40 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                         </span>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getTransactionTypeColor(transaction.transactionType)}`}>
                         {transaction.transactionType}
                       </span>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getTransactionModeColor(transaction.transactionMode)}`}>
                         {transaction.transactionMode}
                       </span>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border`}>
                         {transaction?.transactionBank ? transaction?.transactionBank : 'NA'}
                       </span>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(transaction.transactionStatus)}`}>
-                        <div className={`w-2 h-2 rounded-full mr-2 mt-0.5 ${
-                          transaction.transactionStatus === 'Completed' ? 'bg-green-500' : 
-                          transaction.transactionStatus === 'Pending' ? 'bg-yellow-500' : 'bg-red-500'
-                        }`}></div>
+                        <div className={`w-2 h-2 rounded-full mr-2 mt-0.5 ${transaction.transactionStatus === 'Completed' ? 'bg-green-500' :
+                            transaction.transactionStatus === 'Pending' ? 'bg-yellow-500' : 'bg-red-500'
+                          }`}></div>
                         {transaction.transactionStatus}
                       </span>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm text-gray-900">{formatDate(transaction.createdAt)}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
-                        <button 
+                        <button
                           className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
                           title="View Transaction"
                           onClick={() => {
@@ -245,7 +311,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                         >
                           <Eye size={16} />
                         </button>
-                        <button 
+                        <button
                           className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
                           title="Edit Transaction"
                           onClick={() => {
@@ -255,27 +321,32 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                         >
                           <Edit size={16} />
                         </button>
-                        <button 
+                        <button
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete Transaction"
+                          onClick={() => {
+                            setSelectedTransaction(transaction);
+                            setIsConfirmDialogOpen(true);
+                          }}
                         >
                           <Trash2 size={16} />
+
                         </button>
                       </div>
-                      </td>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
               <div className="text-sm text-gray-600">
                 Showing <span className="font-semibold">{(pagination.currentPage - 1) * pagination.limit + 1}-{Math.min(pagination.currentPage * pagination.limit, pagination.totalResults)}</span> of <span className="font-semibold">{pagination.totalResults}</span> transactions
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => onPageChange(pagination.currentPage - 1)}
@@ -284,11 +355,11 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
                 >
                   <ChevronLeft size={18} />
                 </button>
-                
+
                 <div className="text-sm font-medium text-gray-700">
                   Page {pagination.currentPage} of {pagination.totalPages}
                 </div>
-                
+
                 <button
                   onClick={() => onPageChange(pagination.currentPage + 1)}
                   disabled={!pagination.hasNext}
@@ -300,15 +371,28 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
             </div>
           )}
           <TransactionDetailsModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              transaction={selectedTransaction}
-            />
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            transaction={selectedTransaction}
+          />
           <TransactionDetailsEditModal
-              isOpen={isEditModalOpen}
-              onClose={() => setIsEditModalOpen(false)}
-              transaction={selectedTransaction}
-            />
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            transaction={selectedTransaction}
+            onSuccess={handleEditSuccess} // Pass success handler
+          />
+
+          {/* Confirmation Dialog */}
+          <ConfirmationDialog
+            isOpen={isConfirmDialogOpen}
+            title={`Are you sure delete this transaction?`}
+            message="Press Yes for Permanent Delete"
+            confirmText="Yes"
+            cancelText="No"
+            onConfirm={confirmDeleteTransaction}
+            onCancel={cancelDeleteTransaction}
+            type="danger"
+          />
 
         </>
       )}

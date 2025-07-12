@@ -170,6 +170,7 @@ const InvestorDetails: React.FC = () => {
         error={transactionsError}
         pagination={pagination}
         onPageChange={handleTransactionPageChange}
+        refetchTransactions={refetchTransactions} // Pass the refetch function here
       />
 
       {/* Add Funds Modal */}

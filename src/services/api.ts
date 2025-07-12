@@ -113,6 +113,13 @@ class ApiService {
     });
     return response.data;
   }
+
+   // Delete Transaction By Id for Investor endpoint
+   async deleteTransactionById(transactionId: string) {
+    const response = await this.api.delete(`/transaction/admin/deleteTransaction/${transactionId}`);
+    return response.data;
+  }
+
   // User endpoints
   async getAllUsers(params: { page: number; limit: number; search: string; userType?: string; status?: string }) {
     const queryParams = new URLSearchParams({
