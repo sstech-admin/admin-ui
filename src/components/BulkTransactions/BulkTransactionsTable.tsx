@@ -20,6 +20,9 @@ import { useTransactionModes } from './hooks/useTransactionModes';
 import { usePaymentSystems } from './hooks/usePaymentSystems';
 import { BulkTransaction } from './types';
 import BulkTransactionsPagination from './BulkTransactionsPagination';
+import ConfirmationDialog from '../common/ConfirmationDialog';
+import { showNotification } from '../../utils/utils';
+import apiService from '../../services/api';
 
 const BulkTransactionsTable: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +38,51 @@ const BulkTransactionsTable: React.FC = () => {
   const [selectedPaymentSystem, setSelectedPaymentSystem] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
 
+  // Confirmation dialog state  
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [investorToDelete, setInvestorToDelete] = useState('');
+  
+  
+    const handleDeleteInvestor = (id: string) => {
+      console.log('Delete id:', id);
+      // Open confirmation dialog
+      setInvestorToDelete(id);
+      setIsConfirmDialogOpen(true);
+    };
+  
+    const confirmDeleteInvestor = async () => {
+      if (!investorToDelete) return;
+      
+      try {
+        setDeleteLoading(true);
+        
+        // Call delete API
+        const response = await apiService.deleteBulkTransaction({ bulkTransactionId: investorToDelete });
+        
+        if (response.success) {
+          // Show success notification
+          showNotification(`Bulk Transaction ${investorToDelete} deleted successfully`, 'success');
+          
+          // Refresh the investors list
+          await refetch();
+        } else {
+          throw new Error(response.message || 'Failed to delete bulk transaction');
+        }
+      } catch (error: any) {
+        console.error('Error deleting bulk transaction:', error);
+        showNotification(error.message || 'Failed to delete bulk transaction', 'error');
+      } finally {
+        setDeleteLoading(false);
+        setIsConfirmDialogOpen(false);
+        setInvestorToDelete('');
+      }
+    };
+  
+    const cancelDeleteInvestor = () => {
+      setIsConfirmDialogOpen(false);
+      setInvestorToDelete('');
+    };
   // Status options
   const statusOptions = [
     { value: 'All', label: 'All Status' },
@@ -510,10 +558,9 @@ const BulkTransactionsTable: React.FC = () => {
                         >
                           <Eye size={16} />
                         </button>
-                        <button className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
-                          <Edit size={16} />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        onClick={()=>{handleDeleteInvestor(transaction.bulkTransactionId)}}
+                        >
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -540,6 +587,17 @@ const BulkTransactionsTable: React.FC = () => {
           loading={loading}
         />
       )}
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        title={`Are you sure delete this transaction?`}
+        message="Press Yes for Permanent Delete"
+        confirmText="Yes"
+        cancelText="No"
+        onConfirm={confirmDeleteInvestor}
+        onCancel={cancelDeleteInvestor}
+        type="danger"
+      />
     </div>
   );
 };

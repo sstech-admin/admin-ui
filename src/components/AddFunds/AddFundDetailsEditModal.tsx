@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { X, ReceiptText, IndianRupee } from "lucide-react";
-import { apiService } from "../../../../services/api";
-import { useAccounts } from "../../../PendingTransactions/hooks/useAccounts";
-import { showNotification } from "../../../../utils/utils";
+import { X } from "lucide-react";
+import apiService from "../../services/api";
+import { showNotification } from "../../utils/utils";
+import { useAccounts } from "../PendingTransactions/hooks/useAccounts";
 
 interface TransactionDetailsEditModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface TransactionDetailsEditModalProps {
   onSuccess: () => void;
 }
 
-const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = ({
+const AddFundDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = ({
   isOpen,
   onClose,
   transaction,
@@ -25,8 +25,10 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
     amount: 0,
     transactionalBankId: "",
     date: "",
+    tag: ""
   });
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -37,6 +39,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
         date: transaction.createdAt
           ? new Date(transaction.createdAt).toISOString().slice(0, 10)
           : "",
+        tag: transaction.tag || ""
       });
 
       const selected = accounts.find((a) => a.accountId === transaction.transactionalBankId);
@@ -50,29 +53,50 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
     setSelectedAccount(accountName);
     setFormData((prev) => ({
       ...prev,
-      transactionalBankId: accountId,
+      transactionalBankId: accountId
     }));
+    setErrors((prev) => ({ ...prev, transactionalBankId: "" }));
     setIsAccountOpen(false);
   };
 
   const handleChange = (key: string, value: any) => {
-    console.log(`Updating ${key} to ${value}`);
     setFormData((prev) => ({
       ...prev,
-      [key]: value,
+      [key]: value
     }));
+    setErrors((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!formData.amount || formData.amount <= 0) {
+      newErrors.amount = "Amount must be greater than 0.";
+    }
+    if (!formData.tag) {
+      newErrors.tag = "Please select a type.";
+    }
+    if (!formData.transactionalBankId) {
+      newErrors.transactionalBankId = "Please select a transactional bank.";
+    }
+    if (!formData.date) {
+      newErrors.date = "Please select a date.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
+    if (!validateForm()) return;
+
     try {
       setLoading(true);
       await apiService.editTransactionData(transaction.transactionId, formData);
-      showNotification('Transaction updated successfully!', 'success');
+      showNotification("Transaction updated successfully!", "success");
       onSuccess();
-    } catch (error:any) {
-      console.error("Error updating transaction:", error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to update transaction. Please try again.';
-      showNotification(errorMessage, 'error');
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to update transaction. Please try again.";
+      showNotification(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -85,23 +109,24 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in">
-        {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
-            <h2 className="text-xl font-bold text-gray-900">Transaction Edit</h2>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+          <h2 className="text-xl font-bold text-gray-900">Transaction Edit</h2>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        {/* Read-only Details */}
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-gray-500">Mode</p>
-              <p className="text-base font-medium">{transaction.transactionMode} - {transaction.tag}</p>
+              <p className="text-base font-medium">
+                {transaction.transactionMode ? `${transaction.transactionMode} - ` : ""}
+                {transaction.tag}
+              </p>
             </div>
             <div>
               <p className="text-xs text-gray-500">Type</p>
@@ -154,27 +179,57 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
 
           {/* Editable Fields */}
           <div className="space-y-4 border-t border-gray-200 pt-4">
+            {/* Amount */}
             <div>
               <label className="block text-xs text-gray-500 mb-1">Amount</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) => handleChange("amount", Number(e.target.value))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
-                />
-              </div>
+              <input
+                type="number"
+                value={formData.amount}
+                onChange={(e) => handleChange("amount", Number(e.target.value))}
+                className={`w-full px-4 py-3 border rounded-xl bg-white text-gray-900 ${
+                  errors.amount ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all`}
+              />
+              {errors.amount && <p className="text-sm text-red-600 mt-1">{errors.amount}</p>}
             </div>
 
+            {/* Tag */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <span className="text-red-500">*</span> Type
+              </label>
+              <div className="flex gap-4">
+                {["New", "Old"].map((option) => (
+                  <label
+                    key={option}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="tag"
+                      value={option}
+                      checked={formData.tag === option}
+                      onChange={(e) => handleChange("tag", e.target.value)}
+                    />
+                    <span className="text-sm font-medium">{option}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.tag && <p className="text-sm text-red-600 mt-1">{errors.tag}</p>}
+            </div>
+
+            {/* Bank */}
             <div>
               <label className="block text-xs text-gray-500 mb-1">Transactional Bank</label>
-              <div className="mb-4 relative">
+              <div className="relative mb-1">
                 <button
                   type="button"
                   onClick={() => setIsAccountOpen((prev) => !prev)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-left flex justify-between items-center hover:border-cyan-400 transition-colors"
+                  className={`w-full px-4 py-3 border rounded-xl bg-white text-left flex justify-between items-center ${
+                    errors.transactionalBankId ? "border-red-500" : "border-gray-300"
+                  }`}
                 >
-                  <span>{selectedAccount}</span>
+                  <span>{selectedAccount || "Select Bank"}</span>
                   <svg
                     className={`w-4 h-4 transform transition-transform ${
                       isAccountOpen ? "rotate-180" : ""
@@ -212,17 +267,23 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
                   </div>
                 )}
               </div>
+              {errors.transactionalBankId && (
+                <p className="text-sm text-red-600 mt-1">{errors.transactionalBankId}</p>
+              )}
             </div>
 
+            {/* Date */}
             <div>
               <label className="block text-xs text-gray-500 mb-1">Date</label>
-              
               <input
                 type="date"
                 value={formData.date}
                 onChange={(e) => handleChange("date", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
+                className={`w-full px-4 py-3 border rounded-xl bg-white text-gray-900 ${
+                  errors.date ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all`}
               />
+              {errors.date && <p className="text-sm text-red-600 mt-1">{errors.date}</p>}
             </div>
           </div>
         </div>
@@ -231,7 +292,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
         <div className="flex justify-between items-center p-4 border-t border-gray-100 sticky bottom-0 bg-white">
           <button
             onClick={onClose}
-            className="px-4 py-3   rounded-lg text-gray-600 hover:bg-gray-100 transition text-sm"
+            className="px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition text-sm"
           >
             Close
           </button>
@@ -239,10 +300,11 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
             onClick={handleSubmit}
             disabled={loading}
             className={`py-3 px-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-lg ${
-                loading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600'
-              }`}          >
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+            }`}
+          >
             {loading ? "Updating..." : "Update Transaction"}
           </button>
         </div>
@@ -251,4 +313,4 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
   );
 };
 
-export default TransactionDetailsEditModal;
+export default AddFundDetailsEditModal;

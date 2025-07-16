@@ -12,12 +12,18 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  ArrowDownLeft
+  ArrowDownLeft,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { useWithdrawFunds } from './hooks/useWithdrawFunds';
 import { WithdrawFundsRequest, StatusOption } from './types';
 import WithdrawFundsPagination from './WithdrawFundsPagination';
 import WithdrawFundsDetailDialog from './WithdrawFundsDetailDialog';
+import apiService from '../../services/api';
+import { showNotification } from '../../utils/utils';
+import ConfirmationDialog from '../common/ConfirmationDialog';
+import WithdrawFundsDetailEditModal from './WithdrawFundsDetailsEditModal';
 
 const WithdrawFundsTable: React.FC = () => {
   const { requests, loading, error, pagination, filters, setFilters, refetch } = useWithdrawFunds();
@@ -28,6 +34,8 @@ const WithdrawFundsTable: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<WithdrawFundsRequest | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   // Status options
   const statusOptions: StatusOption[] = [
     { value: null, label: 'All', color: 'bg-gray-100 text-gray-800 border-gray-200' },
@@ -35,7 +43,38 @@ const WithdrawFundsTable: React.FC = () => {
     { value: 1, label: 'Approved', color: 'bg-green-100 text-green-800 border-green-200' },
     { value: 2, label: 'Rejected', color: 'bg-red-100 text-red-800 border-red-200' }
   ];
+  
+  const handleEditSuccess = () => {
+    showNotification('Transaction updated successfully', 'success');
+    refetch(); // Refresh transactions after edit
+    setIsEditModalOpen(false);
+  };
+  
+  const confirmDeleteTransaction = async () => {
+    console.log('Deleting transaction:', selectedRequest);
+  
+    try {
+      if (selectedRequest?.transactionId) {
+        const response = await apiService.deleteTransactionById(selectedRequest.transactionId);
+  
+        if (response.success) {
+          showNotification(`Transaction deleted successfully`, 'success');
+          refetch(); // Refresh transactions after delete
+        } else {
+          throw new Error(response.message || 'Failed to delete transaction');
+        }
+      }
+    } catch (error: any) {
+      console.error('Error deleting transaction:', error);
+      showNotification(error.message || 'Failed to delete transaction', 'error');
+    } finally {
+      setIsConfirmDialogOpen(false);
+    }
+  };
 
+  const cancelDeleteTransaction = () => {
+    setIsConfirmDialogOpen(false);
+  };
   // Debounced search
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
@@ -444,6 +483,28 @@ const WithdrawFundsTable: React.FC = () => {
                           >
                             <Eye size={16} />
                           </button>
+                          
+                          
+                          <button
+                            className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                            title="Edit Transaction"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setIsEditModalOpen(true);
+                            }}
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete Transaction"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setIsConfirmDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </td>
                       </tr>
                     );
@@ -478,6 +539,27 @@ const WithdrawFundsTable: React.FC = () => {
           setIsDetailDialogOpen(false);
           setSelectedRequest(null);
         }}
+        refetchData={()=>{refetch();}}
+      />
+      
+      
+      <WithdrawFundsDetailEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        transaction={selectedRequest}
+        onSuccess={handleEditSuccess} // Pass success handler
+      />
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        title={`Are you sure delete this transaction?`}
+        message="Press Yes for Permanent Delete"
+        confirmText="Yes"
+        cancelText="No"
+        onConfirm={confirmDeleteTransaction}
+        onCancel={cancelDeleteTransaction}
+        type="danger"
       />
     </>
   );

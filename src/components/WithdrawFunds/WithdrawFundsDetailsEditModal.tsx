@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { X, ReceiptText, IndianRupee } from "lucide-react";
-import { apiService } from "../../../../services/api";
-import { useAccounts } from "../../../PendingTransactions/hooks/useAccounts";
-import { showNotification } from "../../../../utils/utils";
+import {
+  X,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
+import apiService from "../../services/api";
+import { showNotification } from "../../utils/utils";
+import { useAccounts } from "../PendingTransactions/hooks/useAccounts";
+import { StatusOption } from "./types";
 
 interface TransactionDetailsEditModalProps {
   isOpen: boolean;
@@ -11,11 +18,11 @@ interface TransactionDetailsEditModalProps {
   onSuccess: () => void;
 }
 
-const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = ({
+const WithdrawFundsDetailEditModal: React.FC<TransactionDetailsEditModalProps> = ({
   isOpen,
   onClose,
   transaction,
-  onSuccess
+  onSuccess,
 }) => {
   const { accounts, loading: loadingAccounts } = useAccounts();
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -27,7 +34,25 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
     date: "",
   });
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+
+  const statusOptions: StatusOption[] = [
+    { value: null, label: "All", color: "bg-gray-100 text-gray-800 border-gray-200" },
+    { value: 0, label: "Pending", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+    { value: 1, label: "Approved", color: "bg-green-100 text-green-800 border-green-200" },
+    { value: 2, label: "Rejected", color: "bg-red-100 text-red-800 border-red-200" },
+  ];
+
+  const getStatusLabel = (statusId: number): string => {
+    const status = statusOptions.find((opt) => opt.value === statusId);
+    return status?.label || "Unknown";
+  };
+
+  const getStatusColor = (statusId: number) => {
+    const status = statusOptions.find((opt) => opt.value === statusId);
+    return status?.color || "bg-gray-100 text-gray-800 border-gray-200";
+  };
 
   useEffect(() => {
     if (transaction) {
@@ -52,27 +77,51 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
       ...prev,
       transactionalBankId: accountId,
     }));
+    setErrors((prev) => ({ ...prev, transactionalBankId: "" }));
     setIsAccountOpen(false);
   };
 
   const handleChange = (key: string, value: any) => {
-    console.log(`Updating ${key} to ${value}`);
     setFormData((prev) => ({
       ...prev,
       [key]: value,
     }));
+    setErrors((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.amount || formData.amount <= 0) {
+      newErrors.amount = "Amount is required and must be greater than 0.";
+    }
+
+    if (!formData.transactionalBankId) {
+      newErrors.transactionalBankId = "Please select a transactional bank.";
+    }
+
+    if (!formData.date) {
+      newErrors.date = "Date is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
+    if (!validateForm()) return;
+
     try {
       setLoading(true);
       await apiService.editTransactionData(transaction.transactionId, formData);
-      showNotification('Transaction updated successfully!', 'success');
+      showNotification("Transaction updated successfully!", "success");
       onSuccess();
-    } catch (error:any) {
-      console.error("Error updating transaction:", error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to update transaction. Please try again.';
-      showNotification(errorMessage, 'error');
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update transaction. Please try again.";
+      showNotification(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -82,26 +131,43 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
     return `₹${amount.toLocaleString("en-IN")}`;
   };
 
+  const getStatusIcon = (statusId: number) => {
+    switch (statusId) {
+      case 0:
+        return Clock;
+      case 1:
+        return CheckCircle;
+      case 2:
+        return XCircle;
+      default:
+        return AlertCircle;
+    }
+  };
+
+  const StatusIcon = getStatusIcon(transaction.transactionStatusId);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in">
-        {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
-            <h2 className="text-xl font-bold text-gray-900">Transaction Edit</h2>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+          <h2 className="text-xl font-bold text-gray-900">Transaction Edit</h2>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        {/* Read-only Details */}
         <div className="p-6 space-y-6">
+          {/* Read-only info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs text-gray-500">Mode</p>
-              <p className="text-base font-medium">{transaction.transactionMode} - {transaction.tag}</p>
+              <p className="text-base font-medium">
+                {transaction.transactionMode ? `${transaction.transactionMode} - ` : ""}
+                {transaction.tag}
+              </p>
             </div>
             <div>
               <p className="text-xs text-gray-500">Type</p>
@@ -110,29 +176,17 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
             <div>
               <p className="text-xs text-gray-500">Status</p>
               <span
-                className={`inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full ${
-                  transaction.transactionStatus === "Completed"
-                    ? "bg-green-100 text-green-700"
-                    : transaction.transactionStatus === "Pending"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700"
-                }`}
+                className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(
+                  transaction.transactionStatusId
+                )}`}
               >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    transaction.transactionStatus === "Completed"
-                      ? "bg-green-500"
-                      : transaction.transactionStatus === "Pending"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }`}
-                />
-                {transaction.transactionStatus}
+                <StatusIcon size={12} className="mr-1 mt-0.5" />
+                {getStatusLabel(transaction.transactionStatusId)}
               </span>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Reference Number</p>
-              <p className="text-base font-medium">{transaction.transactionRefNumber}</p>
+              <p className="text-xs text-gray-500">Investor</p>
+              <p className="text-base font-medium">{transaction.investorName}</p>
             </div>
             {transaction.note && (
               <div className="col-span-2">
@@ -152,29 +206,34 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
             )}
           </div>
 
-          {/* Editable Fields */}
+          {/* Editable fields */}
           <div className="space-y-4 border-t border-gray-200 pt-4">
+            {/* Amount */}
             <div>
               <label className="block text-xs text-gray-500 mb-1">Amount</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) => handleChange("amount", Number(e.target.value))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
-                />
-              </div>
+              <input
+                type="number"
+                value={formData.amount}
+                onChange={(e) => handleChange("amount", Number(e.target.value))}
+                className={`w-full px-4 py-3 border rounded-xl bg-white text-gray-900 ${
+                  errors.amount ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all`}
+              />
+              {errors.amount && <p className="text-sm text-red-600 mt-1">{errors.amount}</p>}
             </div>
 
+            {/* Bank Dropdown */}
             <div>
               <label className="block text-xs text-gray-500 mb-1">Transactional Bank</label>
-              <div className="mb-4 relative">
+              <div className="mb-1 relative">
                 <button
                   type="button"
                   onClick={() => setIsAccountOpen((prev) => !prev)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-left flex justify-between items-center hover:border-cyan-400 transition-colors"
+                  className={`w-full px-4 py-3 border rounded-xl bg-white text-left flex justify-between items-center transition-colors ${
+                    errors.transactionalBankId ? "border-red-500" : "border-gray-300"
+                  }`}
                 >
-                  <span>{selectedAccount}</span>
+                  <span>{selectedAccount || "Select Bank"}</span>
                   <svg
                     className={`w-4 h-4 transform transition-transform ${
                       isAccountOpen ? "rotate-180" : ""
@@ -212,17 +271,23 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
                   </div>
                 )}
               </div>
+              {errors.transactionalBankId && (
+                <p className="text-sm text-red-600 mt-1">{errors.transactionalBankId}</p>
+              )}
             </div>
 
+            {/* Date */}
             <div>
               <label className="block text-xs text-gray-500 mb-1">Date</label>
-              
               <input
                 type="date"
                 value={formData.date}
                 onChange={(e) => handleChange("date", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
+                className={`w-full px-4 py-3 border rounded-xl bg-white text-gray-900 ${
+                  errors.date ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all`}
               />
+              {errors.date && <p className="text-sm text-red-600 mt-1">{errors.date}</p>}
             </div>
           </div>
         </div>
@@ -231,7 +296,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
         <div className="flex justify-between items-center p-4 border-t border-gray-100 sticky bottom-0 bg-white">
           <button
             onClick={onClose}
-            className="px-4 py-3   rounded-lg text-gray-600 hover:bg-gray-100 transition text-sm"
+            className="px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition text-sm"
           >
             Close
           </button>
@@ -239,10 +304,11 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
             onClick={handleSubmit}
             disabled={loading}
             className={`py-3 px-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-lg ${
-                loading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600'
-              }`}          >
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+            }`}
+          >
             {loading ? "Updating..." : "Update Transaction"}
           </button>
         </div>
@@ -251,4 +317,4 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
   );
 };
 
-export default TransactionDetailsEditModal;
+export default WithdrawFundsDetailEditModal;

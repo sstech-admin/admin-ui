@@ -12,13 +12,18 @@ import {
   User,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { useAddFunds } from './hooks/useAddFunds';
 import { AddFundsRequest, StatusOption } from './types';
 import AddFundsPagination from './AddFundsPagination';
 import AddFundsDetailDialog from './AddFundsDetailDialog';
-import { formatAmountIndian, maskString } from '../../utils/utils';
+import { formatAmountIndian, maskString, showNotification } from '../../utils/utils';
+import AddFundDetailsEditModal from './AddFundDetailsEditModal';
+import apiService from '../../services/api';
+import ConfirmationDialog from '../common/ConfirmationDialog';
 
 const AddFundsTable: React.FC = () => {
   const { requests, loading, error, pagination, filters, setFilters, refetch } = useAddFunds();
@@ -29,6 +34,14 @@ const AddFundsTable: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<AddFundsRequest | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+
+  const handleEditSuccess = () => {
+    showNotification('Transaction updated successfully', 'success');
+    refetch(); // Refresh transactions after edit
+    setIsEditModalOpen(false);
+  };
   // Status options
   const statusOptions: StatusOption[] = [
     { value: null, label: 'All', color: 'bg-gray-100 text-gray-800 border-gray-200' },
@@ -105,6 +118,32 @@ const AddFundsTable: React.FC = () => {
       transactionStatusId: undefined,
       page: 1
     });
+  };
+  
+  const confirmDeleteTransaction = async () => {
+    console.log('Deleting transaction:', selectedRequest);
+  
+    try {
+      if (selectedRequest?.transactionId) {
+        const response = await apiService.deleteTransactionById(selectedRequest.transactionId);
+  
+        if (response.success) {
+          showNotification(`Transaction deleted successfully`, 'success');
+          refetch(); // Refresh transactions after delete
+        } else {
+          throw new Error(response.message || 'Failed to delete transaction');
+        }
+      }
+    } catch (error: any) {
+      console.error('Error deleting transaction:', error);
+      showNotification(error.message || 'Failed to delete transaction', 'error');
+    } finally {
+      setIsConfirmDialogOpen(false);
+    }
+  };
+
+  const cancelDeleteTransaction = () => {
+    setIsConfirmDialogOpen(false);
   };
 
   const handleViewRequest = (request: AddFundsRequest) => {
@@ -416,6 +455,27 @@ const AddFundsTable: React.FC = () => {
                           >
                             <Eye size={16} />
                           </button>
+                          
+                          <button
+                            className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                            title="Edit Transaction"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setIsEditModalOpen(true);
+                            }}
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete Transaction"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setIsConfirmDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </td>
                       </tr>
                     );
@@ -451,6 +511,25 @@ const AddFundsTable: React.FC = () => {
           setIsDetailDialogOpen(false);
           setSelectedRequest(null);
         }}
+      />
+      
+      <AddFundDetailsEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        transaction={selectedRequest}
+        onSuccess={handleEditSuccess} // Pass success handler
+      />
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        title={`Are you sure delete this transaction?`}
+        message="Press Yes for Permanent Delete"
+        confirmText="Yes"
+        cancelText="No"
+        onConfirm={confirmDeleteTransaction}
+        onCancel={cancelDeleteTransaction}
+        type="danger"
       />
     </>
   );
