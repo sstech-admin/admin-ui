@@ -5,7 +5,7 @@ import { Reference } from './types';
 interface ReferenceSearchDropdownProps {
   references: Reference[];
   selectedReference: Reference | null;
-  // onSelect: (reference: Reference) => void;
+  onSelect: (reference: Reference) => void;
   onSearch: (searchTerm: string) => void;
   loading: boolean;
   error?: string;
@@ -16,7 +16,7 @@ interface ReferenceSearchDropdownProps {
 const ReferenceSearchDropdown: React.FC<ReferenceSearchDropdownProps> = ({
   references,
   selectedReference,
-  // onSelect,
+  onSelect,
   onSearch,
   loading,
   error,
@@ -47,13 +47,20 @@ const ReferenceSearchDropdown: React.FC<ReferenceSearchDropdownProps> = ({
     }
   }, [isOpen]);
 
+  // Auto-select if only one reference is available
+  useEffect(() => {
+    if (references.length === 1 && !selectedReference) {
+      onSelect(references[0]);
+    }
+  }, [references, selectedReference, onSelect]);
+
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     onSearch(value);
   };
 
   const handleReferenceSelect = (reference: Reference) => {
-    // onSelect(reference);
+    onSelect(reference);
     setIsOpen(false);
     setSearchTerm('');
   };
