@@ -20,7 +20,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
     nameAsPerPanCard: '',
     email: '',
     phoneNumber: '',
-    amount: 500000, // Default amount
+    amount: 500000, // Default amount - will be displayed but not sent in API
     paymentSystemId: 0,
     referenceId: '',
     bankName: '',
@@ -38,8 +38,6 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
     state: '',
     pinCode: '',
     country: 'India',
-    description: '',
-    activeInvestor: true,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -78,7 +76,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
         nameAsPerPanCard: investorData.nameAsPerPanCard || '',
         email: investorData.email || '',
         phoneNumber: investorData.phoneNumber?.replace('+91', '') || '',
-        amount: investorData.amount || 500000,
+        amount: investorData.amount || 500000, // Keep for display purposes
         paymentSystemId: investorData.paymentSystemId || '',
         referenceId: investorData.referenceId || '',
         bankName: investorData.bankName || '',
@@ -96,8 +94,6 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
         state: investorData.state || '',
         pinCode: investorData.pinCode || '',
         country: investorData.country || 'India',
-        description: investorData.description || '',
-        activeInvestor: investorData.investorStatusId === 1,
       });
 
       // Set PAN card as valid since it's already in the system
@@ -340,12 +336,15 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    const formErrors = validateForm(formData);
+    // Create a copy of formData without the amount field for API submission
+    const { amount, ...submitData } = formData;
+    
+    // Validate form (excluding amount from validation if needed)
+    const formErrors = validateForm(submitData);
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length > 0) {
-      console.log('ERRRO', Object.keys(formErrors))
+      console.log('ERROR', Object.keys(formErrors))
       setSubmitError('Please fix the errors above before submitting.');
       return;
     }
@@ -354,7 +353,8 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
     setSubmitError(null);
 
     try {
-      await onSubmit(formData);
+      // Submit data without the amount field
+      await onSubmit(submitData);
       setSubmitSuccess(true);
       
       // Show success notification
@@ -376,7 +376,6 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
 
   // Dropdown handlers
   const handlePaymentSystemSelect = (id: number) => {
-    alert(id)
     setFormData(prev => ({ ...prev, paymentSystemId: id }));
     setIsPaymentSystemOpen(false);
     if (errors.paymentSystemId) {
@@ -405,29 +404,6 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
     setIsStateOpen(false);
     if (errors.state) {
       setErrors(prev => ({ ...prev, state: '' }));
-    }
-  };
-
-  // Amount increment/decrement handlers
-  const incrementAmount = () => {
-    setFormData(prev => ({
-      ...prev,
-      amount: prev.amount + 500000
-    }));
-    if (errors.amount) {
-      setErrors(prev => ({ ...prev, amount: '' }));
-    }
-  };
-
-  const decrementAmount = () => {
-    if (formData.amount > 500000) {
-      setFormData(prev => ({
-        ...prev,
-        amount: prev.amount - 500000
-      }));
-      if (errors.amount) {
-        setErrors(prev => ({ ...prev, amount: '' }));
-      }
     }
   };
 
@@ -548,26 +524,6 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
               required
               placeholder="Investor Name As Per Pan Card"
             />
-            {/* <FormField
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              error={errors.firstName}
-              required
-              placeholder="Investor First Name"
-            />
-            <FormField
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              error={errors.lastName}
-              required
-              placeholder="Investor Last Name"
-            /> */}
             <FormField
               label="Email"
               name="email"
@@ -596,23 +552,22 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
         {/* Investment Details */}
         <FormSection title="Investment Details">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Amount with increment/decrement buttons */}
+            {/* Amount - Read Only Display */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
-                <span className="text-red-500 mr-1"></span>
-                Amount
+                Investment Amount
               </label>
-              <div className="flex items-center">
-              <p className="mt-2 text-lg text-gray-500 font-bold">
-                {formatAmount(formData.amount)}
-              </p>
-              </div>
-              {errors.amount && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <AlertCircle size={16} className="mr-1" />
-                  {errors.amount}
+              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
+                <div className="flex items-center space-x-2">
+                  <IndianRupee size={18} className="text-gray-500" />
+                  <span className="text-lg font-semibold text-gray-800">
+                    {formatAmount(formData.amount)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Current investment amount (read-only)
                 </p>
-              )}
+              </div>
             </div>
 
             {/* Payment System Dropdown */}
@@ -630,7 +585,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
                   }`}
                 >
                   <span className={formData.paymentSystemId ? 'text-gray-900' : 'text-gray-400'}>
-                    {formData.paymentSystemId || 'Select Payment System'}
+                    {paymentSystems.find(s => s.paymentSystemId === formData.paymentSystemId)?.name || 'Select Payment System'}
                   </span>
                   <ChevronDown 
                     size={20} 
@@ -833,7 +788,6 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
               </div>
             </div>
 
-
             {/* PAN Card Number with validation */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -1027,31 +981,6 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
               onChange={handleFileChange('signatureFile')}
               existingFileUrl={investorData?.signatureURL}
             />
-          </div>
-
-          <div className="mt-6">
-            <FormField
-              label="Description"
-              name="description"
-              type="textarea"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Additional notes or description..."
-              rows={4}
-            />
-          </div>
-
-          <div className="flex items-center space-x-3 mt-5">
-            <input
-              type="checkbox"
-              name="activeInvestor"
-              checked={formData.activeInvestor}
-              onChange={handleInputChange}
-              className="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
-            />
-            <label className="text-sm font-medium text-gray-700">
-              Active Investor
-            </label>
           </div>
         </FormSection>
 

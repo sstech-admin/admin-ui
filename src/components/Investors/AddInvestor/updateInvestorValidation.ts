@@ -14,14 +14,6 @@ export const validationRules: ValidationRules = {
     required: true,
     pattern: /^[+]?[1-9]\d{1,14}$/,
   },
-  amount: {
-    required: true,
-    custom: (value: number) => {
-      if (value <= 0) return 'Amount must be greater than 0';
-      if (value > 100000000) return 'Amount cannot exceed 10 crores';
-      return null;
-    },
-  },
   paymentSystemId: {
     required: true,
   },
