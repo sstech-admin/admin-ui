@@ -106,56 +106,6 @@ class ApiService {
     return response.data;
   }
 
-  async exportAddFundsRequests(params: {fromDate: string; toDate?: string; transactionStatusId?: number | null }) {
-    const queryParams = new URLSearchParams({
-      transactionTypeId: '1',
-    });
-
-    if (params.transactionStatusId !== undefined && params.transactionStatusId !== null) {
-      queryParams.append('transactionStatusId', params.transactionStatusId.toString());
-    }
-
-    if (params.fromDate !== undefined && params.fromDate !== null && params.fromDate !== '') {
-      queryParams.append('fromDate', params.fromDate.toString());
-    }
-
-    if (params.toDate !== undefined && params.toDate !== null && params.toDate !== '') {
-      queryParams.append('toDate', params.toDate.toString());
-    }
-
-    console.log('Fetching withdraw funds with URL:', `/transaction/admin/exportAddWithdrawCSV?${queryParams.toString()}`);
-    
-    const response = await this.api.get(`/transaction/admin/exportAddWithdrawCSV?${queryParams.toString()}`, {
-      timeout: 60000,
-    });
-    return response.data;
-  }
-
-  async exportWithdrawFundsRequests(params: {fromDate: string; toDate?: string; transactionStatusId?: number | null }) {
-    const queryParams = new URLSearchParams({
-      transactionTypeId: '2',
-    });
-
-    if (params.transactionStatusId !== undefined && params.transactionStatusId !== null) {
-      queryParams.append('transactionStatusId', params.transactionStatusId.toString());
-    }
-
-    if (params.fromDate !== undefined && params.fromDate !== null && params.fromDate !== '') {
-      queryParams.append('fromDate', params.fromDate.toString());
-    }
-
-    if (params.toDate !== undefined && params.toDate !== null && params.toDate !== '') {
-      queryParams.append('toDate', params.toDate.toString());
-    }
-
-    console.log('Fetching withdraw funds with URL:', `/transaction/admin/exportAddWithdrawCSV?${queryParams.toString()}`);
-    
-    const response = await this.api.get(`/transaction/admin/exportAddWithdrawCSV?${queryParams.toString()}`, {
-      timeout: 60000,
-    });
-    return response.data;
-  }
-
 
   async editTransactionData(transaction_id:string, formData: { amount: number; transactionalBankId: string; date: string }) {
     const response = await this.api.post(`transaction/admin/updateTransaction/${transaction_id}`, formData, {

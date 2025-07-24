@@ -42,9 +42,9 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onBack }) => {
       newErrors.tag = 'Please select a tag';
     }
 
-    if (!formData.amount || formData.amount <= 0) {
-      newErrors.amount = 'Please enter a valid amount';
-    }
+    if (formData.amount === 0 || isNaN(formData.amount)) {
+      newErrors.amount = 'Please enter a non-zero valid amount';
+    }    
 
     if (!formData.dateTime) {
       newErrors.dateTime = 'Please select a date and time';
@@ -278,7 +278,6 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onBack }) => {
                   value={formData.amount || ''}
                   onChange={(e) => handleInputChange('amount', parseFloat(e.target.value) || 0)}
                   placeholder="Enter amount"
-                  min="0"
                   step="0.01"
                   className={`w-full pl-11 pr-4 py-4 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-white text-gray-900 ${
                     errors.amount ? 'border-red-300 bg-red-50' : 'border-gray-300'
