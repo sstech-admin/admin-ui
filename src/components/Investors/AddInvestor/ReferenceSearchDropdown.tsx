@@ -47,6 +47,13 @@ const ReferenceSearchDropdown: React.FC<ReferenceSearchDropdownProps> = ({
     }
   }, [isOpen]);
 
+  // Auto-select if only one reference is available
+  useEffect(() => {
+    if (references.length === 1 && !selectedReference) {
+      onSelect(references[0]);
+    }
+  }, [references, selectedReference, onSelect]);
+
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     onSearch(value);
@@ -95,7 +102,7 @@ const ReferenceSearchDropdown: React.FC<ReferenceSearchDropdownProps> = ({
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-80 overflow-hidden">
           {/* Search Input */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100 hidden">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
               <input
@@ -131,20 +138,20 @@ const ReferenceSearchDropdown: React.FC<ReferenceSearchDropdownProps> = ({
             <div className="max-h-60 overflow-y-auto">
               <button
                 type="button"
-                onClick={() => handleReferenceSelect({ 
-                  id: "0", 
-                  name: "- NA", 
-                  referenceId: "0", 
-                  deleted: false, 
-                  updatedAt: new Date().toISOString(),
-                  totalInvestors: 0
-                })}
+                // onClick={() => handleReferenceSelect({ 
+                //   id: "0", 
+                //   name: "- NA", 
+                //   referenceId: "0", 
+                //   deleted: false, 
+                //   updatedAt: new Date().toISOString(),
+                //   totalInvestors: 0
+                // })}
                 className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 ${
                   selectedReference?.referenceId === "0" ? 'bg-cyan-50 text-cyan-700' : ''
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">- NA</span>
+                  {/* <span className="font-medium">- NA</span> */}
                   {selectedReference?.referenceId === "0" && (
                     <Check size={16} className="text-cyan-500" />
                   )}

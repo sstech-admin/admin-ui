@@ -14,21 +14,17 @@ import {
   CheckCircle,
   XCircle,
   Edit,
-  Trash2,
-  Calendar
+  Trash2
 } from 'lucide-react';
 import { useAddFunds } from './hooks/useAddFunds';
 import { AddFundsRequest, StatusOption } from './types';
 import AddFundsPagination from './AddFundsPagination';
 import AddFundsDetailDialog from './AddFundsDetailDialog';
-import { convertExcel, formatAmountIndian, maskString, showNotification } from '../../utils/utils';
+import { formatAmountIndian, maskString, showNotification } from '../../utils/utils';
 import AddFundDetailsEditModal from './AddFundDetailsEditModal';
 import apiService from '../../services/api';
 import ConfirmationDialog from '../common/ConfirmationDialog';
-import ExportModal from '../ExportModal/ExportModal';
-interface ExtraFilters {
-  transactionStatusId: number | null;
-}
+
 const AddFundsTable: React.FC = () => {
   const { requests, loading, error, pagination, filters, setFilters, refetch } = useAddFunds();
   
@@ -37,16 +33,9 @@ const AddFundsTable: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedRequest, setSelectedRequest] = useState<AddFundsRequest | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [selectedFromDate, setSelectedFromDate] = useState('');
-  const [selectedToDate, setSelectedToDate] = useState('');
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  
-  const [isExportOpen, setIsExportOpen] = useState(false);
-  const [extraFilters, setExtraFilters] = useState<ExtraFilters>({
-    transactionStatusId: null,
-  });
 
   const handleEditSuccess = () => {
     showNotification('Transaction updated successfully', 'success');
@@ -121,32 +110,12 @@ const AddFundsTable: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  
-
-  const handleFromDateChange = (date: string) => {
-    setSelectedFromDate(date);
-    setFilters({ 
-      fromDate: date || undefined, 
-      page: 1 
-    });
-  };
-  const handleToDateChange = (date: string) => {
-    setSelectedToDate(date);
-    setFilters({ 
-      toDate: date || undefined, 
-      page: 1 
-    });
-  };
   const clearAllFilters = () => {
     setSelectedStatus('All');
     setSearchTerm('');
-    setSelectedFromDate('')
-    setSelectedToDate('')
     setFilters({
       search: '',
       transactionStatusId: undefined,
-      fromDate: undefined,
-      toDate: undefined,
       page: 1
     });
   };
@@ -289,7 +258,7 @@ const AddFundsTable: React.FC = () => {
               </button>
               
               <button 
-                 onClick={()=>{setIsExportOpen(!isExportOpen)}}
+                onClick={handleExport}
                 disabled={loading}
                 className={`flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors ${
                   loading ? 'opacity-50 cursor-not-allowed' : ''
@@ -346,32 +315,6 @@ const AddFundsTable: React.FC = () => {
                   <span className="text-sm font-medium">Clear</span>
                 </button>
               )}
-              
-              <div className="relative">
-                <div className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl">
-                  <Calendar size={16} className="text-gray-400" />
-                  <input
-                    type="date"
-                    value={selectedFromDate}
-                    onChange={(e) => handleFromDateChange(e.target.value)}
-                    className="text-sm font-medium text-gray-700 bg-transparent border-none outline-none"
-                    placeholder="DD MMM YYYY"
-                  />
-                </div>
-              </div>
-              
-              <div className="relative">
-                <div className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl">
-                  <Calendar size={16} className="text-gray-400" />
-                  <input
-                    type="date"
-                    value={selectedToDate}
-                    onChange={(e) => handleToDateChange(e.target.value)}
-                    className="text-sm font-medium text-gray-700 bg-transparent border-none outline-none"
-                    placeholder="DD MMM YYYY"
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Stats */}
@@ -557,72 +500,6 @@ const AddFundsTable: React.FC = () => {
             loading={loading}
           />
         )}
-        
-      <ExportModal
-        isOpen={isExportOpen}
-        onClose={() => setIsExportOpen(false)}
-        showPDF
-        showExcel
-        extraFiltersData={extraFilters}
-        extraFiltersContent={
-          <div className="space-y-4 relative">
-            {/* Status Filter */}
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Transaction Status
-            </label>
-            <div className="relative">
-                <button
-                  onClick={() => setIsStatusOpen(!isStatusOpen)}
-                  disabled={loading}
-                  className={`flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors w-full justify-between ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <span className="text-sm font-medium text-gray-700">
-                    {selectedStatus}
-                  </span>
-                  <ChevronDown size={16} className={`text-gray-400 transition-transform ${isStatusOpen ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {isStatusOpen && !loading && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg">
-                    {statusOptions.map((option) => (
-                      <button
-                        key={option.label}
-                        onClick={() => {setExtraFilters((prev) => ({ ...prev, transactionStatusId: option.value })), setIsStatusOpen(false)}}
-                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl last:rounded-b-xl ${
-                          selectedStatus === option.label ? 'bg-cyan-50 text-cyan-700' : ''
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-          </div>
-        }
-        onExport={async (data) => {
-          console.log('Exporting data:', data);
-          try {
-            const response = await apiService.exportAddFundsRequests({
-              transactionStatusId: data?.filters?.transactionStatusId,
-              fromDate: data?.fromDate,
-              toDate: data?.toDate
-            });
-            console.log('Res', response);
-            convertExcel(
-              response?.buffer?.data,
-              response?.filename
-            );
-            setIsExportOpen(!isExportOpen);
-          } catch (error) {
-            console.error('Export failed:', error);
-            // Optionally show error feedback to user
-          }
-        }}
-
-      />
       </div>
 
       {/* Detail Dialog */}

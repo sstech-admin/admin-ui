@@ -27,9 +27,7 @@ export const useWithdrawFunds = (): UseWithdrawFundsReturn => {
   const [filters, setFiltersState] = useState<WithdrawFundsFilters>({
     page: 1,
     limit: 10,
-    search: '',
-    fromDate:'',
-    toDate:''
+    search: ''
   });
 
   const fetchWithdrawFunds = useCallback(async () => {
@@ -50,14 +48,6 @@ export const useWithdrawFunds = (): UseWithdrawFundsReturn => {
       if (filters.transactionStatusId !== undefined && filters.transactionStatusId !== null) {
         queryParams.append('transactionStatusId', filters.transactionStatusId.toString());
       }
-
-      if (filters.fromDate !== undefined && filters.fromDate !== null && filters.fromDate !== '') {
-        queryParams.append('fromDate', filters.fromDate.toString());
-      }
-
-      if (filters.toDate !== undefined && filters.toDate !== null && filters.toDate !== '') {
-        queryParams.append('toDate', filters.toDate.toString());
-      }1
 
       console.log('Fetching withdraw funds with URL:', `/transaction/admin/getAddWithdrawRequest?${queryParams.toString()}`);
       

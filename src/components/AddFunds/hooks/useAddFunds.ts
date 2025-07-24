@@ -27,9 +27,7 @@ export const useAddFunds = (): UseAddFundsReturn => {
   const [filters, setFiltersState] = useState<AddFundsFilters>({
     page: 1,
     limit: 10,
-    search: '',
-    fromDate:'',
-    toDate:''
+    search: ''
   });
 
   const fetchAddFunds = useCallback(async () => {
@@ -49,14 +47,6 @@ export const useAddFunds = (): UseAddFundsReturn => {
 
       if (filters.transactionStatusId !== undefined && filters.transactionStatusId !== null) {
         queryParams.append('transactionStatusId', filters.transactionStatusId.toString());
-      }
-
-      if (filters.fromDate !== undefined && filters.fromDate !== null && filters.fromDate !== '') {
-        queryParams.append('fromDate', filters.fromDate.toString());
-      }
-
-      if (filters.toDate !== undefined && filters.toDate !== null && filters.toDate !== '') {
-        queryParams.append('toDate', filters.toDate.toString());
       }
 
       console.log('Fetching add funds with URL:', `/transaction/admin/getAddWithdrawRequest?${queryParams.toString()}`);
