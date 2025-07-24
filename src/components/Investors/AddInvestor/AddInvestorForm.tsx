@@ -106,35 +106,12 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
         setLoadingReferences(true);
         const response = await apiService.get('/references');
         if (response && response.results) {
-          console.log(response.results);
-          setReferences([{
-            "id": "67f7a189eb52c64544c295ba",
-            "name": "Dharma",
-            "referenceId": "24f07be5-d27b-4ea7-9652-d979fd488268",
-            "deleted": false,
-            "updatedAt": "2025-07-22T05:26:28.815Z",
-            "totalInvestors": 1757
-        }]);
-        setSelectedReference({
-            "id": "67f7a189eb52c64544c295ba",
-            "name": "Dharma",
-            "referenceId": "24f07be5-d27b-4ea7-9652-d979fd488268",
-            "deleted": false,
-            "updatedAt": "2025-07-22T05:26:28.815Z",
-            "totalInvestors": 1757
-        });
+          setReferences(response.results);
         }
       } catch (error) {
         console.error('Error fetching references:', error);
         // Fallback data
-        setReferences([{
-            "id": "67f7a189eb52c64544c295ba",
-            "name": "Dharma",
-            "referenceId": "24f07be5-d27b-4ea7-9652-d979fd488268",
-            "deleted": false,
-            "updatedAt": "2025-07-22T05:26:28.815Z",
-            "totalInvestors": 1757
-        }]);
+        setReferences([]);
       } finally {
         setLoadingReferences(false);
       }
@@ -350,7 +327,7 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
 
       submitData.append("amount", formData.amount.toString());
       submitData.append("paymentSystemId", paymentSystems.find(ps => ps.name === formData.paymentSystem)?.paymentSystemId.toString() || "");
-      submitData.append("referenceId", "24f07be5-d27b-4ea7-9652-d979fd488268");
+      submitData.append("referenceId", formData.referencePerson || "");
 
       submitData.append("bankName", formData.bankName);
       submitData.append("bankAccountNumber", formData.bankAccountNumber);
@@ -498,16 +475,16 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   };
 
   // Handle reference selection
-  // const handleReferenceSelect = (reference: Reference) => {
-  //   setSelectedReference(reference);
-  //   // setFormData(prev => ({
-  //   //   ...prev,
-  //   //   referencePerson: reference.referenceId
-  //   // }));
-  //   if (errors.referencePerson) {
-  //     setErrors(prev => ({ ...prev, referencePerson: '' }));
-  //   }
-  // };
+  const handleReferenceSelect = (reference: Reference) => {
+    setSelectedReference(reference);
+    setFormData(prev => ({
+      ...prev,
+      referencePerson: reference.referenceId
+    }));
+    if (errors.referencePerson) {
+      setErrors(prev => ({ ...prev, referencePerson: '' }));
+    }
+  };
 
   // Format amount for display
   const formatAmount = (amount: number): string => {
@@ -763,11 +740,11 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
               <ReferenceSearchDropdown
                 references={references}
                 selectedReference={selectedReference}
-                // onSelect={handleReferenceSelect}
+                onSelect={handleReferenceSelect}
                 onSearch={handleReferenceSearch}
                 loading={loadingReferences}
                 error={errors.referencePerson}
-                // required
+                required
               />
             </div>
           </div>

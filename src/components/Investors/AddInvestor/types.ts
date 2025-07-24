@@ -54,7 +54,7 @@ export interface InvestorUpdateFormData {
   phoneNumber: string;
 
   // Investment Details
-  amount: number;
+  // amount: number;
   paymentSystemId: number;
   referenceId: string;
 
@@ -85,10 +85,10 @@ export interface InvestorUpdateFormData {
   chequePassbookFile?: File;
   bankStatementFile?: File;
   signatureFile?: File;
-  description: string;
+  // description: string;
 
   // Status
-  activeInvestor: boolean;
+  // activeInvestor: boolean;
 }
 
 export interface FormErrors {

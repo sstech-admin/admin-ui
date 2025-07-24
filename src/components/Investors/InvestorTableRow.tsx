@@ -84,13 +84,13 @@ const InvestorTableRow: React.FC<InvestorTableRowProps> = ({
           >
             <Edit size={16} />
           </button>
-          {/* <button 
+          <button 
             onClick={() => onDelete(investor)}
             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             title="Delete Investor"
           >
             <Trash2 size={16} />
-          </button> */}
+          </button>
         </div>
       </td>
     </tr>
