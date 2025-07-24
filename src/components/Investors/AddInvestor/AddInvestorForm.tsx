@@ -100,37 +100,25 @@ const AddInvestorForm: React.FC<AddInvestorFormProps> = ({ onBack, onSubmit }) =
   }, []);
 
   // Fetch references
-useEffect(() => {
-  const fetchReferences = async () => {
-    try {
-      setLoadingReferences(true);
-      const response = await apiService.get('/references');
-
-      if (response && response.results) {
-        // Filter for the reference with name 'Dharma'
-        const dharmaReference = response.results.find(
-          (ref: any) => ref.name === 'Dharma'
-        );
-
-        if (dharmaReference) {
-          setReferences([dharmaReference]); // Set only Dharma
-          setSelectedReference(dharmaReference);
-        } else {
-          setReferences([]); // Or show empty if Dharma not found
+  useEffect(() => {
+    const fetchReferences = async () => {
+      try {
+        setLoadingReferences(true);
+        const response = await apiService.get('/references');
+        if (response && response.results) {
+          setReferences(response.results);
         }
+      } catch (error) {
+        console.error('Error fetching references:', error);
+        // Fallback data
+        setReferences([]);
+      } finally {
+        setLoadingReferences(false);
       }
-    } catch (error) {
-      console.error('Error fetching references:', error);
-      // Optional: fallback data if needed
-      setReferences([]);
-    } finally {
-      setLoadingReferences(false);
-    }
-  };
+    };
 
-  fetchReferences();
-}, []);
-
+    fetchReferences();
+  }, []);
 
   // Fetch accounts
   useEffect(() => {
@@ -339,7 +327,7 @@ useEffect(() => {
 
       submitData.append("amount", formData.amount.toString());
       submitData.append("paymentSystemId", paymentSystems.find(ps => ps.name === formData.paymentSystem)?.paymentSystemId.toString() || "");
-      submitData.append("referenceId", references[0].referenceId || "");
+      submitData.append("referenceId", formData.referencePerson || "");
 
       submitData.append("bankName", formData.bankName);
       submitData.append("bankAccountNumber", formData.bankAccountNumber);
@@ -489,10 +477,10 @@ useEffect(() => {
   // Handle reference selection
   const handleReferenceSelect = (reference: Reference) => {
     setSelectedReference(reference);
-    // setFormData(prev => ({
-    //   ...prev,
-    //   referencePerson: reference.referenceId
-    // }));
+    setFormData(prev => ({
+      ...prev,
+      referencePerson: reference.referenceId
+    }));
     if (errors.referencePerson) {
       setErrors(prev => ({ ...prev, referencePerson: '' }));
     }
@@ -756,7 +744,7 @@ useEffect(() => {
                 onSearch={handleReferenceSearch}
                 loading={loadingReferences}
                 error={errors.referencePerson}
-                // required
+                required
               />
             </div>
           </div>

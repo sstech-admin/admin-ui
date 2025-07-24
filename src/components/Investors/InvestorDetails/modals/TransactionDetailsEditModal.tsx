@@ -20,13 +20,11 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
   const { accounts, loading: loadingAccounts } = useAccounts();
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState("All");
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState({
     amount: 0,
     transactionalBankId: "",
     date: "",
-    tag:""
   });
 
   const [loading, setLoading] = useState(false);
@@ -39,7 +37,6 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
         date: transaction.createdAt
           ? new Date(transaction.createdAt).toISOString().slice(0, 10)
           : "",
-        tag: transaction.transactionType === 'Deposit' ? transaction.tag : null,
       });
 
       const selected = accounts.find((a) => a.accountId === transaction.transactionalBankId);
@@ -64,66 +61,22 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
       ...prev,
       [key]: value,
     }));
-    
-    if(transaction.transactionType === 'Deposit'){
-      setFormData((prev) => ({
-        ...prev,
-        tag: value,
-      }));
-    }
-    
-    setErrors((prev) => ({ ...prev, [key]: "" }));
-
   };
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     setLoading(true);
-  //     await apiService.editTransactionData(transaction.transactionId, formData);
-  //     showNotification('Transaction updated successfully!', 'success');
-  //     onSuccess();
-  //   } catch (error:any) {
-  //     console.error("Error updating transaction:", error);
-  //     const errorMessage = error.response?.data?.message || error.message || 'Failed to update transaction. Please try again.';
-  //     showNotification(errorMessage, 'error');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleSubmit = async () => {
-  try {
-    setLoading(true);
-
-    // Build payload conditionally
-    const payload: any = {
-      amount: formData.amount,
-      transactionalBankId: formData.transactionalBankId,
-      date: formData.date,
-    };
-
-    // Only include 'tag' if transactionType is 'Deposit'
-    if (transaction.transactionType === 'Deposit') {
-      payload.tag = formData.tag;
+    try {
+      setLoading(true);
+      await apiService.editTransactionData(transaction.transactionId, formData);
+      showNotification('Transaction updated successfully!', 'success');
+      onSuccess();
+    } catch (error:any) {
+      console.error("Error updating transaction:", error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update transaction. Please try again.';
+      showNotification(errorMessage, 'error');
+    } finally {
+      setLoading(false);
     }
-
-    // Send the filtered payload
-    await apiService.editTransactionData(transaction.transactionId, payload);
-
-    showNotification('Transaction updated successfully!', 'success');
-    onSuccess();
-  } catch (error: any) {
-    console.error("Error updating transaction:", error);
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      'Failed to update transaction. Please try again.';
-    showNotification(errorMessage, 'error');
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const formatAmount = (amount: number) => {
     return `₹${amount.toLocaleString("en-IN")}`;
@@ -213,32 +166,6 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
               </div>
             </div>
 
-            {/* Tag */}
-            {transaction.transactionType === 'Deposit' ? (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <span className="text-red-500">*</span> Type
-              </label>
-              <div className="flex gap-4">
-                {["New", "Old"].map((option) => (
-                  <label
-                    key={option}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      name="tag"
-                      value={option}
-                      checked={formData.tag === option}
-                      onChange={(e) => handleChange("tag", e.target.value)}
-                    />
-                    <span className="text-sm font-medium">{option}</span>
-                  </label>
-                ))}
-              </div>
-              {errors.tag && <p className="text-sm text-red-600 mt-1">{errors.tag}</p>}
-            </div>
-            ): '  '}
             <div>
               <label className="block text-xs text-gray-500 mb-1">Transactional Bank</label>
               <div className="mb-4 relative">

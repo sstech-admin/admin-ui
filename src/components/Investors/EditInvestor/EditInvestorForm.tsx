@@ -20,7 +20,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
     nameAsPerPanCard: '',
     email: '',
     phoneNumber: '',
-    amount: 500000, // Default amount
+    // amount: 500000, // Default amount
     paymentSystemId: 0,
     referenceId: '',
     bankName: '',
@@ -38,8 +38,8 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
     state: '',
     pinCode: '',
     country: 'India',
-    description: '',
-    activeInvestor: true,
+    // description: '',
+    // activeInvestor: true,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -78,7 +78,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
         nameAsPerPanCard: investorData.nameAsPerPanCard || '',
         email: investorData.email || '',
         phoneNumber: investorData.phoneNumber?.replace('+91', '') || '',
-        amount: investorData.amount || 500000,
+        // amount: investorData.amount || 500000,
         paymentSystemId: investorData.paymentSystemId || '',
         referenceId: investorData.referenceId || '',
         bankName: investorData.bankName || '',
@@ -96,8 +96,8 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
         state: investorData.state || '',
         pinCode: investorData.pinCode || '',
         country: investorData.country || 'India',
-        description: investorData.description || '',
-        activeInvestor: investorData.investorStatusId === 1,
+        // description: investorData.description || '',
+        // activeInvestor: investorData.investorStatusId === 1,
       });
 
       // Set PAN card as valid since it's already in the system
@@ -409,27 +409,27 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
   };
 
   // Amount increment/decrement handlers
-  const incrementAmount = () => {
-    setFormData(prev => ({
-      ...prev,
-      amount: prev.amount + 500000
-    }));
-    if (errors.amount) {
-      setErrors(prev => ({ ...prev, amount: '' }));
-    }
-  };
+  // const incrementAmount = () => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     amount: prev.amount + 500000
+  //   }));
+  //   if (errors.amount) {
+  //     setErrors(prev => ({ ...prev, amount: '' }));
+  //   }
+  // };
 
-  const decrementAmount = () => {
-    if (formData.amount > 500000) {
-      setFormData(prev => ({
-        ...prev,
-        amount: prev.amount - 500000
-      }));
-      if (errors.amount) {
-        setErrors(prev => ({ ...prev, amount: '' }));
-      }
-    }
-  };
+  // const decrementAmount = () => {
+  //   if (formData.amount > 500000) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       amount: prev.amount - 500000
+  //     }));
+  //     if (errors.amount) {
+  //       setErrors(prev => ({ ...prev, amount: '' }));
+  //     }
+  //   }
+  // };
 
   // Search references
   const handleReferenceSearch = (term: string) => {
@@ -597,7 +597,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
         <FormSection title="Investment Details">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Amount with increment/decrement buttons */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3">
                 <span className="text-red-500 mr-1"></span>
                 Amount
@@ -613,7 +613,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
                   {errors.amount}
                 </p>
               )}
-            </div>
+            </div> */}
 
             {/* Payment System Dropdown */}
             <div>
@@ -1029,7 +1029,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
             />
           </div>
 
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <FormField
               label="Description"
               name="description"
@@ -1039,9 +1039,9 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
               placeholder="Additional notes or description..."
               rows={4}
             />
-          </div>
+          </div> */}
 
-          <div className="flex items-center space-x-3 mt-5">
+          {/* <div className="flex items-center space-x-3 mt-5">
             <input
               type="checkbox"
               name="activeInvestor"
@@ -1052,7 +1052,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
             <label className="text-sm font-medium text-gray-700">
               Active Investor
             </label>
-          </div>
+          </div> */}
         </FormSection>
 
         {/* Submit Button */}
