@@ -35,10 +35,10 @@ export const validationRules: ValidationRules = {
   paymentSystem: {
     required: true,
   },
-  referencePerson: {
-    required: true,
-    minLength: 2,
-  },
+  // referencePerson: {
+  //   required: true,
+  //   minLength: 2,
+  // },
   // paymentReceivedAccount: {
   //   required: true,
   // },
