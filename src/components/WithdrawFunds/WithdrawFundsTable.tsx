@@ -636,6 +636,7 @@ const WithdrawFundsTable: React.FC = () => {
           console.log('Exporting data:', data);
           try {
             const response = await apiService.exportWithdrawFundsRequests({
+              transactionTypeId: 2,
               transactionStatusId: data?.filters?.transactionStatusId,
               fromDate: data?.fromDate,
               toDate: data?.toDate
