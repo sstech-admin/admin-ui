@@ -1,12 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, AlertCircle, ChevronLeft, ChevronRight, Download, CheckCircle, X } from 'lucide-react';
 import { useBulkTransactionDetails } from './hooks/useBulkTransactionDetails';
 import BulkTransactionHeader from './BulkTransactionHeader';
 import BulkTransactionSummaryCard from './BulkTransactionSummaryCard';
 import BulkTransactionDetailsTable from './BulkTransactionDetailsTable';
+import BulkTransactionDetailsModal from './BulkTransactionDetailsModal';
 import { apiService } from '../../../services/api';
-
+import ConfirmationDialog from '../../common/ConfirmationDialog';
+import { convertExcel, showNotification } from '../../../utils/utils';
+interface Transaction {
+  transactionId: string;
+  accountId: string;
+  transactionStatusId: number;
+  transactionModeId: number;
+  transactionMode: string; // e.g., "Debit"
+  transactionType: string; // e.g., "Profit Withdraw TDS"
+  investorName: string;
+  name: string; // Account holder's name
+  transactionStatus: string; // e.g., "Completed"
+  amount: number;
+  amountColour: string; // e.g., "red"
+  accountName: string;
+  investorId: string;
+  dateTime: string; // ISO date string
+  updatedAt: string; // ISO date string
+  transactionBank: string; // e.g., "TDS"
+}
 const BulkTransactionDetails: React.FC = () => {
   const { bulkTransactionId } = useParams<{ bulkTransactionId: string }>();
   
@@ -19,6 +39,8 @@ const BulkTransactionDetails: React.FC = () => {
     setFilters, 
     refetch 
   } = useBulkTransactionDetails(bulkTransactionId || '');
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isExportLoading, setIsExportLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'completed' | 'pending'>('completed');
   const [completedTransactions, setCompletedTransactions] = useState<any[]>([]);
@@ -28,6 +50,9 @@ const BulkTransactionDetails: React.FC = () => {
   const [completedError, setCompletedError] = useState<string | null>(null);
   const [pendingError, setPendingError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [ selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isBulkTransactionViewModal, setIsBulkTransactionViewModal] = useState(false);
+
   
     // Debounced search
     const handleSearchChange = useCallback((value: string) => {
@@ -111,13 +136,51 @@ const BulkTransactionDetails: React.FC = () => {
       setLoadingPending(false);
     }
   };
+    
+  const updateAllTransactionStatus = async (transactionType:string) => {
+    try {
+      setLoadingPending(true);
+      setLoadingCompleted(true);
 
+      if (transactionType === 'pending') {
+        const response = await apiService.updateAllBulkTransactionTransactionStatus({
+          bulkTransactionId: bulkTransactionId || '',
+          bulkTransactionStatusId: 3
+        });
+
+        if (response.success) {
+          setIsConfirmDialogOpen(false);
+          setActiveTab('completed')
+          setLoadingPending(true);
+          setLoadingCompleted(true);
+          fetchCompletedTransactions();
+          await showNotification("All Transaction Updated Successfully.", 'success');
+          setLoadingPending(false);
+          setLoadingCompleted(false);
+        } else {
+          await showNotification("Failed to update all transactions.",'error');
+        }
+      }
+
+    } catch (error:any) {
+      showNotification(error.message, 'error');
+    } finally {
+      setLoadingPending(false);
+      setLoadingCompleted(false);
+      setIsConfirmDialogOpen(false);
+    }
+  };
+
+  const handleTransactionView = (transaction : Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsBulkTransactionViewModal(true);
+  }
   // Initial data fetch
   useEffect(() => {
     if (!bulkTransactionId) return;
     fetchCompletedTransactions();
     fetchPendingTransactions();
-  }, [bulkTransactionId]);
+  }, [bulkTransactionId, isConfirmDialogOpen]);
 
   // Handle page change for completed transactions
   const handleCompletedPageChange = (page: number) => {
@@ -156,33 +219,25 @@ const BulkTransactionDetails: React.FC = () => {
   };
 
   // Handle export
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!transactions.length) return;
+    setIsExportLoading(true);
     
-    console.log('Exporting bulk transaction details...');
-    const csvData = transactions.map(transaction => ({
-      'Investor': transaction.investorName || '-',
-      'Investor ID': transaction.investor || '-',
-      'Account': transaction.accountName || '-',
-      'Amount': transaction.amount,
-      'Transaction Mode': transaction.transactionMode || '-',
-      'Tag': transaction.tag,
-      'Status': transaction.bulkTransactionStatus,
-      'Date': new Date(transaction.createdAt).toLocaleString()
-    }));
-    
-    const csvString = [
-      Object.keys(csvData[0] || {}).join(','),
-      ...csvData.map(row => Object.values(row).join(','))
-    ].join('\n');
-    
-    const blob = new Blob([csvString], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `bulk-transaction-${bulkTransactionId}-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    try {
+          const response = await apiService.exportBulkTransactions({
+            bulkTransactionId: bulkTransactionId || '',
+          });
+          console.log('REs', response)
+          convertExcel(
+            response?.data?.buffer?.data,
+            response?.data?.filename
+          )
+        } catch (error) {
+          console.error('Export failed:', error);
+          // Optionally show error feedback to user
+        } finally {
+          setIsExportLoading(false);
+        }
   };
 
   // Get visible pages for pagination
@@ -253,7 +308,7 @@ const BulkTransactionDetails: React.FC = () => {
       {/* Header */}
       <BulkTransactionHeader 
         summary={summary} 
-        loading={loading} 
+        loading={loading || isExportLoading} 
         error={error} 
         onRefresh={handleRefresh}
         onExport={handleExport}
@@ -369,7 +424,7 @@ const BulkTransactionDetails: React.FC = () => {
         
         {/* Search and Filter Row */}
         <div className="p-4 bg-gray-50 border-b border-gray-200">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 justify-between">
             <div className="relative flex-1 max-w-md">
               <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -381,6 +436,22 @@ const BulkTransactionDetails: React.FC = () => {
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
               />
+            </div>
+            <div>
+              {
+                activeTab === 'pending' &&  pendingTransactions.length > 0 ? (
+                <button 
+                  onClick={()=>{setIsConfirmDialogOpen(true)}}
+                  disabled={loadingPending}
+                  className={`flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all shadow-md ${
+                    loadingPending ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <CheckCircle size={18} />
+                  <span className="text-sm font-medium">All Approve</span>
+                </button>
+                ) : ''
+              }
             </div>
           </div>
         </div>
@@ -487,7 +558,7 @@ const BulkTransactionDetails: React.FC = () => {
                         </td>
                         
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                          <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" onClick={()=>handleTransactionView(transaction)}>
                             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                               <circle cx="12" cy="12" r="3"></circle>
@@ -768,6 +839,23 @@ const BulkTransactionDetails: React.FC = () => {
           </div>
         )}
       </div>
+      
+      <ConfirmationDialog
+        isOpen={isConfirmDialogOpen}
+        title={`Are you sure appraove all transactions?`}
+        message="Press Yes for Approve Transactions"
+        confirmText="Yes"
+        cancelText="No"
+        onConfirm={()=>{updateAllTransactionStatus('pending')}}
+        onCancel={()=>{setIsConfirmDialogOpen(false)}}
+        type="danger"
+      />
+
+      <BulkTransactionDetailsModal 
+        isOpen={isBulkTransactionViewModal}
+        onClose={() => setIsBulkTransactionViewModal(false)}
+        transaction={selectedTransaction}
+      />
     </div>
   );
 };

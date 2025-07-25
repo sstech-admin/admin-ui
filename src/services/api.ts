@@ -106,6 +106,18 @@ class ApiService {
     return response.data;
   }
 
+  async exportBulkTransactions(formData: { bulkTransactionId: string;}) {
+    const response = await this.api.post('export-data/admin/exportBulkTransaction', formData, {
+      timeout: 60000, // 60 seconds
+    });
+    return response.data;
+  }
+
+  async updateAllBulkTransactionTransactionStatus(formData: { bulkTransactionId: string; bulkTransactionStatusId: number; }) {
+    const response = await this.api.post('/bulk-transactions/admin/updateStatus', formData);
+    return response.data;
+  }
+
   async exportAddFundsRequests(params: {fromDate: string; toDate?: string; transactionStatusId?: number | null }) {
     const queryParams = new URLSearchParams({
       transactionTypeId: '1',
