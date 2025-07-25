@@ -98,6 +98,13 @@ class ApiService {
     return response.data;
   }
 
+  async exportTallyData(payload: { type: string; fromDate: string; toDate: string }) {
+    const response = await this.api.post('/export-data/admin/exportData', payload, {
+      timeout: 60000, // 60 seconds
+    });
+    return response.data;
+  }
+
 
   async exportInvestorData(formData: { investorId: string; type: string; }) {
     const response = await this.api.post('export-data/admin/exportInvestorData', formData, {
@@ -429,12 +436,6 @@ async exportWithdrawFundsRequests(formData: {
   // Payout endpoints
   async createPayout(payload: { paymentSystemId: number; asOnDate: string; note: string }) {
     const response = await this.api.post('/transaction/admin/payout', payload);
-    return response.data;
-  }
-
-  // Tally Export endpoint
-  async exportTallyData(payload: { type: string; fromDate: string; toDate: string }) {
-    const response = await this.api.post('/export-data/admin/exportData', payload);
     return response.data;
   }
 

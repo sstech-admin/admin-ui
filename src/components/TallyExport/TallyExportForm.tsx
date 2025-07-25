@@ -33,7 +33,10 @@ const TallyExportForm: React.FC = () => {
   // Type options - only All and Payout as requested
   const typeOptions: TypeOption[] = [
     { value: 'All', label: 'All' },
-    { value: 'Payout', label: 'Payout' }
+    { value: 'BulkPayout', label: 'BulkPayout' },
+    { value: 'PayoutTds', label: 'PayoutTds' },
+    { value: 'DepositPayin', label: 'DepositPayin' },
+    { value: 'PnlPayin', label: 'PnlPayin' }
   ];
 
   const validateForm = (): boolean => {
@@ -83,7 +86,7 @@ const TallyExportForm: React.FC = () => {
 
       console.log('Exporting data with payload:', payload);
 
-      const exportResponse: TallyExportResponse = await apiService.post('/export-data/admin/exportData', payload);
+      const exportResponse: TallyExportResponse = await apiService.exportTallyData( payload);
 
       if (exportResponse.success && exportResponse.data) {
         // Convert and download the Excel file
