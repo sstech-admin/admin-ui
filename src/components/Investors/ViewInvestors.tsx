@@ -8,6 +8,7 @@ import InvestorTableRow from './InvestorTableRow';
 import InvestorTablePagination from './InvestorTablePagination';
 import { apiService } from '../../services/api';
 import ConfirmationDialog from '../common/ConfirmationDialog';
+import ExportModal from '../ExportModal/ExportModal';
 
 const ViewInvestors: React.FC = () => {
   const navigate = useNavigate();
@@ -16,7 +17,6 @@ const ViewInvestors: React.FC = () => {
   const [paymentTypeFilter, setPaymentTypeFilter] = useState('All');
   const [isPaymentFilterOpen, setIsPaymentFilterOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  
   // Confirmation dialog state
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [investorToDelete, setInvestorToDelete] = useState<Investor | null>(null);
@@ -66,32 +66,7 @@ const ViewInvestors: React.FC = () => {
 
   const handleExport = () => {
     console.log('Exporting investors data...');
-    // Create CSV data
-    const csvData = investors.map(investor => ({
-      Name: investor.name,
-      Username: investor.username,
-      'Payment System': investor.paymentSystem,
-      Amount: investor.amount,
-      'Investor Type': investor.investorType,
-      Status: investor.status,
-      'PAN Card': investor.panCardNumber || '',
-      'Aadhar Card': investor.aadharCardNumber || ''
-    }));
     
-    // Convert to CSV string
-    const csvString = [
-      Object.keys(csvData[0] || {}).join(','),
-      ...csvData.map(row => Object.values(row).join(','))
-    ].join('\n');
-    
-    // Download CSV
-    const blob = new Blob([csvString], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `investors-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
   };
 
   // Investor action handlers
