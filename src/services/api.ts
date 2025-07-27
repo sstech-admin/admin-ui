@@ -1,11 +1,13 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
+const BASE_URL = process.env.REACT_APP_BACKEND_URL || 'https://6jwvtpvyyv.ap-south-1.awsapprunner.com/v1';
+
 class ApiService {
   private api: AxiosInstance;
 
   constructor() {
     this.api = axios.create({
-      baseURL: process.env.REACT_APP_BACKEND_URL || 'https://6jwvtpvyyv.ap-south-1.awsapprunner.com/v1',
+      baseURL: BASE_URL,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
