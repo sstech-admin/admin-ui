@@ -1,12 +1,11 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-
-const BASE_URL = process.env.REACT_APP_BACKEND_URL;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 class ApiService {
   private api: AxiosInstance;
 
   constructor() {
-    this.api = axios.create({
+    this.api = axios.create({ 
       baseURL: BASE_URL,
       timeout: 10000,
       headers: {
