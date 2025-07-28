@@ -17,14 +17,14 @@ interface WithdrawalAmounts {
 }
 
 interface WithdrawFundsFormData {
-  withdrawType: 'Capital' | 'Profit';
+  withdrawType: 'capital' | 'profitOrLoss';
   amount: number;
   transactionalBankId: string;
 }
 
 const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose, investor, onSuccess }) => {
   const [formData, setFormData] = useState<WithdrawFundsFormData>({
-    withdrawType: 'Capital',
+    withdrawType: 'capital',
     amount: 0,
     transactionalBankId: '',
   });
@@ -50,7 +50,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
 
   useEffect(() => {
     // Reset amount when withdraw type changes
-    if (formData.withdrawType === 'Capital') {
+    if (formData.withdrawType === 'capital') {
       setFormData(prev => ({ ...prev, amount: 0 }));
     } else {
       setFormData(prev => ({ ...prev, amount: 0 }));
@@ -79,7 +79,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
         });
         
         // Set initial amount based on withdraw type
-        if (formData.withdrawType === 'Capital') {
+        if (formData.withdrawType === 'capital') {
           setFormData(prev => ({ ...prev, amount: 0 }));
         } else {
           setFormData(prev => ({ ...prev, amount: 0 }));
@@ -104,7 +104,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
-    const maxAmount = formData.withdrawType === 'Capital' 
+    const maxAmount = formData.withdrawType === 'capital' 
       ? withdrawalAmounts.capitalAmount 
       : withdrawalAmounts.pnlAmount;
 
@@ -133,7 +133,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
 
     try {
       // Calculate final amount (for profit, subtract TDS)
-      const finalAmount = formData.withdrawType === 'Profit'
+      const finalAmount = formData.withdrawType === 'profitOrLoss'
         ? formData.amount - (formData.amount * tdsPercentage / 100)
         : formData.amount;
 
@@ -168,8 +168,8 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
   };
 
   const incrementAmount = () => {
-    const increment = formData.withdrawType === 'Capital' ? 100000 : 1000;
-    const maxAmount = formData.withdrawType === 'Capital' 
+    const increment = formData.withdrawType === 'capital' ? 100000 : 1000;
+    const maxAmount = formData.withdrawType === 'capital' 
       ? withdrawalAmounts.capitalAmount 
       : withdrawalAmounts.pnlAmount;
     
@@ -179,7 +179,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
   };
 
   const decrementAmount = () => {
-    const decrement = formData.withdrawType === 'Capital' ? 100000 : 1000;
+    const decrement = formData.withdrawType === 'capital' ? 100000 : 1000;
     if (formData.amount > 0) {
       setFormData(prev => ({ ...prev, amount: Math.max(prev.amount - decrement, 0) }));
       setErrors(prev => ({ ...prev, amount: '' }));
@@ -224,11 +224,11 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
   };
 
   // Calculate TDS amount and total amount for Profit withdrawal
-  const tdsAmount = formData.withdrawType === 'Profit' ? (formData.amount * tdsPercentage / 100) : 0;
+  const tdsAmount = formData.withdrawType === 'profitOrLoss' ? (formData.amount * tdsPercentage / 100) : 0;
   const totalAmount = formData.amount - tdsAmount;
 
   // Check if amount exceeds available amount
-  const maxAmount = formData.withdrawType === 'Capital' 
+  const maxAmount = formData.withdrawType === 'capital' 
     ? withdrawalAmounts.capitalAmount 
     : withdrawalAmounts.pnlAmount;
   const isAmountExceeded = formData.amount > maxAmount;
@@ -259,9 +259,9 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
                 <input
                   type="radio"
                   name="withdrawType"
-                  value="Capital"
-                  checked={formData.withdrawType === 'Capital'}
-                  onChange={() => setFormData(prev => ({ ...prev, withdrawType: 'Capital' }))}
+                  value="capital"
+                  checked={formData.withdrawType === 'capital'}
+                  onChange={() => setFormData(prev => ({ ...prev, withdrawType: 'capital' }))}
                   className="mr-2 text-green-600 focus:ring-green-500"
                 />
                 <span className="text-gray-900">Capital</span>
@@ -270,9 +270,9 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
                 <input
                   type="radio"
                   name="withdrawType"
-                  value="Profit"
-                  checked={formData.withdrawType === 'Profit'}
-                  onChange={() => setFormData(prev => ({ ...prev, withdrawType: 'Profit' }))}
+                  value="profitOrLoss"
+                  checked={formData.withdrawType === 'profitOrLoss'}
+                  onChange={() => setFormData(prev => ({ ...prev, withdrawType: 'profitOrLoss' }))}
                   className="mr-2 text-green-600 focus:ring-green-500"
                 />
                 <span className="text-gray-900">Profit</span>
@@ -287,13 +287,13 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
                 Withdrawal Amount:
               </label>
               <span className="text-lg font-bold text-gray-900">
-                {formData.withdrawType === 'Capital' 
+                {formData.withdrawType === 'capital' 
                   ? formatAmount(withdrawalAmounts.capitalAmount)
                   : formatAmount(withdrawalAmounts.pnlAmount)}
               </span>
             </div>
             
-            {formData.withdrawType === 'Profit' && (
+            {formData.withdrawType === 'profitOrLoss' && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <span className="text-red-500 mr-1">*</span>
@@ -319,7 +319,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
               </div>
             )}
             
-            {formData.withdrawType === 'Capital' && (
+            {formData.withdrawType === 'capital' && (
               <div className="flex items-center mb-4">
                 <button
                   type="button"
@@ -365,7 +365,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
             <div className="flex items-center space-x-3 mb-4">
               <Building2 size={20} className="text-gray-700" />
               <h3 className="text-lg font-semibold text-gray-900">
-                {formData.withdrawType === 'Capital' ? 'Capital Details' : 'Profit Details'}
+                {formData.withdrawType === 'capital' ? 'Capital Details' : 'Profit Details'}
               </h3>
             </div>
             
@@ -375,7 +375,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
                 <span className="font-semibold text-gray-900">{formData.withdrawType}</span>
               </div>
               
-              {formData.withdrawType === 'Capital' ? (
+              {formData.withdrawType === 'capital' ? (
                 <div className="flex items-center justify-between">
                   <span className="text-gray-700">Total Amount:</span>
                   <span className="font-semibold text-green-600">{formatAmount(formData.amount)}</span>
