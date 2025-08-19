@@ -65,15 +65,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
       [key]: value,
     }));
     
-    if(transaction.transactionType === 'Deposit'){
-      setFormData((prev) => ({
-        ...prev,
-        tag: value,
-      }));
-    }
-    
     setErrors((prev) => ({ ...prev, [key]: "" }));
-
   };
 
   // const handleSubmit = async () => {

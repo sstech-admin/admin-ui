@@ -21,6 +21,7 @@ import InvestorDetails from './components/Investors/InvestorDetails/InvestorDeta
 import AddTransaction from './components/AddTransaction/AddTransaction';
 import WithdrawFunds from './components/WithdrawFunds/WithdrawFunds';
 import AllAccounts from './components/AllAccounts/AllAccounts';
+import AccountSettings from './components/AccountSettings/AccountSettings';
 import TallyExport from './components/TallyExport/TallyExport';
 import NotFound from './components/NotFound';
 // import PendingInvestors from './components/Investors/PendingInvestors';
@@ -72,12 +73,7 @@ const DashboardLayout: React.FC = () => {
               
               {/* Account Routes */}
               <Route path="/all-accounts" element={<AllAccounts />} />
-              <Route path="/account-settings" element={
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Account Settings</h2>
-                  <p className="text-gray-600">This section is under development.</p>
-                </div>
-              } />
+              <Route path="/account-settings" element={<AccountSettings />} />
               <Route path="/profile" element={
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">Profile</h2>

@@ -397,6 +397,18 @@ async exportWithdrawFundsRequests(formData: {
     return response.data;
   }
 
+
+  // Maintenance Note endpoints
+  async getMaintenanceNote() {
+    const response = await this.api.get('/maintenance-note');
+    return response.data;
+  }
+
+  async updateMaintenanceNote(payload: { title: string; subtitle: string; description: string; status: 'active' | 'inactive' }) {
+    const response = await this.api.put('/maintenance-note', payload);
+    return response.data;
+  }
+
   // Bulk Transactions endpoints
   async getBulkTransactions(params: { page: number; limit: number; search?: string; transactionType?: string; paymentSystem?: string; status?: string }) {
     const queryParams = new URLSearchParams({
