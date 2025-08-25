@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Bell, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { NotificationFormData } from './types';
+import apiService from '../../services/api';
 
 const NotificationCard: React.FC = () => {
   const [formData, setFormData] = useState<NotificationFormData>({
     title: '',
-    message: ''
-  });
+    message: '',
+    userFilter: []  });
   
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,13 +58,13 @@ const NotificationCard: React.FC = () => {
       console.log('Sending notification:', formData);
       
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await apiService.sendBulkNotification(formData); 
       
       setSubmitSuccess(true);
       showNotification('Notification sent successfully!', 'success');
       
       // Reset form
-      setFormData({ title: '', message: '' });
+      setFormData({ title: '', message: '' , userFilter: []});
       
       // Hide success message after 3 seconds
       setTimeout(() => {
