@@ -35,4 +35,5 @@ export interface MaintenanceUpdatePayload {
 export interface NotificationFormData {
   title: string;
   message: string;
+  userFilter: string[]
 }
