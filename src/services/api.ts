@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const BASE_URL = 'https://6jwvtpvyyv.ap-south-1.awsapprunner.com/v1';
 
 class ApiService {
   private api: AxiosInstance;
