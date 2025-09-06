@@ -112,6 +112,24 @@ class ApiService {
     return response.data;
   }
 
+  // Export Database to Sheet endpoint
+  async exportDatabaseToSheet(payload: { fromDate?: string; toDate?: string }) {
+    const body: any = {};
+    
+    if (payload.fromDate) {
+      body.fromDate = payload.fromDate;
+    }
+    
+    if (payload.toDate) {
+      body.toDate = payload.toDate;
+    }
+    
+    const response = await this.api.post('/export-data/v1/admin/exportDatabaseToSheet', body, {
+      timeout: 60000, // 60 seconds
+    });
+    return response.data;
+  }
+
   async exportBulkTransactions(formData: { bulkTransactionId: string;}) {
     const response = await this.api.post('export-data/admin/exportBulkTransaction', formData, {
       timeout: 60000, // 60 seconds
