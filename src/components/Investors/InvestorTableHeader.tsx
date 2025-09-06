@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, RefreshCw, Download, AlertCircle, ChevronDown } from 'lucide-react';
 import ExportModal from '../ExportModal/ExportModal';
+import apiService from '../../services/api';
+import { convertExcel } from '../../utils/utils';
 
 interface InvestorTableHeaderProps {
   searchTerm: string;
@@ -192,23 +194,29 @@ const InvestorTableHeader: React.FC<InvestorTableHeaderProps> = ({
         }
         onExport={async (data) => {
           console.log('View Investors Exporting data:', data);
-          // try {
-          //   const response = await apiService.exportAddFundsRequests({
-          //     transactionTypeId: 1,
-          //     transactionStatusId: data?.filters?.transactionStatusId,
-          //     fromDate: data?.fromDate,
-          //     toDate: data?.toDate
-          //   });
-          //   console.log('Res', response);
-          //   convertExcel(
-          //     response?.buffer?.data,
-          //     response?.filename
-          //   );
-          //   setIsExportOpen(!isExportOpen);
-          // } catch (error) {
-          //   console.error('Export failed:', error);
-          //   // Optionally show error feedback to user
-          // }
+            console.log('Exporting investors data:', data);
+            try {
+              const response = await apiService.exportDatabaseToSheet({
+                fromDate: data?.fromDate,
+                toDate: data?.toDate
+              });
+              console.log('Export response:', response);
+              
+              if (response?.data?.buffer?.data && response?.data?.filename) {
+                convertExcel(
+                  response.data.buffer.data,
+                  response.data.filename
+                );
+              } else {
+                throw new Error('Invalid response format');
+              }
+              
+              setIsExportOpen(false);
+            } catch (error) {
+              console.error('Export failed:', error);
+              // Optionally show error feedback to user
+            }
+          
         }}
       />
     </div>
