@@ -176,24 +176,24 @@ const Referrals: React.FC = () => {
               <span className="text-sm font-medium">{loading ? 'Loading...' : 'Refresh'}</span>
             </button>
             
-            <button 
-              onClick={handleExport}
-              disabled={loading}
-              className={`flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <Download size={18} />
-              <span className="text-sm font-medium">Export</span>
-            </button>
-            
-            <button 
-              onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md"
-            >
-              <UserPlus size={18} />
-              <span className="text-sm font-medium">Add Reference</span>
-            </button>
+              {/* <button 
+                onClick={handleExport}
+                disabled={loading}
+                className={`flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                <Download size={18} />
+                <span className="text-sm font-medium">Export</span>
+              </button>
+              
+              <button 
+                onClick={() => setIsAddModalOpen(true)}
+                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md"
+              >
+                <UserPlus size={18} />
+                <span className="text-sm font-medium">Add Reference</span>
+              </button> */}
           </div>
         </div>
       </div>
