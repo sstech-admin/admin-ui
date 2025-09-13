@@ -82,7 +82,7 @@ const InvestorHeader: React.FC<InvestorHeaderProps> = ({
             <span className="text-sm font-medium">Withdraw</span>
           </button>
           
-          <button 
+          {/* <button 
             onClick={onStatement}
             disabled={loading || !profile}
             className={`flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 transition-all shadow-md ${
@@ -90,7 +90,7 @@ const InvestorHeader: React.FC<InvestorHeaderProps> = ({
             }`}
           >
             <span className="text-sm font-medium">Statement</span>
-          </button>
+          </button> */}
           
           <button 
             onClick={onExport}
