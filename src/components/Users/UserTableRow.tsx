@@ -72,7 +72,7 @@ const UserTableRow: React.FC<UserTableRowProps> = ({
         </span>
       </td>
       
-      <td className="px-6 py-4 whitespace-nowrap">
+      {/* <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center space-x-2">
           <button 
             onClick={() => onView(user)}
@@ -96,7 +96,7 @@ const UserTableRow: React.FC<UserTableRowProps> = ({
             <Trash2 size={16} />
           </button>
         </div>
-      </td>
+      </td> */}
     </tr>
   );
 };
