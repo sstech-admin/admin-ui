@@ -263,7 +263,7 @@ const TransactionsTable: React.FC = () => {
               <span className="text-sm font-medium">{loading ? 'Loading...' : 'Refresh'}</span>
             </button>
             
-            <button 
+            {/* <button 
               onClick={handleExport}
               disabled={loading}
               className={`flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors ${
@@ -272,7 +272,7 @@ const TransactionsTable: React.FC = () => {
             >
               <Download size={18} />
               <span className="text-sm font-medium">Export</span>
-            </button>
+            </button> */}
           </div>
         </div>
         
