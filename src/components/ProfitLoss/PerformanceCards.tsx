@@ -21,7 +21,7 @@ interface PerformanceCardsProps {
 
 const PerformanceCards: React.FC<PerformanceCardsProps> = ({ statistics, formatAmount }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Average Performance</h3>
         <div className="space-y-4">
@@ -67,7 +67,7 @@ const PerformanceCards: React.FC<PerformanceCardsProps> = ({ statistics, formatA
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      {/* <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
         <div className="space-y-3">
           <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all">
@@ -79,7 +79,7 @@ const PerformanceCards: React.FC<PerformanceCardsProps> = ({ statistics, formatA
             <span className="text-sm font-medium">Export Report</span>
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
