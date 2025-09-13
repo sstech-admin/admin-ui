@@ -88,6 +88,7 @@ const [formData, setFormData] = useState<AddFundsFormData>({
       submitData.append('investorId', investor.id);
       submitData.append('transactionRefNumber', formData.transactionRefNumber);
       submitData.append('tag', formData.tag);
+      submitData.append('date', formData.dateTime);
 
       if (formData.transactionImage) {
         submitData.append('transactionImage', formData.transactionImage);
@@ -270,8 +271,11 @@ const [formData, setFormData] = useState<AddFundsFormData>({
             <div className="relative">
               <input
                 type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+                value={formData.dateTime}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setFormData((prev) => ({ ...prev, dateTime: e.target.value }))}
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
               />
             </div>  
