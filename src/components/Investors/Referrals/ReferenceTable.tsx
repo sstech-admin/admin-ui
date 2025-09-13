@@ -68,9 +68,6 @@ const ReferenceTable: React.FC<ReferenceTableProps> = ({ references, onEdit, onD
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Actions
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
@@ -120,13 +117,6 @@ const ReferenceTable: React.FC<ReferenceTableProps> = ({ references, onEdit, onD
                 
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={() => handleViewInvestors(reference.referenceId)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="View Details"
-                    >
-                      <Eye size={16} />
-                    </button>
                     {/* <button 
                       onClick={() => onEdit(reference)}
                       className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

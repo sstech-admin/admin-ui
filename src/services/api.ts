@@ -106,7 +106,7 @@ class ApiService {
   }
 
 
-  async exportInvestorData(formData: { investorId: string; type: string; }) {
+  async exportInvestorData(formData: { investorId: string;fromDate: string, toDate: string, type: string; }) {
     const response = await this.api.post('export-data/admin/exportInvestorData', formData, {
       timeout: 60000, // 60 seconds
     });
