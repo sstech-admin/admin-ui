@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 class ApiService {
   private api: AxiosInstance;
