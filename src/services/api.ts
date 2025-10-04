@@ -105,14 +105,13 @@ class ApiService {
   }
 
 
-  async exportInvestorData(formData: { investorId: string; type: string; }) {
+  async exportInvestorData(formData: { investorId: string;fromDate: string, toDate: string, type: string; }) {
     const response = await this.api.post('export-data/admin/exportInvestorData', formData, {
       timeout: 60000, // 60 seconds
     });
     return response.data;
   }
 
-  // Export Database to Sheet endpoint
   async exportDatabaseToSheet(payload: { fromDate?: string; toDate?: string }) {
     const body: any = {};
     
@@ -124,11 +123,12 @@ class ApiService {
       body.toDate = payload.toDate;
     }
     
-    const response = await this.api.post('/export-data/v1/admin/exportDatabaseToSheet', body, {
+    const response = await this.api.post('/export-data/admin/exportDatabaseToSheet', body, {
       timeout: 60000, // 60 seconds
     });
     return response.data;
   }
+
 
   async exportBulkTransactions(formData: { bulkTransactionId: string;}) {
     const response = await this.api.post('export-data/admin/exportBulkTransaction', formData, {
@@ -424,6 +424,11 @@ async exportWithdrawFundsRequests(formData: {
 
   async updateMaintenanceNote(payload: { title: string; subtitle: string; description: string; status: 'active' | 'inactive' }) {
     const response = await this.api.put('/maintenance-note', payload);
+    return response.data;
+  }
+
+  async sendBulkNotification(payload: { title: string; message: string; userFilter: string[]}) {
+    const response = await this.api.post('/notifications/send-bulk', payload);
     return response.data;
   }
 

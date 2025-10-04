@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, RefreshCw, Download, AlertCircle, ChevronDown } from 'lucide-react';
 import ExportModal from '../ExportModal/ExportModal';
-import { apiService } from '../../services/api';
+import apiService from '../../services/api';
 import { convertExcel } from '../../utils/utils';
 
 interface InvestorTableHeaderProps {
@@ -18,6 +18,9 @@ interface InvestorTableHeaderProps {
   totalInvestors: number;
 }
 
+interface ExtraFilters {
+  transactionStatusId: string | null;
+}
 const InvestorTableHeader: React.FC<InvestorTableHeaderProps> = ({
   searchTerm,
   onSearchChange,
@@ -34,6 +37,11 @@ const InvestorTableHeader: React.FC<InvestorTableHeaderProps> = ({
   
     
   const [isExportOpen, setIsExportOpen] = useState(false);  
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [extraFilters, setExtraFilters] = useState<ExtraFilters>({
+    transactionStatusId: null,
+  });
   const paymentTypeOptions = [
     { value: '', label: 'All' },
     { value: '31', label: 'Monthly' },
@@ -145,29 +153,70 @@ const InvestorTableHeader: React.FC<InvestorTableHeaderProps> = ({
         onClose={() => setIsExportOpen(false)}
         showPDF={false}
         showExcel
+        extraFiltersData={extraFilters}
+        extraFiltersContent={
+          <div className="space-y-4 relative">
+            {/* Status Filter */}
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Payment Status
+            </label>
+            <div className="relative">
+                <button
+                  onClick={() => setIsStatusOpen(!isStatusOpen)}
+                  disabled={loading}
+                  className={`flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors w-full justify-between ${
+                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <span className="text-sm font-medium text-gray-700">
+                    {selectedStatus}
+                  </span>
+                  <ChevronDown size={16} className={`text-gray-400 transition-transform ${isStatusOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isStatusOpen && !loading && (
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg">
+                    {paymentTypeOptions.map((option) => (
+                      <button
+                        key={option.label}
+                        onClick={() => {setExtraFilters((prev) => ({ ...prev, transactionStatusId: option.value })), setIsStatusOpen(false)}}
+                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-xl last:rounded-b-xl ${
+                          selectedStatus === option.label ? 'bg-cyan-50 text-cyan-700' : ''
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+          </div>
+        }
         onExport={async (data) => {
-          console.log('Exporting investors data:', data);
-          try {
-            const response = await apiService.exportDatabaseToSheet({
-              fromDate: data?.fromDate,
-              toDate: data?.toDate
-            });
-            console.log('Export response:', response);
-            
-            if (response?.data?.buffer?.data && response?.data?.filename) {
-              convertExcel(
-                response.data.buffer.data,
-                response.data.filename
-              );
-            } else {
-              throw new Error('Invalid response format');
+          console.log('View Investors Exporting data:', data);
+            console.log('Exporting investors data:', data);
+            try {
+              const response = await apiService.exportDatabaseToSheet({
+                fromDate: data?.fromDate,
+                toDate: data?.toDate
+              });
+              console.log('Export response:', response);
+              
+              if (response?.data?.buffer?.data && response?.data?.filename) {
+                convertExcel(
+                  response.data.buffer.data,
+                  response.data.filename
+                );
+              } else {
+                throw new Error('Invalid response format');
+              }
+              
+              setIsExportOpen(false);
+            } catch (error) {
+              console.error('Export failed:', error);
+              // Optionally show error feedback to user
             }
-            
-            setIsExportOpen(false);
-          } catch (error) {
-            console.error('Export failed:', error);
-            // Optionally show error feedback to user
-          }
+          
         }}
       />
     </div>

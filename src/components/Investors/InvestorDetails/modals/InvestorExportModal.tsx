@@ -59,8 +59,8 @@ const InvestorExportModal: React.FC<AddFundsModalProps> = ({
     try {
       const response = await apiService.exportInvestorData({
         investorId: investor.id,
-        // fromDate,
-        // toDate,
+        fromDate,
+        toDate,
         type
       });
       console.log('REs', response)

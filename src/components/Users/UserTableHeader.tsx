@@ -62,7 +62,7 @@ const UserTableHeader: React.FC<UserTableHeaderProps> = ({
             <span className="text-sm font-medium">{loading ? 'Loading...' : 'Refresh'}</span>
           </button>
           
-          <button 
+          {/* <button 
             onClick={onExport}
             disabled={loading}
             className={`flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors ${
@@ -71,7 +71,7 @@ const UserTableHeader: React.FC<UserTableHeaderProps> = ({
           >
             <Download size={18} />
             <span className="text-sm font-medium">Export</span>
-          </button>
+          </button> */}
           
           {/* <button className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-orange-500 text-white rounded-xl hover:from-cyan-600 hover:to-orange-600 transition-all shadow-md">
             <Plus size={18} />
