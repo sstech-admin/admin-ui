@@ -584,8 +584,8 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
                     errors.paymentSystemId ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 >
-                  <span className={formData.paymentSystemId ? 'text-gray-900' : 'text-gray-400'}>
-                    {paymentSystems.find(s => s.paymentSystemId === formData.paymentSystemId)?.name || 'Select Payment System'}
+                  <span className={(formData.paymentSystemId !== null && formData.paymentSystemId !== undefined) ? 'text-gray-900' : 'text-gray-400'}>
+                    {paymentSystems.find(s => s.paymentSystemId === Number(formData.paymentSystemId))?.name || 'Select Payment System'}
                   </span>
                   <ChevronDown 
                     size={20} 
@@ -608,7 +608,7 @@ const EditInvestorForm: React.FC<EditInvestorFormProps> = ({ investorData, onBac
                           onClick={() => handlePaymentSystemSelect(system.paymentSystemId)}
                         >
                           <span className="text-gray-900">{system.name}</span>
-                          {formData.paymentSystemId === system.paymentSystemId && (
+                          {Number(formData.paymentSystemId) === system.paymentSystemId && (
                             <CheckCircle size={16} className="text-cyan-500" />
                           )}
                         </div>

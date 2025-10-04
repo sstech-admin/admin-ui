@@ -22,9 +22,9 @@ export const validationRules: ValidationRules = {
   //     return null;
   //   },
   // },
-  paymentSystemId: {
-    required: true,
-  },
+  // paymentSystemId: {
+  //   required: true,
+  // },
   referenceId: {
     required: true,
     minLength: 2,
