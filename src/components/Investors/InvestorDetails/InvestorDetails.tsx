@@ -14,6 +14,8 @@ import TransactionsCard from './TransactionsCard';
 import AddFundsModal from './modals/AddFundsModal';
 import WithdrawFundsModal from './modals/WithdrawFundsModal';
 import InvestorExportModal from './modals/InvestorExportModal';
+import InvestmentDataCard from './InvestmentDataCard';
+import { apiService } from '../../../services/api';
 
 const InvestorDetails: React.FC = () => {
   const { investorId } = useParams<{ investorId: string }>();
@@ -49,6 +51,43 @@ const InvestorDetails: React.FC = () => {
   const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState(false);
   const [isInvestorExportModalOpen, setIsInvestorExportModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+
+  
+  // Investment data state
+  const [investmentData, setInvestmentData] = useState<{
+    invested6040: number;
+    profit5050: number;
+    profit6040: number;
+    totalInvested: number;
+    returnPercentage: number;
+  } | null>(null);
+
+  // Call investmentData API
+  useEffect(() => {
+    const callInvestmentData = async () => {
+      if (investorId) {
+        try {
+          const response = await apiService.investmentData(investorId);
+          console.log('investmentData API Response:', response);
+          
+          if (response.success && response.data) {
+            setInvestmentData({
+              invested6040: response.data.invested6040 || 0,
+              profit5050: response.data.profit5050 || 0,
+              profit6040: response.data.profit6040 || 0,
+              totalInvested: response.data.totalInvested || 0,
+              returnPercentage: response.data.returnPercentage || 0,
+            });
+          }
+        } catch (error) {
+          console.error('Error calling investmentData API:', error);
+        }
+      }
+    };
+
+    callInvestmentData();
+  }, [investorId]);
+
 
   // Handle page change for transactions
   const handleTransactionPageChange = (page: number) => {
@@ -145,6 +184,17 @@ const InvestorDetails: React.FC = () => {
       
       {/* Investor Profile */}
       <InvestorProfileCard profile={profile} loading={loadingProfile} />
+      
+      {/* Investment Data */}
+      {investmentData && (
+        <InvestmentDataCard
+          invested6040={investmentData.invested6040}
+          profit5050={investmentData.profit5050}
+          profit6040={investmentData.profit6040}
+          totalInvested={investmentData.totalInvested}
+          returnPercentage={investmentData.returnPercentage}
+        />
+      )}
       
       {/* Bank Details */}
       <BankDetailsCard profile={profile} loading={loadingProfile} />

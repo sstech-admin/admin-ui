@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 class ApiService {
   private api: AxiosInstance;
@@ -92,6 +92,12 @@ class ApiService {
     return response.data;
   }
 
+  // investmentData endpoint
+  async investmentData(investorId: string) {
+    const response = await this.api.get(`/investor/${investorId}/investment-data`);
+    return response.data;
+  }
+  
   async updateTransaction(formData: { transactionId: string; transactionStatusId: number; }) {
     const response = await this.api.post('/transaction/admin/updateTransactionStatus', formData);
     return response.data;
