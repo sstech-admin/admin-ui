@@ -55,6 +55,7 @@ const InvestorDetails: React.FC = () => {
   
   // Investment data state
   const [investmentData, setInvestmentData] = useState<{
+    invested5050: number;
     invested6040: number;
     profit5050: number;
     profit6040: number;
@@ -72,6 +73,7 @@ const InvestorDetails: React.FC = () => {
           
           if (response.success && response.data) {
             setInvestmentData({
+              invested5050: response.data.invested5050 || 0,
               invested6040: response.data.invested6040 || 0,
               profit5050: response.data.profit5050 || 0,
               profit6040: response.data.profit6040 || 0,
@@ -187,7 +189,8 @@ const InvestorDetails: React.FC = () => {
       
       {/* Investment Data */}
       {investmentData && (
-        <InvestmentDataCard
+        <InvestmentDataCard 
+          invested5050={investmentData.invested5050}
           invested6040={investmentData.invested6040}
           profit5050={investmentData.profit5050}
           profit6040={investmentData.profit6040}
