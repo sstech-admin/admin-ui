@@ -23,7 +23,11 @@ import {
   Clock,
   UserPlus,
   Link2,
-  icons
+  icons,
+  BellDotIcon,
+  UserCheck2,
+  UserX,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -84,15 +88,15 @@ const Sidebar: React.FC = () => {
     { 
       name: 'Account', 
       icon: Folder, 
-      path: '/account-settings',
+      path: '/notifications-settings',
       hasSubmenu: true,
       isOpen: isAccountOpen,
       setIsOpen: setIsAccountOpen,
       submenuItems: [
         { name: 'All Accounts', path: '/all-accounts', icon: Building2 },
-        { name: 'Account Settings', path: '/account-settings' },
-        { name: 'Profile', path: '/profile' },
-        { name: 'Security', path: '/security' }
+        { name: 'Notification Settings', path: '/notifications-settings', icon: BellDotIcon},
+        { name: 'Manage Sessions', path: '/manage-sessions', icon: UserX },
+        { name: 'Security', path: '/security' , icon: Shield}
       ]
     },
     { 
