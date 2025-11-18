@@ -86,6 +86,17 @@ class ApiService {
     return response.data;
   }
 
+  // User Session endpoints
+  async logoutUser(userId: string) {
+    const response = await this.api.post(`/auth/logout-user/${userId}`);
+    return response.data;
+  }
+
+  async logoutAllUsers() {
+    const response = await this.api.post('/auth/logout-all-users');
+    return response.data;
+  }
+
   // Approve Investor endpoint
   async approveInvestor(investorId: string) {
     const response = await this.api.patch(`/investor/admin/approve/${investorId}`);
