@@ -28,6 +28,7 @@ import NotFound from './components/NotFound';
 import PendingInvestors from './components/Investors/PendingInvestors/PendingInvestors';
 import EditInvestor from './components/Investors/EditInvestor/EditInvestor';
 import ManageSessions from './components/ManageSessions/ManageSessions';
+import ManageVersions from './components/ManageVersions/ManageVersions';
 const DashboardLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-50">
@@ -76,12 +77,7 @@ const DashboardLayout: React.FC = () => {
               <Route path="/all-accounts" element={<AllAccounts />} />
               <Route path="/notifications-settings" element={<AccountSettings />} />
               <Route path="/manage-sessions"  element={<ManageSessions onBack={() => window.history.back()} />} />
-              <Route path="/security" element={
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Security</h2>
-                  <p className="text-gray-600">This section is under development.</p>
-                </div>
-              } />
+              <Route path="/manage-versions" element={<ManageVersions onBack={() => window.history.back()} />}  />
               
               {/* Tally Export Route */}
               <Route path="/tally-export" element={<TallyExport />} />

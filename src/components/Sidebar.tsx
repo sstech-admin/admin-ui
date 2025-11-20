@@ -27,7 +27,8 @@ import {
   BellDotIcon,
   UserCheck2,
   UserX,
-  Shield
+  Shield,
+  TabletSmartphone
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -96,7 +97,7 @@ const Sidebar: React.FC = () => {
         { name: 'All Accounts', path: '/all-accounts', icon: Building2 },
         { name: 'Notification Settings', path: '/notifications-settings', icon: BellDotIcon},
         { name: 'Manage Sessions', path: '/manage-sessions', icon: UserX },
-        { name: 'Security', path: '/security' , icon: Shield}
+        { name: 'Manage Versions', path: '/manage-versions' , icon: TabletSmartphone}
       ]
     },
     { 
