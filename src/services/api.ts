@@ -91,9 +91,54 @@ class ApiService {
     const response = await this.api.post(`/auth/logout-user/${userId}`);
     return response.data;
   }
-
+  
   async logoutAllUsers() {
     const response = await this.api.post('/auth/logout-all-users');
+    return response.data;
+  }
+
+  // App Version endpoints
+  async getAppVersions() {
+    const response = await this.api.get('/app-version');
+    return response.data;
+  }
+
+  async createAppVersion(payload: {
+    latestVersion: string;
+    minimumVersion: string;
+    forceUpdateIos: boolean;
+    forceUpdateAndroid: boolean;
+    appStoreUrl?: string;
+    playStoreUrl?: string;
+    updateMessage?: string;
+  }) {
+    const response = await this.api.post('/app-version', payload);
+    return response.data;
+  }
+
+  async getAppVersionById(versionId: string) {
+    const response = await this.api.get(`/app-version/${versionId}`);
+    return response.data;
+  }
+
+  async updateAppVersion(
+    versionId: string,
+    payload: {
+      latestVersion?: string;
+      minimumVersion?: string;
+      forceUpdateIos?: boolean;
+      forceUpdateAndroid?: boolean;
+      appStoreUrl?: string;
+      playStoreUrl?: string;
+      updateMessage?: string;
+    }
+  ) {
+    const response = await this.api.patch(`/app-version/${versionId}`, payload);
+    return response.data;
+  }
+
+  async deleteAppVersion(versionId: string) {
+    const response = await this.api.delete(`/app-version/${versionId}`);
     return response.data;
   }
 

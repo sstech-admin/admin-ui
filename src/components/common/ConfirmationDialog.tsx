@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -10,6 +10,8 @@ interface ConfirmationDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
   type?: 'danger' | 'warning' | 'info';
+  isLoading?: boolean;
+  loadingText?: string;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -20,7 +22,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   cancelText = 'No',
   onConfirm,
   onCancel,
-  type = 'danger'
+  type = 'danger',
+  isLoading = false,
+  loadingText = 'Processing...'
 }) => {
   if (!isOpen) return null;
 
@@ -79,15 +83,24 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <div className="flex justify-end space-x-4">
             <button
               onClick={onCancel}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isLoading}
             >
               {cancelText}
             </button>
             <button
               onClick={onConfirm}
-              className={`px-6 py-2 rounded-lg transition-colors ${styles.confirmButton}`}
+              disabled={isLoading}
+              className={`px-6 py-2 rounded-lg transition-colors ${styles.confirmButton} disabled:cursor-not-allowed disabled:opacity-60`}
             >
-              {confirmText}
+              {isLoading ? (
+                <span className="inline-flex items-center space-x-2">
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>{loadingText}</span>
+                </span>
+              ) : (
+                confirmText
+              )}
             </button>
           </div>
         </div>
