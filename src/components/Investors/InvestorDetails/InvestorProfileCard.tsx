@@ -184,7 +184,7 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
               <div className="text-gray-900 pl-6 font-mono">{profile.aadharCardNumber}</div>
             </div>
             
-            <div>
+            {/* <div>
               <div className="flex items-center space-x-2 mb-1">
                 <Tag size={16} className="text-gray-400" />
                 <span className="text-sm font-medium text-gray-600">Investor Type</span>
@@ -198,7 +198,7 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ profile, load
                 <span className="text-sm font-medium text-gray-600">Investment Amount</span>
               </div>
               <div className="text-gray-900 pl-6 font-semibold">{formatAmount(profile.investorAmount)}</div>
-            </div>
+            </div> */}
           </div>
         </div>
         
