@@ -98,6 +98,7 @@ export interface InvestorTransaction {
   amountColour: string;
   accountName: string;
   transactionRefNumber?: string;
+  closingBalance?: number;
 }
 
 export interface InvestorTransactionsApiResponse {
