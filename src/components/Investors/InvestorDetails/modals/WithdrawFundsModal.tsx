@@ -138,7 +138,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
         : formData.amount;
 
       const payload = {
-        amount: finalAmount,
+        amount: Math.round(finalAmount),
         type: formData.withdrawType,
         transactionalBankId: formData.transactionalBankId,
         investorId: investor.id,
