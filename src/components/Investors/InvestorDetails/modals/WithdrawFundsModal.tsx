@@ -134,11 +134,11 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
     try {
       // Calculate final amount (for profit, subtract TDS)
       const finalAmount = formData.withdrawType === 'profitOrLoss'
-        ? formData.amount - (formData.amount * tdsPercentage / 100)
+        ? formData.amount
         : formData.amount;
 
       const payload = {
-        amount: finalAmount,
+        amount: Math.round(finalAmount),
         type: formData.withdrawType,
         transactionalBankId: formData.transactionalBankId,
         investorId: investor.id,
