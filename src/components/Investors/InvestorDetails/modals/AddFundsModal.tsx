@@ -94,7 +94,6 @@ const [formData, setFormData] = useState<AddFundsFormData>({
         submitData.append('transactionImage', formData.transactionImage);
       }
 
-
       console.log('Submitting add funds with payload:', {
         tag: formData.tag,
         amount: formData.amount,
@@ -104,17 +103,8 @@ const [formData, setFormData] = useState<AddFundsFormData>({
         transactionImage: formData.transactionImage ? formData.transactionImage.name : null
       });
 
-      // Call API with multipart/form-data
-      const response = await fetch(`${apiService.getBaseUrl()}/transaction/admin/addFunds`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: submitData
-      });
-      
-      const responseData = await response.json();
-      
+      const responseData = await apiService.addFunds(submitData);
+
       if (responseData.success) {
         showNotification('Funds added successfully!', 'success');
         onSuccess();
@@ -286,7 +276,7 @@ const [formData, setFormData] = useState<AddFundsFormData>({
               <span className="text-red-500">*</span> Type
             </label>
             <div className="flex gap-4">
-              {['New', 'Old'].map((option) => (
+              {['New', 'Old', 'D10'].map((option) => (
                 <label
                   key={option}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer transition-colors `}
