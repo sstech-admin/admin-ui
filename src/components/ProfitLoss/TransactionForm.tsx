@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Calendar, ChevronDown, Save, Calculator, IndianRupee } from 'lucide-react';
 
 interface TransactionFormProps {
@@ -34,6 +34,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   isSubmitting,
   isFinalizing
 }) => {
+  
+  const dateInputRef = useRef<HTMLInputElement>(null);
+
+  const openDatePicker = () => {
+    dateInputRef.current?.showPicker?.();
+  };
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">Add New Transaction</h2>
@@ -50,7 +56,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               placeholder="Enter amount..."
               value={amount}
               onChange={(e) => onAmountChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900 placeholder-gray-400"
+              className="w-full outline-none pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900 placeholder-gray-400"
             />
           </div>
         </div>
@@ -62,12 +68,15 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           </label>
           <div className="relative">
             <input
+              ref={dateInputRef}
+
               type="date"
               value={date}
               onChange={(e) => onDateChange(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
+              onClick={openDatePicker}
+              className="w-full px-4 py-3 outline-none border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white text-gray-900"
             />
-            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+            {/* <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={18} /> */}
           </div>
         </div>
 

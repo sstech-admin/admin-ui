@@ -212,7 +212,7 @@ const TransactionDetailsEditModal: React.FC<TransactionDetailsEditModalProps> = 
                 <span className="text-red-500">*</span> Type
               </label>
               <div className="flex gap-4">
-                {["New", "Old"].map((option) => (
+                {["New", "Old", "D10"].map((option) => (
                   <label
                     key={option}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer"
