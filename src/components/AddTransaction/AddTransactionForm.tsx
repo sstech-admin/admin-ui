@@ -28,7 +28,8 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onBack }) => {
 
   const tagOptions = [
     { value: 'Old', label: 'Old' },
-    { value: 'New', label: 'New' }
+    { value: 'New', label: 'New' },
+    { value: 'D10', label: 'D10' }
   ];
 
   const validateForm = (): boolean => {
