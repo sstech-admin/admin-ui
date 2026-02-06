@@ -59,6 +59,7 @@ const InvestorDetails: React.FC = () => {
     invested6040: number;
     profit5050: number;
     profit6040: number;
+    profitD10: number;
     totalInvested: number;
     returnPercentage: number;
   } | null>(null);
@@ -77,6 +78,7 @@ const InvestorDetails: React.FC = () => {
               invested6040: response.data.invested6040 || 0,
               profit5050: response.data.profit5050 || 0,
               profit6040: response.data.profit6040 || 0,
+              profitD10: response.data.profitD10 || 0,
               totalInvested: response.data.totalInvested || 0,
               returnPercentage: response.data.returnPercentage || 0,
             });
@@ -194,6 +196,7 @@ const InvestorDetails: React.FC = () => {
           invested6040={investmentData.invested6040}
           profit5050={investmentData.profit5050}
           profit6040={investmentData.profit6040}
+          profitD10={investmentData.profitD10}
           totalInvested={investmentData.totalInvested}
           returnPercentage={investmentData.returnPercentage}
         />
