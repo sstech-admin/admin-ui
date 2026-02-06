@@ -383,7 +383,6 @@ async exportWithdrawFundsRequests(formData: {
     return response.data;
   }
 
-
   // Profit & Loss endpoints
   async saveAmount(payload: { amount: number; date: string; tag: string }) {
     const response = await this.api.post('/amount/saveAmount', payload);
@@ -397,7 +396,11 @@ async exportWithdrawFundsRequests(formData: {
 
   // Add Funds endpoints
   async addFunds(formData: FormData) {
-    const response = await this.api.post('/transaction/admin/addFunds', formData, {
+    const investorId = formData.get('investorId');
+    if (!investorId || typeof investorId !== 'string') {
+      throw new Error('investorId is required in formData');
+    }
+    const response = await this.api.post(`/transaction/admin/addFunds`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

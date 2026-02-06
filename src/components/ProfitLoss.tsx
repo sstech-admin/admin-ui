@@ -49,8 +49,8 @@ const ProfitLoss: React.FC = () => {
   } | null>(null);
 
   // Options
-  const tagOptions = ['New', 'Old'];
-  const filterOptions = ['All', 'New', 'Old'];
+  const tagOptions = ['New', 'Old', 'D10'];
+  const filterOptions = ['All', 'New', 'Old', 'D10'];
 
   // Calculate statistics using custom hook
   const statistics = useStatistics(transactions, filterTag);
