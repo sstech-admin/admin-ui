@@ -1,8 +1,9 @@
-import { TrendingUp, DollarSign, PiggyBank, Wallet, Target, HandCoins, CircleDollarSign } from 'lucide-react';
+import { TrendingUp, DollarSign, PiggyBank, Wallet, Target, HandCoins, CircleDollarSign, Landmark } from 'lucide-react';
 
 interface InvestmentDataProps {
   invested5050: number;
   invested6040: number;
+  investedD10: number;
   profit5050: number;
   profit6040: number;
   profitD10: number;
@@ -10,7 +11,7 @@ interface InvestmentDataProps {
   returnPercentage: number;
 }
 
-function InvestmentDataCard({ invested5050, invested6040, profit5050, profit6040, profitD10, totalInvested, returnPercentage }: InvestmentDataProps) {
+function InvestmentDataCard({ invested5050, invested6040, investedD10, profit5050, profit6040, profitD10, totalInvested, returnPercentage }: InvestmentDataProps) {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -20,14 +21,14 @@ function InvestmentDataCard({ invested5050, invested6040, profit5050, profit6040
     }).format(amount);
   };
 
-  // Calculate total of all five values
-  const totalOfAll = invested5050 + invested6040 + profit5050 + profit6040 + profitD10;
+  // Calculate total of all six values
+  const totalOfAll = invested5050 + invested6040 + investedD10 + profit5050 + profit6040 + profitD10;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
       <h2 className="text-lg font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-100">Investment Data</h2>
 
-      {/* Row 1: 3 cards - Invested 5050, Invested 6040, Profit D10 */}
+      {/* Row 1: 3 cards - Invested 5050, Invested 6040, Invested D10 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
           <div className="flex items-center gap-2 mb-2">
@@ -45,15 +46,15 @@ function InvestmentDataCard({ invested5050, invested6040, profit5050, profit6040
         </div>
         <div className="bg-cyan-50 rounded-lg p-4 border border-cyan-100">
           <div className="flex items-center gap-2 mb-2">
-            <CircleDollarSign className="w-4 h-4 text-cyan-600" />
-            <span className="text-sm text-gray-600">Profit D10</span>
+            <Landmark className="w-4 h-4 text-cyan-600" />
+            <span className="text-sm text-gray-600">Invested D10</span>
           </div>
-          <p className="text-xl font-semibold text-gray-800">{formatCurrency(profitD10)}</p>
+          <p className="text-xl font-semibold text-gray-800">{formatCurrency(investedD10)}</p>
         </div>
       </div>
 
-      {/* Row 2: 2 cards - Profit 5050, Profit 6040 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      {/* Row 2: 3 cards - Profit 5050, Profit 6040, Profit D10 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div className="bg-green-50 rounded-lg p-4 border border-green-100">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-green-600" />
@@ -67,6 +68,13 @@ function InvestmentDataCard({ invested5050, invested6040, profit5050, profit6040
             <span className="text-sm text-gray-600">Profit 6040</span>
           </div>
           <p className="text-xl font-semibold text-gray-800">{formatCurrency(profit6040)}</p>
+        </div>
+        <div className="bg-cyan-50 rounded-lg p-4 border border-cyan-100">
+          <div className="flex items-center gap-2 mb-2">
+            <CircleDollarSign className="w-4 h-4 text-cyan-600" />
+            <span className="text-sm text-gray-600">Profit D10</span>
+          </div>
+          <p className="text-xl font-semibold text-gray-800">{formatCurrency(profitD10)}</p>
         </div>
       </div>
 
