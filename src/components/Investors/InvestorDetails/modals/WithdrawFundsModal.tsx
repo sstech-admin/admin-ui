@@ -16,10 +16,13 @@ interface WithdrawalAmounts {
   capitalAmount: number;
 }
 
+const TAG_OPTIONS = ['Old', 'New', 'D10'] as const;
+
 interface WithdrawFundsFormData {
   withdrawType: 'capital' | 'profitOrLoss';
   amount: number;
   transactionalBankId: string;
+  tag: string;
 }
 
 const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose, investor, onSuccess }) => {
@@ -27,6 +30,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
     withdrawType: 'capital',
     amount: 0,
     transactionalBankId: '',
+    tag: 'New',
   });
   
   const [withdrawalAmounts, setWithdrawalAmounts] = useState<WithdrawalAmounts>({
@@ -114,8 +118,12 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
       newErrors.amount = `Amount cannot exceed ${formatAmount(maxAmount)}`;
     }
 
-    if(!formData.transactionalBankId){
-      newErrors.transactionalBankId = 'Please selec a valid Transactional Bank';
+    if (!formData.transactionalBankId) {
+      newErrors.transactionalBankId = 'Please select a valid Transactional Bank';
+    }
+
+    if (!formData.tag || !TAG_OPTIONS.includes(formData.tag as any)) {
+      newErrors.tag = 'Please select a tag';
     }
 
     setErrors(newErrors);
@@ -142,6 +150,7 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
         type: formData.withdrawType,
         transactionalBankId: formData.transactionalBankId,
         investorId: investor.id,
+        tag: formData.tag,
       };
 
       // Call API
@@ -156,7 +165,9 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
       }
     } catch (error: any) {
       console.error('Error withdrawing funds:', error);
-      showNotification(error.message || 'Failed to withdraw funds', 'error');
+      const apiMessage = error.response?.data?.message;
+      const errorText = apiMessage || error.message || 'Failed to withdraw funds';
+      showNotification(`${formData.tag}: ${errorText}`, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -278,6 +289,31 @@ const WithdrawFundsModal: React.FC<WithdrawFundsModalProps> = ({ isOpen, onClose
                 <span className="text-gray-900">Profit</span>
               </label>
             </div>
+          </div>
+
+          {/* Tag */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <span className="text-red-500">*</span> Tag
+            </label>
+            <div className="flex gap-4">
+              {TAG_OPTIONS.map((option) => (
+                <label
+                  key={option}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl cursor-pointer transition-colors"
+                >
+                  <input
+                    type="radio"
+                    name="tag"
+                    value={option}
+                    checked={formData.tag === option}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, tag: e.target.value }))}
+                  />
+                  <span className="text-sm font-medium">{option}</span>
+                </label>
+              ))}
+            </div>
+            {errors.tag && <p className="mt-2 text-sm text-red-600">{errors.tag}</p>}
           </div>
 
           {/* Withdrawal Amount */}
